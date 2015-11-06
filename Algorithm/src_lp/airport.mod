@@ -1,0 +1,16 @@
+var x1;
+var x2;
+var x3;
+var y;
+maximize obj: y;
+s.t. c1: x1 >= 0;
+s.t. c2: x1 <= 60;
+s.t. c3: x2 >= 80;
+s.t. c4: x2 <= 100;
+s.t. c5: x3 >= 120;
+s.t. c6: x3 <= 140;
+s.t. c7: x2 - x1 >= y;
+s.t. c8: x3 - x2 >= y;
+solve;
+display x1, x2, x3, y;
+end;
