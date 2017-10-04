@@ -33,6 +33,7 @@
 *********************************************************************/
 
 /* Modifier: Keren Zhou */
+/* Date: 04/10/2017 */
 /* Author: Ioan Sucan */
 
 #ifndef OMPL_GEOMETRIC_PLANNERS_RTP_

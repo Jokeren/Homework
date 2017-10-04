@@ -18,27 +18,35 @@ CXX           = c++
 
 # Change PROGRAM to the name of your program
 PROGRAM       = project3
-SRC_DIR       = src
+BENCHMARK     = project3benchmark
+SRC_DIR       = src/RTP
+BIN_DIR       = src
 UTIL_DIR      = utils
 
 # The Makefile will compile all *.cpp files in SRC_DIR and UTIL_DIR
-SOURCES       = $(wildcard $(UTIL_DIR)/*.cpp $(SRC_DIR)/*.cpp)
+SOURCES       = $(wildcard $(UTIL_DIR)/*.cpp $(SRC_DIR)/*.cpp $(BIN_DIR)/*.cpp)
 OBJECTS       = $(patsubst %.cpp, %.o, $(SOURCES))
+PROGRAM_OBJECTS   = $(filter-out src/Project3benchmark.o, $(OBJECTS))
+BENCHMARK_OBJECTS = $(filter-out src/Project3.o, $(OBJECTS))
 
 .PHONY : all
-all : $(PROGRAM)
+all : $(PROGRAM) $(BENCHMARK)
 
 # Remove everything (object files in SRC_DIR, the compiled PROGRAM)
 clean : 
 	$(RM) $(UTIL_DIR)/*.o
 	$(RM) $(SRC_DIR)/*.o
+	$(RM) $(BIN_DIR)/*.o
 	$(RM) $(PROGRAM)
+	$(RM) $(BENCHMARK)
 
 # Compile all *.cpp files to object files
 %.o : %.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDE_FLAGS) -c $< -o $@
 
-# Compile the object files into the main program
-$(PROGRAM) : $(OBJECTS)
+# Compile the object files into the main program and the benchmark
+$(PROGRAM) : $(PROGRAM_OBJECTS)
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LD_FLAGS)
 
+$(BENCHMARK) : $(BENCHMARK_OBJECTS)
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LD_FLAGS)

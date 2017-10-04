@@ -33,6 +33,7 @@
 *********************************************************************/
 
 /* Modifier: Keren Zhou */
+/* Date: 04/10/2017 */
 /* Author: Ioan Sucan */
 
 #include "RTP.h"
@@ -99,7 +100,6 @@ ompl::base::PlannerStatus ompl::geometric::RTP::solve(const base::PlannerTermina
         si_->copyState(motion->state, st);
         tmotions_->push_back(motion);
     }
-    std::cout << "here" << std::endl;
 
     if (tmotions_->size() == 0)
     {

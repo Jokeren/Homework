@@ -1,9 +1,16 @@
+///////////////////////////////////////
+// COMP/ELEC/MECH 450/550
+// Project 3
+// Authors: Keren Zhou
+// Date: 09/29/2017
+//////////////////////////////////////
+
 #include "CollisionChecking.h"
 
 #include <cstdlib>
 #include "Setup.h"
-#include "../utils/Transform.h"
-#include "../utils/LineIntersection.h"
+#include "../../utils/Transform.h"
+#include "../../utils/LineIntersection.h"
 
 static const size_t CORNERS = 4;
 

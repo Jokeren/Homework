@@ -1,3 +1,10 @@
+///////////////////////////////////////
+// COMP/ELEC/MECH 450/550
+// Project 3
+// Authors: Keren Zhou
+// Date: 09/29/2017
+//////////////////////////////////////
+
 #include "LineIntersection.h"
 #include <algorithm>
 #include <utility>

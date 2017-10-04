@@ -1,3 +1,10 @@
+///////////////////////////////////////
+// COMP/ELEC/MECH 450/550
+// Project 3
+// Authors: Keren Zhou
+// Date: 09/29/2017
+//////////////////////////////////////
+
 #ifndef PROJECT3_SETUP_H_
 #define PROJECT3_SETUP_H_
 

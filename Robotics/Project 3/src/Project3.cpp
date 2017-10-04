@@ -1,3 +1,10 @@
+///////////////////////////////////////
+// COMP/ELEC/MECH 450/550
+// Project 3
+// Modifer: Keren Zhou
+// Date: 09/29/2017
+//////////////////////////////////////
+
 #include <iostream>
 #include <fstream>
 #include <cmath>
@@ -16,9 +23,9 @@
 #include <ompl/tools/benchmark/Benchmark.h>
 
 // The collision checker produced in project 2
-#include "Setup.h"
-#include "CollisionChecking.h"
-#include "RTP.h"
+#include "RTP/Setup.h"
+#include "RTP/CollisionChecking.h"
+#include "RTP/RTP.h"
 
 // This is our state validitiy checker for checking if our point robot is in collision
 bool isValidStatePoint(const ompl::base::State* state, const std::vector<Rectangle>& obstacles)
@@ -287,6 +294,7 @@ int main(int, char **)
         getComplexObstacles(obstacles);
     }
 
+    // Simple bechmark, only for testing
     int benchmark;
     do
     {
