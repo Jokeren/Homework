@@ -159,6 +159,8 @@ namespace ompl
 
                 /** \brief The parent motion in the exploration tree */
                 Motion *parent{nullptr};
+
+                mutable std::vector<base::State *> *reachable{nullptr};
             };
 
             /** \brief Free the memory allocated by this planner */
@@ -170,33 +172,33 @@ namespace ompl
             {
                 const double maxDistance = std::numeric_limits<double>::max();
                 double distance = si_->distance(a->state, b->state);
-                ControlSpacePtr cptr = siC_->getControlSpace();
-                base::RealVectorBounds bounds = cptr->as<RealVectorControlSpace>()->getBounds();
-                const double step_size = (bounds.high[0] - bounds.low[0]) / interval_;
-                const double bakControl = a->control->as<RealVectorControlSpace::ControlType>()->values[0];
-                for (size_t i = 0; i < interval_ + 1; ++i) {  // steps is fixed to 1
-                    a->control->as<RealVectorControlSpace::ControlType>()->values[0] = i * step_size;
-                    siC_->propagate(a->state, a->control, 1, results_[i]);
+                if (!a->reachable) {
+                    a->reachable = new std::vector<base::State *>(interval_ + 1);
+                    siC_->allocStates(*(a->reachable));
+                    ControlSpacePtr cptr = siC_->getControlSpace();
+                    base::RealVectorBounds bounds = cptr->as<RealVectorControlSpace>()->getBounds();
+                    const double step_size = (bounds.high[0] - bounds.low[0]) / interval_;
+                    const double bakControl = a->control->as<RealVectorControlSpace::ControlType>()->values[0];
+                    for (size_t i = 0; i < interval_ + 1; ++i) {  // steps is fixed to 1
+                        a->control->as<RealVectorControlSpace::ControlType>()->values[0] = bounds.low[0] + i * step_size;
+                        siC_->propagate(a->state, a->control, 1, (*(a->reachable))[i]);
+                    }
+                    // avoid allocate new memory
+                    a->control->as<RealVectorControlSpace::ControlType>()->values[0] = bakControl;
                 }
-                // avoid allocate new memory
-                a->control->as<RealVectorControlSpace::ControlType>()->values[0] = bakControl;
 
-                bool find = false; 
-                for (size_t i = 0; i < results_.size(); ++i) {
-                    double nextDistance = si_->distance(results_[i], b->state);
+                for (size_t i = 0; i < a->reachable->size(); ++i) {
+                    double nextDistance = si_->distance((*(a->reachable))[i], b->state);
                     if (nextDistance < distance) {
                         return distance;
                     }
                 }
                 
-                return find ? distance : maxDistance;
+                return maxDistance;
             }
 
             // ten results
             const size_t interval_ = 9;
-
-            // reachable results
-            std::vector<base::State *> results_;
 
             /** \brief State sampler */
             base::StateSamplerPtr sampler_;

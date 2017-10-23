@@ -39,6 +39,8 @@
 #include "RGRRT.h"
 #include <ompl/base/goals/GoalSampleableRegion.h>
 #include <ompl/tools/config/SelfConfig.h>
+// Data structure
+#include <ompl/datastructures/NearestNeighborsLinear.h>
 #include <limits>
 
 ompl::control::RGRRT::RGRRT(const SpaceInformationPtr &si) : base::Planner(si, "RGRRT")
@@ -49,7 +51,6 @@ ompl::control::RGRRT::RGRRT(const SpaceInformationPtr &si) : base::Planner(si, "
     Planner::declareParam<double>("goal_bias", this, &RGRRT::setGoalBias, &RGRRT::getGoalBias, "0.:.05:1.");
     Planner::declareParam<bool>("intermediate_states", this, &RGRRT::setIntermediateStates, &RGRRT::getIntermediateStates);
 
-    siC_->allocStates(results_);
 }
 
 ompl::control::RGRRT::~RGRRT()
@@ -61,7 +62,8 @@ void ompl::control::RGRRT::setup()
 {
     base::Planner::setup();
     if (!nn_)
-        nn_.reset(tools::SelfConfig::getDefaultNearestNeighbors<Motion *>(this));
+        nn_ = std::make_shared<NearestNeighborsLinear<Motion *>>();
+       // nn_.reset(tools::SelfConfig::getDefaultNearestNeighbors<Motion *>(this));
     nn_->setDistanceFunction([this](const Motion *a, const Motion *b)
                              {
                                  return distanceFunction(a, b);
@@ -91,13 +93,16 @@ void ompl::control::RGRRT::freeMemory()
                 si_->freeState(motion->state);
             if (motion->control)
                 siC_->freeControl(motion->control);
+            if (motion->reachable) 
+            {
+                for (auto state : *(motion->reachable)) {
+                    si_->freeState(state);
+                }
+            }
             delete motion;
         }
     }
 
-    for (auto state : results_) {
-        si_->freeState(state);
-    }
 }
 
 ompl::base::PlannerStatus ompl::control::RGRRT::solve(const base::PlannerTerminationCondition &ptc)

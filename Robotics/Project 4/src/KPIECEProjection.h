@@ -29,7 +29,7 @@ public:
 	{
 	    cellSizes_.resize(2);
 	    cellSizes_[0] = 0.1;
-	    cellSizes_[1] = 0.25;
+	    cellSizes_[1] = 0.1;
 	}
 	
 	virtual void project(const ob::State *state, ob::EuclideanProjection &projection) const
@@ -37,7 +37,7 @@ public:
 	    const double value = state->as<ob::CompoundStateSpace::StateType>()->as<ob::SO2StateSpace::StateType>(0)->value;
 	    const double *values = state->as<ob::CompoundStateSpace::StateType>()->as<ob::RealVectorStateSpace::StateType>(1)->values;
 	    projection(0) = value;
-	    projection(1) = values[1];
+	    projection(1) = values[0];
 	}
 
 };
@@ -58,8 +58,8 @@ public:
 	virtual void defaultCellSizes(void)
 	{
 	    cellSizes_.resize(2);
-	    cellSizes_[0] = 0.1;
-	    cellSizes_[1] = 0.25;
+	    cellSizes_[0] = 0.05;
+	    cellSizes_[1] = 0.05;
 	}
 	
 	virtual void project(const ob::State *state, ob::EuclideanProjection &projection) const
@@ -68,7 +68,7 @@ public:
                                    ->as<ob::SE2StateSpace::StateType>(0)
                                    ->as<ob::RealVectorStateSpace::StateType>(0)->values;
 	    const double theta = state->as<ob::CompoundStateSpace::StateType>()
-                                   ->as<ob::SE2StateSpace::StateType>(1)
+                                   ->as<ob::SE2StateSpace::StateType>(0)
                                    ->as<ob::SO2StateSpace::StateType>(1)->value;
 	    const double *speed = state->as<ob::CompoundStateSpace::StateType>()->as<ob::RealVectorStateSpace::StateType>(1)->values;
 	    projection(0) = values[0] * cos(theta) * speed[0];

@@ -42,6 +42,12 @@ void getStart(Robot& robot);
 
 void getGoal(Robot& robot);
 
+void getSpeedBound(double& low, double& high);
+
+void getOmegaBound(double& low, double& high);
+
+void getAccelerateBound(double& low, double& high);
+
 void getBound(double& low, double& high);
 
 #endif  // UTILS_SETUP_H_

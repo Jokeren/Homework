@@ -63,14 +63,19 @@ namespace oc = ompl::control;
 void KinematicCarODE(const oc::ODESolver::StateType& q, const oc::Control* control, oc::ODESolver::StateType& qdot)
 {
     const double *u = control->as<oc::RealVectorControlSpace::ControlType>()->values;
+
     const double theta = q[2];
+    const double speed = q[3];
+    const double omega = u[0];
+    const double accelerate = u[1];
 
     // Zero out qdot
     qdot.resize(q.size(), 0);
 
-    qdot[0] = u[0] * cos(theta);
-    qdot[1] = u[0] * sin(theta);
-    qdot[2] = u[0] * tan(u[1]) / CAR_LENGTH;
+    qdot[0] = speed * cos(theta);
+    qdot[1] = speed * sin(theta);
+    qdot[2] = omega;
+    qdot[3] = accelerate;
 }
 
 
@@ -203,21 +208,22 @@ ob::PlannerPtr getPlannerPtr(int alg, int choice, const oc::SimpleSetup& ss)
             break;
         }
     }
-    std::cerr << "No much options" << std::endl;
+    std::cerr << "No such options" << std::endl;
 }
 
 
-void PlanPendulum(int torque_bound, int alg, int choice, double seconds = 10.0)
+void planPendulum(int torque_bound, int alg, int choice, double seconds = 10.0)
 {
     /// construct the state space we are planning in
     ompl::base::StateSpacePtr so2(new ompl::base::SO2StateSpace());
-    ompl::base::StateSpacePtr rv(new ompl::base::RealVectorStateSpace());
+    ompl::base::StateSpacePtr rv(new ompl::base::RealVectorStateSpace(1));
     ompl::base::StateSpacePtr space = so2 + rv;
 
+    /// so2 bound is set automatically
     /// set the bounds for rv
     ob::RealVectorBounds bounds(1);
-    bounds.setLow(-9.8 - torque_bound);
-    bounds.setHigh(9.8 + torque_bound);
+    bounds.setLow(-10);
+    bounds.setHigh(10);
 
     rv->as<ob::RealVectorStateSpace>()->setBounds(bounds);
 
@@ -225,7 +231,7 @@ void PlanPendulum(int torque_bound, int alg, int choice, double seconds = 10.0)
     auto cspace(std::make_shared<PendulumControlSpace>(space));
 
     // set the bounds for the control space
-    ob::RealVectorBounds cbounds(2);
+    ob::RealVectorBounds cbounds(1);
     cbounds.setLow(-torque_bound);
     cbounds.setHigh(torque_bound);
 
@@ -235,6 +241,7 @@ void PlanPendulum(int torque_bound, int alg, int choice, double seconds = 10.0)
     oc::SimpleSetup ss(cspace);
 
     ob::PlannerPtr planner = getPlannerPtr(alg, choice, ss);
+    std::cout << "herehere\n" << std::endl;
 
     // set state validity checking for this space
     oc::SpaceInformation *si = ss.getSpaceInformation().get();
@@ -275,17 +282,20 @@ void PlanPendulum(int torque_bound, int alg, int choice, double seconds = 10.0)
 }
 
 
-void PlanCar(int alg, int choice,
+void planCar(int alg, int choice,
         const Robot& startCar, const Robot& goalCar,
         const std::vector<Rectangle>& obstacles,
         double spaceLow, double spaceHigh,
-        double controlLow = -0.3, double controlHigh = 0.3)
+        double speedLow, double speedHigh,
+        double omegaLow, double omegaHigh,
+        double accelerateLow, double accelerateHigh)
 {
     /// construct the state space we are planning in
     ompl::base::StateSpacePtr se2(new ompl::base::SE2StateSpace());
-    ompl::base::StateSpacePtr rv(new ompl::base::RealVectorStateSpace());
+    ompl::base::StateSpacePtr rv(new ompl::base::RealVectorStateSpace(1));
     ompl::base::StateSpacePtr space = se2 + rv;
 
+    /// so2 bound is set automatically
     /// set the bounds for the R^2 part of SE(2)
     ob::RealVectorBounds bounds(2);
     bounds.setLow(spaceLow);
@@ -293,13 +303,21 @@ void PlanCar(int alg, int choice,
 
     se2->as<ob::SE2StateSpace>()->setBounds(bounds);
 
+    // set the bounds for the R part
+    ob::RealVectorBounds speedBounds(1);
+    speedBounds.setLow(speedLow);
+    speedBounds.setHigh(speedHigh);
+    rv->as<ob::RealVectorStateSpace>()->setBounds(speedBounds);
+
     // create a control space
     auto cspace(std::make_shared<CarControlSpace>(space));
 
     // set the bounds for the control space
     ob::RealVectorBounds cbounds(2);
-    cbounds.setLow(controlLow);
-    cbounds.setHigh(controlHigh);
+    cbounds.setLow(0, omegaLow);
+    cbounds.setHigh(0, omegaHigh);
+    cbounds.setLow(1, accelerateLow);
+    cbounds.setHigh(1, accelerateHigh);
 
     cspace->setBounds(cbounds);
 
@@ -338,7 +356,7 @@ void PlanCar(int alg, int choice,
     ss.setPlanner(planner);
 
     /// attempt to solve the problem within one second of planning time
-    ob::PlannerStatus solved = ss.solve(10.0);
+    ob::PlannerStatus solved = ss.solve(20.0);
 
     if (solved)
     {
@@ -378,30 +396,40 @@ int main(int /*argc*/, char ** /*argv*/)
     } while (alg < 1 || alg > 4);
 
 
-    switch (choice) {
+    switch (choice)
+    {
         case 1:
         {
             int torque;
             std::cout << "Torque: "<< std::endl;
             std::cin >> torque;
-            PlanPendulum(torque, alg, choice); 
+            planPendulum(torque, alg, choice); 
             break;
         }
         case 2:
         {
             Robot startCar, goalCar;
             double spaceLow, spaceHigh;
+            double speedLow, speedHigh;
+            double omegaLow, omegaHigh;
+            double accelerateLow, accelerateHigh;
             std::vector<Rectangle> obstacles;
 
             getStart(startCar);
-            getStart(goalCar);
+            getGoal(goalCar);
             getBound(spaceLow, spaceHigh);
+            getSpeedBound(speedLow, speedHigh);
+            getOmegaBound(omegaLow, omegaHigh);
+            getAccelerateBound(accelerateLow, accelerateHigh);
             getObstacles(obstacles);
 
-            PlanCar(alg, choice,
+            planCar(alg, choice,
                     startCar, goalCar,
                     obstacles,
-                    spaceLow, spaceHigh);
+                    spaceLow, spaceHigh,
+                    speedLow, speedHigh,
+                    omegaLow, omegaHigh,
+                    accelerateLow, accelerateHigh);
             break;
         }
         default:
