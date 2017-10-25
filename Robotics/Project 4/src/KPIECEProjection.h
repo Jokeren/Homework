@@ -52,14 +52,15 @@ public:
 	
 	virtual unsigned int getDimension(void) const
 	{
-	    return 2;
+	    return 3;
 	}
 	
 	virtual void defaultCellSizes(void)
 	{
-	    cellSizes_.resize(2);
+	    cellSizes_.resize(3);
 	    cellSizes_[0] = 0.05;
 	    cellSizes_[1] = 0.05;
+	    cellSizes_[2] = 0.05;
 	}
 	
 	virtual void project(const ob::State *state, ob::EuclideanProjection &projection) const
@@ -71,8 +72,9 @@ public:
                                    ->as<ob::SE2StateSpace::StateType>(0)
                                    ->as<ob::SO2StateSpace::StateType>(1)->value;
 	    const double *speed = state->as<ob::CompoundStateSpace::StateType>()->as<ob::RealVectorStateSpace::StateType>(1)->values;
-	    projection(0) = values[0] * cos(theta) * speed[0];
-	    projection(1) = values[1] * sin(theta) * speed[0];
+	    projection(0) = values[0] * speed[0];
+	    projection(1) = values[1] * speed[0];
+	    projection(2) = theta;
 	}
 
 };
