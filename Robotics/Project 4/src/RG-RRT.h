@@ -161,6 +161,8 @@ namespace ompl
                 Motion *parent{nullptr};
 
                 mutable std::vector<base::State *> *reachable{nullptr};
+
+                mutable std::vector<bool> *valid{nullptr};
             };
 
             /** \brief Free the memory allocated by this planner */
@@ -174,6 +176,7 @@ namespace ompl
                 double distance = si_->distance(a->state, b->state);
                 if (!a->reachable) {
                     a->reachable = new std::vector<base::State *>(interval_ + 1);
+                    a->valid = new std::vector<bool>(interval_ + 1);
                     siC_->allocStates(*(a->reachable));
                     ControlSpacePtr cptr = siC_->getControlSpace();
                     base::RealVectorBounds bounds = cptr->as<RealVectorControlSpace>()->getBounds();
@@ -181,16 +184,22 @@ namespace ompl
                     const double bakControl = a->control->as<RealVectorControlSpace::ControlType>()->values[0];
                     for (size_t i = 0; i < interval_ + 1; ++i) {  // steps is fixed to 1
                         a->control->as<RealVectorControlSpace::ControlType>()->values[0] = bounds.low[0] + i * step_size;
-                        siC_->propagate(a->state, a->control, 1, (*(a->reachable))[i]);
+                        if (siC_->propagateWhileValid(a->state, a->control, 1, (*(a->reachable))[i]) == 1) {
+                            (*(a->valid))[i] = true;
+                        } else {
+                            (*(a->valid))[i] = false;
+                        }
                     }
                     // avoid allocate new memory
                     a->control->as<RealVectorControlSpace::ControlType>()->values[0] = bakControl;
                 }
 
                 for (size_t i = 0; i < a->reachable->size(); ++i) {
-                    double nextDistance = si_->distance((*(a->reachable))[i], b->state);
-                    if (nextDistance < distance) {
-                        return distance;
+                    if ((*(a->valid))[i]) {
+                        double nextDistance = si_->distance((*(a->reachable))[i], b->state);
+                        if (nextDistance < distance) {
+                            return distance;
+                        }
                     }
                 }
                 

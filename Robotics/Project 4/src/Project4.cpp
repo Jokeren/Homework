@@ -53,7 +53,7 @@
 #include "../utils/Setup.h"
 #include "../utils/CollisionChecking.h"
 #include "KPIECEProjection.h"
-#include "RGRRT.h"
+#include "RG-RRT.h"
 
 namespace ob = ompl::base;
 namespace oc = ompl::control;
@@ -212,7 +212,7 @@ ob::PlannerPtr getPlannerPtr(int alg, int choice, const oc::SimpleSetup& ss)
 }
 
 
-void planPendulum(int torque_bound, int alg, int choice, double seconds = 10.0)
+void PlanPendulum(int torque_bound, int alg, int choice, double seconds = 10.0)
 {
     /// construct the state space we are planning in
     ompl::base::StateSpacePtr so2(new ompl::base::SO2StateSpace());
@@ -241,7 +241,6 @@ void planPendulum(int torque_bound, int alg, int choice, double seconds = 10.0)
     oc::SimpleSetup ss(cspace);
 
     ob::PlannerPtr planner = getPlannerPtr(alg, choice, ss);
-    std::cout << "herehere\n" << std::endl;
 
     // set state validity checking for this space
     oc::SpaceInformation *si = ss.getSpaceInformation().get();
@@ -282,13 +281,14 @@ void planPendulum(int torque_bound, int alg, int choice, double seconds = 10.0)
 }
 
 
-void planCar(int alg, int choice,
+void PlanCar(int alg, int choice,
         const Robot& startCar, const Robot& goalCar,
         const std::vector<Rectangle>& obstacles,
         double spaceLow, double spaceHigh,
         double speedLow, double speedHigh,
         double omegaLow, double omegaHigh,
-        double accelerateLow, double accelerateHigh)
+        double accelerateLow, double accelerateHigh,
+        double seconds = 20.0)
 {
     /// construct the state space we are planning in
     ompl::base::StateSpacePtr se2(new ompl::base::SE2StateSpace());
@@ -350,13 +350,13 @@ void planCar(int alg, int choice,
     goal->as<ob::RealVectorStateSpace::StateType>(1)->values[0] = 0;
 
     /// set the start and goal states
-    ss.setStartAndGoalStates(start, goal, 0.05);
+    ss.setStartAndGoalStates(start, goal, 0.2);
 
     /// set planner
     ss.setPlanner(planner);
 
     /// attempt to solve the problem within one second of planning time
-    ob::PlannerStatus solved = ss.solve(20.0);
+    ob::PlannerStatus solved = ss.solve(seconds);
 
     if (solved)
     {
@@ -403,7 +403,7 @@ int main(int /*argc*/, char ** /*argv*/)
             int torque;
             std::cout << "Torque: "<< std::endl;
             std::cin >> torque;
-            planPendulum(torque, alg, choice); 
+            PlanPendulum(torque, alg, choice); 
             break;
         }
         case 2:
@@ -423,7 +423,7 @@ int main(int /*argc*/, char ** /*argv*/)
             getAccelerateBound(accelerateLow, accelerateHigh);
             getObstacles(obstacles);
 
-            planCar(alg, choice,
+            PlanCar(alg, choice,
                     startCar, goalCar,
                     obstacles,
                     spaceLow, spaceHigh,

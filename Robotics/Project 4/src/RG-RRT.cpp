@@ -36,7 +36,7 @@
 /* Date: 10/21/2017 */
 /* Author: Ioan Sucan */
 
-#include "RGRRT.h"
+#include "RG-RRT.h"
 #include <ompl/base/goals/GoalSampleableRegion.h>
 #include <ompl/tools/config/SelfConfig.h>
 // Data structure
@@ -98,6 +98,10 @@ void ompl::control::RGRRT::freeMemory()
                 for (auto state : *(motion->reachable)) {
                     si_->freeState(state);
                 }
+                delete motion->reachable;
+            }
+            if (motion->valid) {
+                delete motion->valid;
             }
             delete motion;
         }
