@@ -212,7 +212,7 @@ ob::PlannerPtr getPlannerPtr(int alg, int choice, const oc::SimpleSetup& ss)
 }
 
 
-void PlanPendulum(int torque_bound, int alg, int choice, double seconds = 10.0)
+void PlanPendulum(int torque_bound, int alg, int choice, double seconds = 20.0)
 {
     /// construct the state space we are planning in
     ompl::base::StateSpacePtr so2(new ompl::base::SO2StateSpace());
@@ -261,7 +261,7 @@ void PlanPendulum(int torque_bound, int alg, int choice, double seconds = 10.0)
     goal->as<ob::RealVectorStateSpace::StateType>(1)->values[0] = 0;
 
     /// set the start and goal states
-    ss.setStartAndGoalStates(start, goal, 0.05);
+    ss.setStartAndGoalStates(start, goal, 0.1);
 
     /// set planner
     ss.setPlanner(planner);

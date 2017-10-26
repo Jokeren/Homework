@@ -93,16 +93,8 @@ void ompl::control::RGRRT::freeMemory()
                 si_->freeState(motion->state);
             if (motion->control)
                 siC_->freeControl(motion->control);
-            if (motion->reachable) 
-            {
-                for (auto state : *(motion->reachable)) {
-                    si_->freeState(state);
-                }
-                delete motion->reachable;
-            }
-            if (motion->valid) {
-                delete motion->valid;
-            }
+            for (auto *state: motion->reachable)
+                siC_->freeState(state);
             delete motion;
         }
     }
@@ -120,6 +112,7 @@ ompl::base::PlannerStatus ompl::control::RGRRT::solve(const base::PlannerTermina
         auto *motion = new Motion(siC_);
         si_->copyState(motion->state, st);
         siC_->nullControl(motion->control);
+        motion->initReachble(siC_);
         nn_->add(motion);
     }
 
@@ -180,6 +173,7 @@ ompl::base::PlannerStatus ompl::control::RGRRT::solve(const base::PlannerTermina
                     siC_->copyControl(motion->control, rctrl);
                     motion->steps = 1;
                     motion->parent = lastmotion;
+                    motion->initReachble(siC_);
                     lastmotion = motion;
                     nn_->add(motion);
                     double dist = 0.0;
@@ -217,6 +211,7 @@ ompl::base::PlannerStatus ompl::control::RGRRT::solve(const base::PlannerTermina
                 siC_->copyControl(motion->control, rctrl);
                 motion->steps = cd;
                 motion->parent = nmotion;
+                motion->initReachble(siC_);
 
                 nn_->add(motion);
                 double dist = 0.0;

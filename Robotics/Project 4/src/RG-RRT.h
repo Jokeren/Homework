@@ -144,6 +144,27 @@ namespace ompl
                 Motion(const SpaceInformation *si)
                   : state(si->allocState()), control(si->allocControl())
                 {
+                    const SpaceInformation *siMotion = (ompl::control::SpaceInformation *)si;
+                    ControlSpacePtr cptr = siMotion->getControlSpace();
+                    base::RealVectorBounds bounds = cptr->as<RealVectorControlSpace>()->getBounds();
+                    low_ = bounds.low[0];
+                    step_size_ = (bounds.high[0] - bounds.low[0]) / RGRRT::interval_;
+                }
+
+                void initReachble(const SpaceInformation *si)
+                {
+                    const SpaceInformation *siMotion = (ompl::control::SpaceInformation *)si;
+                    const double bakControl = control->as<RealVectorControlSpace::ControlType>()->values[0];
+                    for (size_t i = 0; i <= RGRRT::interval_; ++i) {  // steps is fixed to 1
+                        base::State* newState = siMotion->allocState();
+                        control->as<RealVectorControlSpace::ControlType>()->values[0] = low_ + i * step_size_;
+                        if (siMotion->propagateWhileValid(state, control, 1, newState) == 1) {
+                            reachable.push_back(newState);
+                        } else {
+                            siMotion->freeState(newState);
+                        }
+                    }
+                    control->as<RealVectorControlSpace::ControlType>()->values[0] = bakControl;
                 }
 
                 ~Motion() = default;
@@ -160,9 +181,10 @@ namespace ompl
                 /** \brief The parent motion in the exploration tree */
                 Motion *parent{nullptr};
 
-                mutable std::vector<base::State *> *reachable{nullptr};
+                std::vector<base::State*> reachable;
 
-                mutable std::vector<bool> *valid{nullptr};
+                double low_;
+                double step_size_;
             };
 
             /** \brief Free the memory allocated by this planner */
@@ -174,32 +196,11 @@ namespace ompl
             {
                 const double maxDistance = std::numeric_limits<double>::max();
                 double distance = si_->distance(a->state, b->state);
-                if (!a->reachable) {
-                    a->reachable = new std::vector<base::State *>(interval_ + 1);
-                    a->valid = new std::vector<bool>(interval_ + 1);
-                    siC_->allocStates(*(a->reachable));
-                    ControlSpacePtr cptr = siC_->getControlSpace();
-                    base::RealVectorBounds bounds = cptr->as<RealVectorControlSpace>()->getBounds();
-                    const double step_size = (bounds.high[0] - bounds.low[0]) / interval_;
-                    const double bakControl = a->control->as<RealVectorControlSpace::ControlType>()->values[0];
-                    for (size_t i = 0; i < interval_ + 1; ++i) {  // steps is fixed to 1
-                        a->control->as<RealVectorControlSpace::ControlType>()->values[0] = bounds.low[0] + i * step_size;
-                        if (siC_->propagateWhileValid(a->state, a->control, 1, (*(a->reachable))[i]) == 1) {
-                            (*(a->valid))[i] = true;
-                        } else {
-                            (*(a->valid))[i] = false;
-                        }
-                    }
-                    // avoid allocate new memory
-                    a->control->as<RealVectorControlSpace::ControlType>()->values[0] = bakControl;
-                }
 
-                for (size_t i = 0; i < a->reachable->size(); ++i) {
-                    if ((*(a->valid))[i]) {
-                        double nextDistance = si_->distance((*(a->reachable))[i], b->state);
-                        if (nextDistance < distance) {
-                            return distance;
-                        }
+                for (size_t i = 0; i < a->reachable.size(); ++i) {
+                    double nextDistance = si_->distance(a->reachable[i], b->state);
+                    if (nextDistance < distance) {
+                        return distance;
                     }
                 }
                 
@@ -207,7 +208,7 @@ namespace ompl
             }
 
             // ten results
-            const size_t interval_ = 9;
+            static const size_t interval_ = 2;
 
             /** \brief State sampler */
             base::StateSamplerPtr sampler_;
