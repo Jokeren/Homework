@@ -51,6 +51,67 @@ ompl::control::RGRRT::RGRRT(const SpaceInformationPtr &si) : base::Planner(si, "
     Planner::declareParam<double>("goal_bias", this, &RGRRT::setGoalBias, &RGRRT::getGoalBias, "0.:.05:1.");
     Planner::declareParam<bool>("intermediate_states", this, &RGRRT::setIntermediateStates, &RGRRT::getIntermediateStates);
 
+    ControlSpacePtr cptr = siC_->getControlSpace();
+    base::RealVectorBounds bounds = cptr->as<RealVectorControlSpace>()->getBounds();
+    double low = bounds.low[0];
+    double interval = bounds.high[0] - bounds.low[0];
+    // control strategy 1
+    //controls_.push_back(low + interval * 0.0);
+    //controls_.push_back(low + interval * 1.0);
+    
+    // control strategy 1
+    controls_.push_back(low + interval * 0.0);
+    controls_.push_back(low + interval * 0.025);
+    controls_.push_back(low + interval * 0.05);
+    controls_.push_back(low + interval * 0.1);
+    controls_.push_back(low + interval * 0.15);
+    controls_.push_back(low + interval * 0.2);
+    controls_.push_back(low + interval * 0.3);
+    controls_.push_back(low + interval * 0.4);
+    controls_.push_back(low + interval * 0.5);
+    controls_.push_back(low + interval * 0.6);
+    controls_.push_back(low + interval * 0.7);
+    controls_.push_back(low + interval * 0.8);
+    controls_.push_back(low + interval * 0.85);
+    controls_.push_back(low + interval * 0.9);
+    controls_.push_back(low + interval * 0.95);
+    controls_.push_back(low + interval * 0.975);
+    controls_.push_back(low + interval * 1.0);
+    
+    // control strategy 2
+    //controls_.push_back(low + interval * 0.0);
+    //controls_.push_back(low + interval * 0.1);
+    //controls_.push_back(low + interval * 0.2);
+    //controls_.push_back(low + interval * 0.3);
+    //controls_.push_back(low + interval * 0.4);
+    //controls_.push_back(low + interval * 0.45);
+    //controls_.push_back(low + interval * 0.425);
+    //controls_.push_back(low + interval * 0.5);
+    //controls_.push_back(low + interval * 0.525);
+    //controls_.push_back(low + interval * 0.55);
+    //controls_.push_back(low + interval * 0.6);
+    //controls_.push_back(low + interval * 0.7);
+    //controls_.push_back(low + interval * 0.8);
+    //controls_.push_back(low + interval * 0.9);
+    //controls_.push_back(low + interval * 1.0);
+    
+    // control strategy 3
+    //controls_.push_back(low + interval * 0.0);
+    //controls_.push_back(low + interval * 0.1);
+    //controls_.push_back(low + interval * 0.2);
+    //controls_.push_back(low + interval * 0.3);
+    //controls_.push_back(low + interval * 0.4);
+    //controls_.push_back(low + interval * 0.5);
+    //controls_.push_back(low + interval * 0.6);
+    //controls_.push_back(low + interval * 0.7);
+    //controls_.push_back(low + interval * 0.8);
+    //controls_.push_back(low + interval * 0.9);
+    //controls_.push_back(low + interval * 1.0);
+    
+    // control strategy 4
+    //for (size_t i = 0; i < 16; ++i) {
+    //    controls_.push_back(low + interval / 16.0 * i);
+    //}
 }
 
 ompl::control::RGRRT::~RGRRT()
@@ -112,7 +173,7 @@ ompl::base::PlannerStatus ompl::control::RGRRT::solve(const base::PlannerTermina
         auto *motion = new Motion(siC_);
         si_->copyState(motion->state, st);
         siC_->nullControl(motion->control);
-        motion->initReachble(siC_);
+        motion->initReachable(siC_, controls_);
         nn_->add(motion);
     }
 
@@ -173,7 +234,7 @@ ompl::base::PlannerStatus ompl::control::RGRRT::solve(const base::PlannerTermina
                     siC_->copyControl(motion->control, rctrl);
                     motion->steps = 1;
                     motion->parent = lastmotion;
-                    motion->initReachble(siC_);
+                    motion->initReachable(siC_, controls_);
                     lastmotion = motion;
                     nn_->add(motion);
                     double dist = 0.0;
@@ -211,7 +272,7 @@ ompl::base::PlannerStatus ompl::control::RGRRT::solve(const base::PlannerTermina
                 siC_->copyControl(motion->control, rctrl);
                 motion->steps = cd;
                 motion->parent = nmotion;
-                motion->initReachble(siC_);
+                motion->initReachable(siC_, controls_);
 
                 nn_->add(motion);
                 double dist = 0.0;

@@ -144,24 +144,20 @@ namespace ompl
                 Motion(const SpaceInformation *si)
                   : state(si->allocState()), control(si->allocControl())
                 {
-                    const SpaceInformation *siMotion = (ompl::control::SpaceInformation *)si;
-                    ControlSpacePtr cptr = siMotion->getControlSpace();
-                    base::RealVectorBounds bounds = cptr->as<RealVectorControlSpace>()->getBounds();
-                    low_ = bounds.low[0];
-                    step_size_ = (bounds.high[0] - bounds.low[0]) / RGRRT::interval_;
+                    reachable.reserve(16);
                 }
 
-                void initReachble(const SpaceInformation *si)
+                void initReachable(const SpaceInformation *si, const std::vector<double>& controls)
                 {
-                    const SpaceInformation *siMotion = (ompl::control::SpaceInformation *)si;
+                    const SpaceInformation *siControl = (ompl::control::SpaceInformation *)si;
                     const double bakControl = control->as<RealVectorControlSpace::ControlType>()->values[0];
-                    for (size_t i = 0; i <= RGRRT::interval_; ++i) {  // steps is fixed to 1
-                        base::State* newState = siMotion->allocState();
-                        control->as<RealVectorControlSpace::ControlType>()->values[0] = low_ + i * step_size_;
-                        if (siMotion->propagateWhileValid(state, control, 1, newState) == 1) {
+                    for (size_t i = 0; i < controls.size(); ++i) {  // steps is fixed to 1
+                        base::State* newState = siControl->allocState();
+                        control->as<RealVectorControlSpace::ControlType>()->values[0] = controls[i];
+                        if (siControl->propagateWhileValid(state, control, 1, newState) == 1) {
                             reachable.push_back(newState);
                         } else {
-                            siMotion->freeState(newState);
+                            siControl->freeState(newState);
                         }
                     }
                     control->as<RealVectorControlSpace::ControlType>()->values[0] = bakControl;
@@ -182,9 +178,6 @@ namespace ompl
                 Motion *parent{nullptr};
 
                 std::vector<base::State*> reachable;
-
-                double low_;
-                double step_size_;
             };
 
             /** \brief Free the memory allocated by this planner */
@@ -207,8 +200,8 @@ namespace ompl
                 return maxDistance;
             }
 
-            // ten results
-            static const size_t interval_ = 2;
+            /** \brief Control steps */
+            std::vector<double> controls_;
 
             /** \brief State sampler */
             base::StateSamplerPtr sampler_;
