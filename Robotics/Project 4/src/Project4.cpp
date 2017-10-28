@@ -265,11 +265,11 @@ void PlanPendulum(int alg, int choice, int torque_bound, bool benchmark = true, 
 	if(benchmark){
 		std::string title = "Pendulum";
 		ompl::tools::Benchmark b(ss, title);
-		ss.getSpaceInformation()->setPropagationStepSize(0.01);
+        //ss.getSpaceInformation()->setPropagationStepSize(0.01);
 		b.addPlanner(ompl::base::PlannerPtr(new ompl::control::RGRRT(ss.getSpaceInformation())));
 		b.addPlanner(ompl::base::PlannerPtr(new ompl::control::RRT(ss.getSpaceInformation())));
 
-		ss.getSpaceInformation()->setPropagationStepSize(0.05);
+        //ss.getSpaceInformation()->setPropagationStepSize(0.05);
 		ompl::base::PlannerPtr kp1(new ompl::control::KPIECE1(ss.getSpaceInformation()));
 		space->registerProjection("PendulumProjection", ob::ProjectionEvaluatorPtr(new PendulumProjection(space)));
 		kp1->as<ompl::control::KPIECE1>()->setProjectionEvaluator("PendulumProjection");
@@ -375,11 +375,11 @@ void PlanCar(int alg, int choice,
 	if(benchmark){
 		std::string title = "Car";
 		ompl::tools::Benchmark b(ss, title);
-		ss.getSpaceInformation()->setPropagationStepSize(0.01);
+        //ss.getSpaceInformation()->setPropagationStepSize(0.01);
 		b.addPlanner(ompl::base::PlannerPtr(new ompl::control::RGRRT(ss.getSpaceInformation())));
 		b.addPlanner(ompl::base::PlannerPtr(new ompl::control::RRT(ss.getSpaceInformation())));
 
-		ss.getSpaceInformation()->setPropagationStepSize(0.05);
+        //ss.getSpaceInformation()->setPropagationStepSize(0.05);
 		ompl::base::PlannerPtr kp1(new ompl::control::KPIECE1(ss.getSpaceInformation()));
 		space->registerProjection("CarProjection", ob::ProjectionEvaluatorPtr(new CarProjection(space)));
 		kp1->as<ompl::control::KPIECE1>()->setProjectionEvaluator("CarProjection");

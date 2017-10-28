@@ -55,28 +55,28 @@ ompl::control::RGRRT::RGRRT(const SpaceInformationPtr &si) : base::Planner(si, "
     base::RealVectorBounds bounds = cptr->as<RealVectorControlSpace>()->getBounds();
     double low = bounds.low[0];
     double interval = bounds.high[0] - bounds.low[0];
-    // control strategy 1
+    // control strategy 0
     //controls_.push_back(low + interval * 0.0);
     //controls_.push_back(low + interval * 1.0);
     
     // control strategy 1
-    controls_.push_back(low + interval * 0.0);
-    controls_.push_back(low + interval * 0.025);
-    controls_.push_back(low + interval * 0.05);
-    controls_.push_back(low + interval * 0.1);
-    controls_.push_back(low + interval * 0.15);
-    controls_.push_back(low + interval * 0.2);
-    controls_.push_back(low + interval * 0.3);
-    controls_.push_back(low + interval * 0.4);
-    controls_.push_back(low + interval * 0.5);
-    controls_.push_back(low + interval * 0.6);
-    controls_.push_back(low + interval * 0.7);
-    controls_.push_back(low + interval * 0.8);
-    controls_.push_back(low + interval * 0.85);
-    controls_.push_back(low + interval * 0.9);
-    controls_.push_back(low + interval * 0.95);
-    controls_.push_back(low + interval * 0.975);
-    controls_.push_back(low + interval * 1.0);
+    //controls_.push_back(low + interval * 0.0);
+    //controls_.push_back(low + interval * 0.025);
+    //controls_.push_back(low + interval * 0.05);
+    //controls_.push_back(low + interval * 0.1);
+    //controls_.push_back(low + interval * 0.15);
+    //controls_.push_back(low + interval * 0.2);
+    //controls_.push_back(low + interval * 0.3);
+    //controls_.push_back(low + interval * 0.4);
+    //controls_.push_back(low + interval * 0.5);
+    //controls_.push_back(low + interval * 0.6);
+    //controls_.push_back(low + interval * 0.7);
+    //controls_.push_back(low + interval * 0.8);
+    //controls_.push_back(low + interval * 0.85);
+    //controls_.push_back(low + interval * 0.9);
+    //controls_.push_back(low + interval * 0.95);
+    //controls_.push_back(low + interval * 0.975);
+    //controls_.push_back(low + interval * 1.0);
     
     // control strategy 2
     //controls_.push_back(low + interval * 0.0);
@@ -109,9 +109,11 @@ ompl::control::RGRRT::RGRRT(const SpaceInformationPtr &si) : base::Planner(si, "
     //controls_.push_back(low + interval * 1.0);
     
     // control strategy 4
-    //for (size_t i = 0; i < 16; ++i) {
-    //    controls_.push_back(low + interval / 16.0 * i);
+    //for (size_t i = 0; i < 2; ++i) {
+    //    controls_.push_back(low + interval / 2.0 * i);
     //}
+    
+    controls_.push_back(0);
 }
 
 ompl::control::RGRRT::~RGRRT()
@@ -201,6 +203,8 @@ ompl::base::PlannerStatus ompl::control::RGRRT::solve(const base::PlannerTermina
 
     while (ptc == false)
     {
+        Motion *nmotion;
+
         /* sample random state (with goal biasing) */
         if (goal_s && rng_.uniform01() < goalBias_ && goal_s->canSample())
             goal_s->sampleGoal(rstate);
@@ -208,7 +212,7 @@ ompl::base::PlannerStatus ompl::control::RGRRT::solve(const base::PlannerTermina
             sampler_->sampleUniform(rstate);
 
         /* find closest state in the tree */
-        Motion *nmotion = nn_->nearest(rmotion);
+        nmotion = nn_->nearest(rmotion);
 
         /* sample a random control that attempts to go towards the random state, and also sample a control duration */
         unsigned int cd = controlSampler_->sampleTo(rctrl, nmotion->control, nmotion->state, rmotion->state);

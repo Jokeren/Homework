@@ -18,7 +18,6 @@ CXX           = c++
 
 # Change PROGRAM to the name of your program
 PROGRAM       = project4
-BENCHMARK     = project4benchmark
 SRC_DIR       = src/RG-RRT
 BIN_DIR       = src
 UTIL_DIR      = utils
@@ -27,10 +26,9 @@ UTIL_DIR      = utils
 SOURCES       = $(wildcard $(UTIL_DIR)/*.cpp $(SRC_DIR)/*.cpp $(BIN_DIR)/*.cpp)
 OBJECTS       = $(patsubst %.cpp, %.o, $(SOURCES))
 PROGRAM_OBJECTS   = $(filter-out src/Project4benchmark.o, $(OBJECTS))
-BENCHMARK_OBJECTS = $(filter-out src/Project4.o, $(OBJECTS))
 
 .PHONY : all
-all : $(PROGRAM) $(BENCHMARK)
+all : $(PROGRAM)
 
 # Remove everything (object files in SRC_DIR, the compiled PROGRAM)
 clean : 
@@ -38,15 +36,11 @@ clean :
 	$(RM) $(SRC_DIR)/*.o
 	$(RM) $(BIN_DIR)/*.o
 	$(RM) $(PROGRAM)
-	$(RM) $(BENCHMARK)
 
 # Compile all *.cpp files to object files
 %.o : %.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDE_FLAGS) -c $< -o $@
 
-# Compile the object files into the main program and the benchmark
+# Compile the object files into the main program
 $(PROGRAM) : $(PROGRAM_OBJECTS)
-	$(CXX) $(CXXFLAGS) -o $@ $^ $(LD_FLAGS)
-
-$(BENCHMARK) : $(BENCHMARK_OBJECTS)
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LD_FLAGS)

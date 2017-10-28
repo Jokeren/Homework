@@ -144,7 +144,7 @@ namespace ompl
                 Motion(const SpaceInformation *si)
                   : state(si->allocState()), control(si->allocControl())
                 {
-                    reachable.reserve(16);
+                    reachable.reserve(10);
                 }
 
                 void initReachable(const SpaceInformation *si, const std::vector<double>& controls)
@@ -154,7 +154,7 @@ namespace ompl
                     for (size_t i = 0; i < controls.size(); ++i) {  // steps is fixed to 1
                         base::State* newState = siControl->allocState();
                         control->as<RealVectorControlSpace::ControlType>()->values[0] = controls[i];
-                        if (siControl->propagateWhileValid(state, control, 1, newState) == 1) {
+                        if (siControl->propagateWhileValid(state, control, siControl->getMinControlDuration(), newState) != 0) {
                             reachable.push_back(newState);
                         } else {
                             siControl->freeState(newState);
