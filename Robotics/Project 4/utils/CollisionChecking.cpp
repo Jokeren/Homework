@@ -33,9 +33,9 @@ static bool contained(std::pair<double, double> childVertice[], std::pair<double
     for (size_t i = 0; i < CORNERS; ++i) {
         double x = childVertice[i].first;
         double y = childVertice[i].second;
-	    double x1 = parentVertice[0].first, x2 = parentVertice[1].first, 
+        double x1 = parentVertice[0].first, x2 = parentVertice[1].first, 
                x3 = parentVertice[2].first, x4 = parentVertice[3].first;
-	    double y1 = parentVertice[0].second, y2 = parentVertice[1].second,
+        double y1 = parentVertice[0].second, y2 = parentVertice[1].second,
                y3 = parentVertice[2].second, y4 = parentVertice[3].second;
         int pos1 = nodePosition(x2 - x1, y2 - y1, x - x1, y - y1);
         int pos2 = nodePosition(x3 - x2, y3 - y2, x - x2, y - y2);

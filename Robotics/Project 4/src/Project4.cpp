@@ -63,54 +63,54 @@ namespace oc = ompl::control;
 // This method is analogous to the above KinematicCarModel::ode function.
 void KinematicCarODE(const oc::ODESolver::StateType& q, const oc::Control* control, oc::ODESolver::StateType& qdot)
 {
-	const double *u = control->as<oc::RealVectorControlSpace::ControlType>()->values;
+    const double *u = control->as<oc::RealVectorControlSpace::ControlType>()->values;
 
-	const double theta = q[2];
-	const double speed = q[3];
-	const double omega = u[0];
-	const double accelerate = u[1];
+    const double theta = q[2];
+    const double speed = q[3];
+    const double omega = u[0];
+    const double accelerate = u[1];
 
-	// Zero out qdot
-	qdot.resize(q.size(), 0);
+    // Zero out qdot
+    qdot.resize(q.size(), 0);
 
-	qdot[0] = speed * cos(theta);
-	qdot[1] = speed * sin(theta);
-	qdot[2] = omega;
-	qdot[3] = accelerate;
+    qdot[0] = speed * cos(theta);
+    qdot[1] = speed * sin(theta);
+    qdot[2] = omega;
+    qdot[3] = accelerate;
 }
 
 
 // This is a callback method invoked after numerical integration.
 void KinematicCarPostIntegration(const ob::State* /*state*/, const oc::Control* /*control*/, const double /*duration*/, ob::State *result)
 {
-	// Normalize orientation between 0 and 2*pi
-	ob::SO2StateSpace SO2;
-	SO2.enforceBounds(result->as<ob::CompoundStateSpace::StateType>()
-			->as<ob::SE2StateSpace::StateType>(0)
-			->as<ob::SO2StateSpace::StateType>(1));
+    // Normalize orientation between 0 and 2*pi
+    ob::SO2StateSpace SO2;
+    SO2.enforceBounds(result->as<ob::CompoundStateSpace::StateType>()
+            ->as<ob::SE2StateSpace::StateType>(0)
+            ->as<ob::SO2StateSpace::StateType>(1));
 }
 
 
 bool isCarStateValid(const ob::State *state, const oc::SpaceInformation *si, const std::vector<Rectangle>& obstacles)
 {
-	//    ob::ScopedState<ob::SE2StateSpace>
-	/// cast the abstract state type to the type we expect
-	const auto *cs = state->as<ob::CompoundStateSpace::StateType>();
-	const auto *se2state = cs->as<ob::SE2StateSpace::StateType>(0);
+    //    ob::ScopedState<ob::SE2StateSpace>
+    /// cast the abstract state type to the type we expect
+    const auto *cs = state->as<ob::CompoundStateSpace::StateType>();
+    const auto *se2state = cs->as<ob::SE2StateSpace::StateType>(0);
 
-	/// extract the first component of the state and cast it to what we expect
-	const auto *pos = se2state->as<ob::RealVectorStateSpace::StateType>(0);
+    /// extract the first component of the state and cast it to what we expect
+    const auto *pos = se2state->as<ob::RealVectorStateSpace::StateType>(0);
 
-	/// extract the second component of the state and cast it to what we expect
-	const auto *rot = se2state->as<ob::SO2StateSpace::StateType>(1);
+    /// extract the second component of the state and cast it to what we expect
+    const auto *rot = se2state->as<ob::SO2StateSpace::StateType>(1);
 
-	/// check validity of state defined by pos & rot
-	double x = pos->values[0];
-	double y = pos->values[1];
-	double theta = rot->value;
+    /// check validity of state defined by pos & rot
+    double x = pos->values[0];
+    double y = pos->values[1];
+    double theta = rot->value;
 
-	// return a value that is always true but uses the two variables we define, so we avoid compiler warnings
-	return si->satisfiesBounds(state) && isValidSquare(x, y, theta, CAR_LENGTH, obstacles) && (const void*)rot != (const void*)pos;
+    // return a value that is always true but uses the two variables we define, so we avoid compiler warnings
+    return si->satisfiesBounds(state) && isValidSquare(x, y, theta, CAR_LENGTH, obstacles) && (const void*)rot != (const void*)pos;
 }
 
 
@@ -118,384 +118,384 @@ bool isCarStateValid(const ob::State *state, const oc::SpaceInformation *si, con
 // This method is analogous to the above KinematicCarModel::ode function.
 void KinematicPendulumODE(const oc::ODESolver::StateType& q, const oc::Control* control, oc::ODESolver::StateType& qdot)
 {
-	const double *u = control->as<oc::RealVectorControlSpace::ControlType>()->values;
-	const double theta = q[0];
-	const double omega = q[1];
+    const double *u = control->as<oc::RealVectorControlSpace::ControlType>()->values;
+    const double theta = q[0];
+    const double omega = q[1];
 
-	// Zero out qdot
-	qdot.resize(2, 0);
+    // Zero out qdot
+    qdot.resize(2, 0);
 
-	qdot[0] = omega;
-	qdot[1] = -9.8 * cos(theta) + u[0];
+    qdot[0] = omega;
+    qdot[1] = -9.8 * cos(theta) + u[0];
 }
 
 
 // This is a callback method invoked after numerical integration.
 void KinematicPendulumPostIntegration(const ob::State* /*state*/, const oc::Control* /*control*/, const double /*duration*/, ob::State *result)
 {
-	// Normalize orientation between 0 and 2*pi
-	ob::SO2StateSpace SO2;
-	SO2.enforceBounds(result->as<ob::CompoundStateSpace::StateType>()->as<ob::SO2StateSpace::StateType>(1));
+    // Normalize orientation between 0 and 2*pi
+    ob::SO2StateSpace SO2;
+    SO2.enforceBounds(result->as<ob::CompoundStateSpace::StateType>()->as<ob::SO2StateSpace::StateType>(1));
 }
 
 
 bool isPendulumStateValid(const oc::SpaceInformation *si, const ob::State *state)
 {
-	//    ob::ScopedState<ob::SE2StateSpace>
-	/// cast the abstract state type to the type we expect
-	const auto *cs = state->as<ob::CompoundStateSpace::StateType>();
+    //    ob::ScopedState<ob::SE2StateSpace>
+    /// cast the abstract state type to the type we expect
+    const auto *cs = state->as<ob::CompoundStateSpace::StateType>();
 
-	/// extract the first component of the state and cast it to what we expect
-	const auto *pos = cs->as<ob::RealVectorStateSpace::StateType>(0);
+    /// extract the first component of the state and cast it to what we expect
+    const auto *pos = cs->as<ob::RealVectorStateSpace::StateType>(0);
 
-	/// extract the second component of the state and cast it to what we expect
-	const auto *rot = cs->as<ob::SO2StateSpace::StateType>(1);
+    /// extract the second component of the state and cast it to what we expect
+    const auto *rot = cs->as<ob::SO2StateSpace::StateType>(1);
 
-	/// check validity of state defined by pos & rot
+    /// check validity of state defined by pos & rot
 
-	// return a value that is always true but uses the two variables we define, so we avoid compiler warnings
-	return si->satisfiesBounds(state) && (const void*)rot != (const void*)pos;
+    // return a value that is always true but uses the two variables we define, so we avoid compiler warnings
+    return si->satisfiesBounds(state) && (const void*)rot != (const void*)pos;
 }
 
 
 class CarControlSpace : public oc::RealVectorControlSpace
 {
-	public:
-		CarControlSpace(const ob::StateSpacePtr &stateSpace) : oc::RealVectorControlSpace(stateSpace, 2)
-	{
-	}
+    public:
+        CarControlSpace(const ob::StateSpacePtr &stateSpace) : oc::RealVectorControlSpace(stateSpace, 2)
+    {
+    }
 };
 
 
 class PendulumControlSpace : public oc::RealVectorControlSpace
 {
-	public:
-		PendulumControlSpace(const ob::StateSpacePtr &stateSpace) : oc::RealVectorControlSpace(stateSpace, 1)
-	{
-	}
+    public:
+        PendulumControlSpace(const ob::StateSpacePtr &stateSpace) : oc::RealVectorControlSpace(stateSpace, 1)
+    {
+    }
 };
 
 
 ob::PlannerPtr getPlannerPtr(int alg, int choice, const oc::SimpleSetup& ss)
 {
-	switch (alg) {
-		case 1:  // RRT
-			{
-				return ob::PlannerPtr(new oc::RRT(ss.getSpaceInformation()));
-				break;
-			}
-		case 2:  // KPIECE
-			{
-				ob::StateSpacePtr space = ss.getStateSpace();
-				ob::PlannerPtr planner(new oc::KPIECE1(ss.getSpaceInformation()));
-				if (choice == 1) {
-					space->registerProjection("pendulumProjection", ob::ProjectionEvaluatorPtr(new PendulumProjection(space)));
-					planner->as<oc::KPIECE1>()->setProjectionEvaluator("pendulumProjection");
-					return planner;
-				} else if (choice == 2) {
-					space->registerProjection("carProjection", ob::ProjectionEvaluatorPtr(new CarProjection(space)));
-					planner->as<oc::KPIECE1>()->setProjectionEvaluator("carProjection");
-					return planner;
-				}
-				break;
-			}
-		case 3:  // RGRRT
-			{
-				return ob::PlannerPtr(new oc::RGRRT(ss.getSpaceInformation()));
-			}
-		default:
-			{
-				return NULL;
-				break;
-			}
-	}
+    switch (alg) {
+        case 1:  // RRT
+            {
+                return ob::PlannerPtr(new oc::RRT(ss.getSpaceInformation()));
+                break;
+            }
+        case 2:  // KPIECE
+            {
+                ob::StateSpacePtr space = ss.getStateSpace();
+                ob::PlannerPtr planner(new oc::KPIECE1(ss.getSpaceInformation()));
+                if (choice == 1) {
+                    space->registerProjection("pendulumProjection", ob::ProjectionEvaluatorPtr(new PendulumProjection(space)));
+                    planner->as<oc::KPIECE1>()->setProjectionEvaluator("pendulumProjection");
+                    return planner;
+                } else if (choice == 2) {
+                    space->registerProjection("carProjection", ob::ProjectionEvaluatorPtr(new CarProjection(space)));
+                    planner->as<oc::KPIECE1>()->setProjectionEvaluator("carProjection");
+                    return planner;
+                }
+                break;
+            }
+        case 3:  // RGRRT
+            {
+                return ob::PlannerPtr(new oc::RGRRT(ss.getSpaceInformation()));
+            }
+        default:
+            {
+                return NULL;
+                break;
+            }
+    }
     return NULL;
 }
 
 
 void PlanPendulum(int alg, int choice, int torque_bound, bool benchmark = true, double seconds = 20.0)
 {
-	/// construct the state space we are planning in
-	ompl::base::StateSpacePtr so2(new ompl::base::SO2StateSpace());
-	ompl::base::StateSpacePtr rv(new ompl::base::RealVectorStateSpace(1));
-	ompl::base::StateSpacePtr space = so2 + rv;
+    /// construct the state space we are planning in
+    ompl::base::StateSpacePtr so2(new ompl::base::SO2StateSpace());
+    ompl::base::StateSpacePtr rv(new ompl::base::RealVectorStateSpace(1));
+    ompl::base::StateSpacePtr space = so2 + rv;
 
-	/// so2 bound is set automatically
-	/// set the bounds for rv
-	ob::RealVectorBounds bounds(1);
-	bounds.setLow(-10);
-	bounds.setHigh(10);
+    /// so2 bound is set automatically
+    /// set the bounds for rv
+    ob::RealVectorBounds bounds(1);
+    bounds.setLow(-10);
+    bounds.setHigh(10);
 
-	rv->as<ob::RealVectorStateSpace>()->setBounds(bounds);
+    rv->as<ob::RealVectorStateSpace>()->setBounds(bounds);
 
-	// create a control space
-	auto cspace(std::make_shared<PendulumControlSpace>(space));
+    // create a control space
+    auto cspace(std::make_shared<PendulumControlSpace>(space));
 
-	// set the bounds for the control space
-	ob::RealVectorBounds cbounds(1);
-	cbounds.setLow(-torque_bound);
-	cbounds.setHigh(torque_bound);
+    // set the bounds for the control space
+    ob::RealVectorBounds cbounds(1);
+    cbounds.setLow(-torque_bound);
+    cbounds.setHigh(torque_bound);
 
-	cspace->setBounds(cbounds);
+    cspace->setBounds(cbounds);
 
-	// define a simple setup class
-	oc::SimpleSetup ss(cspace);
+    // define a simple setup class
+    oc::SimpleSetup ss(cspace);
 
-	// set state validity checking for this space
-	oc::SpaceInformation *si = ss.getSpaceInformation().get();
-	ss.setStateValidityChecker(
-			[si](const ob::State *state) { return isPendulumStateValid(si, state); });
+    // set state validity checking for this space
+    oc::SpaceInformation *si = ss.getSpaceInformation().get();
+    ss.setStateValidityChecker(
+            [si](const ob::State *state) { return isPendulumStateValid(si, state); });
 
-	auto odeSolver(std::make_shared<oc::ODEBasicSolver<>>(ss.getSpaceInformation(), &KinematicPendulumODE));
-	ss.setStatePropagator(oc::ODESolver::getStatePropagator(odeSolver, &KinematicPendulumPostIntegration));
+    auto odeSolver(std::make_shared<oc::ODEBasicSolver<>>(ss.getSpaceInformation(), &KinematicPendulumODE));
+    ss.setStatePropagator(oc::ODESolver::getStatePropagator(odeSolver, &KinematicPendulumPostIntegration));
 
-	/// create a start state
-	ob::ScopedState<ob::CompoundStateSpace> start(space);
-	start->as<ob::SO2StateSpace::StateType>(0)->value = -M_PI / 2;
-	start->as<ob::RealVectorStateSpace::StateType>(1)->values[0] = 0;
+    /// create a start state
+    ob::ScopedState<ob::CompoundStateSpace> start(space);
+    start->as<ob::SO2StateSpace::StateType>(0)->value = -M_PI / 2;
+    start->as<ob::RealVectorStateSpace::StateType>(1)->values[0] = 0;
 
-	/// create a  goal state; use the hard way to set the elements
-	ob::ScopedState<ob::CompoundStateSpace> goal(space);
-	goal->as<ob::SO2StateSpace::StateType>(0)->value = M_PI / 2;
-	goal->as<ob::RealVectorStateSpace::StateType>(1)->values[0] = 0;
+    /// create a  goal state; use the hard way to set the elements
+    ob::ScopedState<ob::CompoundStateSpace> goal(space);
+    goal->as<ob::SO2StateSpace::StateType>(0)->value = M_PI / 2;
+    goal->as<ob::RealVectorStateSpace::StateType>(1)->values[0] = 0;
 
-	/// set the start and goal states
-	ss.setStartAndGoalStates(start, goal, 0.1);
+    /// set the start and goal states
+    ss.setStartAndGoalStates(start, goal, 0.1);
 
-	if(benchmark){
-		std::string title = "Pendulum";
-		ompl::tools::Benchmark b(ss, title);
+    if(benchmark){
+        std::string title = "Pendulum";
+        ompl::tools::Benchmark b(ss, title);
         //ss.getSpaceInformation()->setPropagationStepSize(0.01);
-		b.addPlanner(ompl::base::PlannerPtr(new ompl::control::RGRRT(ss.getSpaceInformation())));
-		b.addPlanner(ompl::base::PlannerPtr(new ompl::control::RRT(ss.getSpaceInformation())));
+        b.addPlanner(ompl::base::PlannerPtr(new ompl::control::RGRRT(ss.getSpaceInformation())));
+        b.addPlanner(ompl::base::PlannerPtr(new ompl::control::RRT(ss.getSpaceInformation())));
 
         //ss.getSpaceInformation()->setPropagationStepSize(0.05);
-		ompl::base::PlannerPtr kp1(new ompl::control::KPIECE1(ss.getSpaceInformation()));
-		space->registerProjection("PendulumProjection", ob::ProjectionEvaluatorPtr(new PendulumProjection(space)));
-		kp1->as<ompl::control::KPIECE1>()->setProjectionEvaluator("PendulumProjection");
-		b.addPlanner(kp1);
-		ompl::tools::Benchmark::Request req;
-		req.maxTime = 20.0;
-		req.maxMem = 1000.0;
-		req.runCount = 20;
-		req.displayProgress = true;
-		b.benchmark(req);
-		std::string logfile = title + ".log";
-		b.saveResultsToFile(logfile.c_str());
-	}
-	else{
-		/// set planner
-	    ob::PlannerPtr planner = getPlannerPtr(alg, choice, ss);
+        ompl::base::PlannerPtr kp1(new ompl::control::KPIECE1(ss.getSpaceInformation()));
+        space->registerProjection("PendulumProjection", ob::ProjectionEvaluatorPtr(new PendulumProjection(space)));
+        kp1->as<ompl::control::KPIECE1>()->setProjectionEvaluator("PendulumProjection");
+        b.addPlanner(kp1);
+        ompl::tools::Benchmark::Request req;
+        req.maxTime = 20.0;
+        req.maxMem = 1000.0;
+        req.runCount = 20;
+        req.displayProgress = true;
+        b.benchmark(req);
+        std::string logfile = title + ".log";
+        b.saveResultsToFile(logfile.c_str());
+    }
+    else{
+        /// set planner
+        ob::PlannerPtr planner = getPlannerPtr(alg, choice, ss);
 
-		ss.setPlanner(planner);
+        ss.setPlanner(planner);
 
-		/// attempt to solve the problem within one second of planning time
-		ob::PlannerStatus solved = ss.solve(seconds);
+        /// attempt to solve the problem within one second of planning time
+        ob::PlannerStatus solved = ss.solve(seconds);
 
-		if (solved)
-		{
-			std::cout << "Found solution:" << std::endl;
-			/// print the path to screen
+        if (solved)
+        {
+            std::cout << "Found solution:" << std::endl;
+            /// print the path to screen
 
-			ss.getSolutionPath().asGeometric().printAsMatrix(std::cout);
-		}
-		else
-			std::cout << "No solution found" << std::endl;
-	}
+            ss.getSolutionPath().asGeometric().printAsMatrix(std::cout);
+        }
+        else
+            std::cout << "No solution found" << std::endl;
+    }
 }
 
 void PlanCar(int alg, int choice,
-		const Robot& startCar, const Robot& goalCar,
-		const std::vector<Rectangle>& obstacles,
-		double spaceLow, double spaceHigh,
-		double speedLow, double speedHigh,
-		double omegaLow, double omegaHigh,
-		double accelerateLow, double accelerateHigh,
-		bool benchmark = false, double seconds = 20.0)
+        const Robot& startCar, const Robot& goalCar,
+        const std::vector<Rectangle>& obstacles,
+        double spaceLow, double spaceHigh,
+        double speedLow, double speedHigh,
+        double omegaLow, double omegaHigh,
+        double accelerateLow, double accelerateHigh,
+        bool benchmark = false, double seconds = 20.0)
 {
-	/// construct the state space we are planning in
-	ompl::base::StateSpacePtr se2(new ompl::base::SE2StateSpace());
-	ompl::base::StateSpacePtr rv(new ompl::base::RealVectorStateSpace(1));
-	ompl::base::StateSpacePtr space = se2 + rv;
+    /// construct the state space we are planning in
+    ompl::base::StateSpacePtr se2(new ompl::base::SE2StateSpace());
+    ompl::base::StateSpacePtr rv(new ompl::base::RealVectorStateSpace(1));
+    ompl::base::StateSpacePtr space = se2 + rv;
 
-	/// so2 bound is set automatically
-	/// set the bounds for the R^2 part of SE(2)
-	ob::RealVectorBounds bounds(2);
-	bounds.setLow(spaceLow);
-	bounds.setHigh(spaceHigh);
+    /// so2 bound is set automatically
+    /// set the bounds for the R^2 part of SE(2)
+    ob::RealVectorBounds bounds(2);
+    bounds.setLow(spaceLow);
+    bounds.setHigh(spaceHigh);
 
-	se2->as<ob::SE2StateSpace>()->setBounds(bounds);
+    se2->as<ob::SE2StateSpace>()->setBounds(bounds);
 
-	// set the bounds for the R part
-	ob::RealVectorBounds speedBounds(1);
-	speedBounds.setLow(speedLow);
-	speedBounds.setHigh(speedHigh);
-	rv->as<ob::RealVectorStateSpace>()->setBounds(speedBounds);
+    // set the bounds for the R part
+    ob::RealVectorBounds speedBounds(1);
+    speedBounds.setLow(speedLow);
+    speedBounds.setHigh(speedHigh);
+    rv->as<ob::RealVectorStateSpace>()->setBounds(speedBounds);
 
-	// create a control space
-	auto cspace(std::make_shared<CarControlSpace>(space));
+    // create a control space
+    auto cspace(std::make_shared<CarControlSpace>(space));
 
-	// set the bounds for the control space
-	ob::RealVectorBounds cbounds(2);
-	cbounds.setLow(0, omegaLow);
-	cbounds.setHigh(0, omegaHigh);
-	cbounds.setLow(1, accelerateLow);
-	cbounds.setHigh(1, accelerateHigh);
+    // set the bounds for the control space
+    ob::RealVectorBounds cbounds(2);
+    cbounds.setLow(0, omegaLow);
+    cbounds.setHigh(0, omegaHigh);
+    cbounds.setLow(1, accelerateLow);
+    cbounds.setHigh(1, accelerateHigh);
 
-	cspace->setBounds(cbounds);
+    cspace->setBounds(cbounds);
 
-	// define a simple setup class
-	oc::SimpleSetup ss(cspace);
-	// set state validity checking for this space
-	oc::SpaceInformation *si = ss.getSpaceInformation().get();
-	ss.setStateValidityChecker(std::bind(isCarStateValid, std::placeholders::_1, si, obstacles));
+    // define a simple setup class
+    oc::SimpleSetup ss(cspace);
+    // set state validity checking for this space
+    oc::SpaceInformation *si = ss.getSpaceInformation().get();
+    ss.setStateValidityChecker(std::bind(isCarStateValid, std::placeholders::_1, si, obstacles));
 
-	// Use the ODESolver to propagate the system.  Call KinematicCarPostIntegration
-	// when integration has finished to normalize the orientation values.
-	auto odeSolver(std::make_shared<oc::ODEBasicSolver<>>(ss.getSpaceInformation(), &KinematicCarODE));
-	ss.setStatePropagator(oc::ODESolver::getStatePropagator(odeSolver, &KinematicCarPostIntegration));
+    // Use the ODESolver to propagate the system.  Call KinematicCarPostIntegration
+    // when integration has finished to normalize the orientation values.
+    auto odeSolver(std::make_shared<oc::ODEBasicSolver<>>(ss.getSpaceInformation(), &KinematicCarODE));
+    ss.setStatePropagator(oc::ODESolver::getStatePropagator(odeSolver, &KinematicCarPostIntegration));
 
-	/// create a start state
-	ob::ScopedState<ob::CompoundStateSpace> start(space);
-	start->as<ob::SE2StateSpace::StateType>(0)->setX(startCar.x);
-	start->as<ob::SE2StateSpace::StateType>(0)->setY(startCar.y);
-	start->as<ob::SE2StateSpace::StateType>(0)->setYaw(startCar.theta);
-	start->as<ob::RealVectorStateSpace::StateType>(1)->values[0] = 0;
+    /// create a start state
+    ob::ScopedState<ob::CompoundStateSpace> start(space);
+    start->as<ob::SE2StateSpace::StateType>(0)->setX(startCar.x);
+    start->as<ob::SE2StateSpace::StateType>(0)->setY(startCar.y);
+    start->as<ob::SE2StateSpace::StateType>(0)->setYaw(startCar.theta);
+    start->as<ob::RealVectorStateSpace::StateType>(1)->values[0] = 0;
 
-	/// create a  goal state; use the hard way to set the elements
-	ob::ScopedState<ob::CompoundStateSpace> goal(space);
-	goal->as<ob::SE2StateSpace::StateType>(0)->setX(goalCar.x);
-	goal->as<ob::SE2StateSpace::StateType>(0)->setY(goalCar.y);
-	goal->as<ob::SE2StateSpace::StateType>(0)->setYaw(goalCar.theta);
-	goal->as<ob::RealVectorStateSpace::StateType>(1)->values[0] = 0;
+    /// create a  goal state; use the hard way to set the elements
+    ob::ScopedState<ob::CompoundStateSpace> goal(space);
+    goal->as<ob::SE2StateSpace::StateType>(0)->setX(goalCar.x);
+    goal->as<ob::SE2StateSpace::StateType>(0)->setY(goalCar.y);
+    goal->as<ob::SE2StateSpace::StateType>(0)->setYaw(goalCar.theta);
+    goal->as<ob::RealVectorStateSpace::StateType>(1)->values[0] = 0;
 
-	/// set the start and goal states
-	ss.setStartAndGoalStates(start, goal, 0.2);
+    /// set the start and goal states
+    ss.setStartAndGoalStates(start, goal, 0.2);
 
-	if(benchmark){
-		std::string title = "Car";
-		ompl::tools::Benchmark b(ss, title);
+    if(benchmark){
+        std::string title = "Car";
+        ompl::tools::Benchmark b(ss, title);
         //ss.getSpaceInformation()->setPropagationStepSize(0.01);
-		b.addPlanner(ompl::base::PlannerPtr(new ompl::control::RGRRT(ss.getSpaceInformation())));
-		b.addPlanner(ompl::base::PlannerPtr(new ompl::control::RRT(ss.getSpaceInformation())));
+        b.addPlanner(ompl::base::PlannerPtr(new ompl::control::RGRRT(ss.getSpaceInformation())));
+        b.addPlanner(ompl::base::PlannerPtr(new ompl::control::RRT(ss.getSpaceInformation())));
 
         //ss.getSpaceInformation()->setPropagationStepSize(0.05);
-		ompl::base::PlannerPtr kp1(new ompl::control::KPIECE1(ss.getSpaceInformation()));
-		space->registerProjection("CarProjection", ob::ProjectionEvaluatorPtr(new CarProjection(space)));
-		kp1->as<ompl::control::KPIECE1>()->setProjectionEvaluator("CarProjection");
-		b.addPlanner(kp1);
-		ompl::tools::Benchmark::Request req;
-		req.maxTime = 20.0;
-		req.maxMem = 1000.0;
-		req.runCount = 20;
-		req.displayProgress = true;
-		b.benchmark(req);
-		std::string logfile = title + ".log";
-		b.saveResultsToFile(logfile.c_str());
-	}
-	else{
-		/// set planner
-    	ob::PlannerPtr planner = getPlannerPtr(alg, choice, ss);
+        ompl::base::PlannerPtr kp1(new ompl::control::KPIECE1(ss.getSpaceInformation()));
+        space->registerProjection("CarProjection", ob::ProjectionEvaluatorPtr(new CarProjection(space)));
+        kp1->as<ompl::control::KPIECE1>()->setProjectionEvaluator("CarProjection");
+        b.addPlanner(kp1);
+        ompl::tools::Benchmark::Request req;
+        req.maxTime = 20.0;
+        req.maxMem = 1000.0;
+        req.runCount = 20;
+        req.displayProgress = true;
+        b.benchmark(req);
+        std::string logfile = title + ".log";
+        b.saveResultsToFile(logfile.c_str());
+    }
+    else{
+        /// set planner
+        ob::PlannerPtr planner = getPlannerPtr(alg, choice, ss);
 
-		ss.setPlanner(planner);
+        ss.setPlanner(planner);
 
 
-		/// attempt to solve the problem within one second of planning time
-		ob::PlannerStatus solved = ss.solve(seconds);
+        /// attempt to solve the problem within one second of planning time
+        ob::PlannerStatus solved = ss.solve(seconds);
 
-		if (solved)
-		{
-			std::cout << "Found solution:" << std::endl;
-			/// print the path to screen
+        if (solved)
+        {
+            std::cout << "Found solution:" << std::endl;
+            /// print the path to screen
 
-			ss.getSolutionPath().asGeometric().printAsMatrix(std::cout);
-		}
-		else
-			std::cout << "No solution found" << std::endl;
-	}
+            ss.getSolutionPath().asGeometric().printAsMatrix(std::cout);
+        }
+        else
+            std::cout << "No solution found" << std::endl;
+    }
 }
 
 int main(int /*argc*/, char ** /*argv*/)
 {
-	std::cout << "OMPL version: " << OMPL_VERSION << std::endl;
+    std::cout << "OMPL version: " << OMPL_VERSION << std::endl;
 
-	int flag;
-	bool benchmark = false;
-	do
-	{
-		std::cout << "Benchmark?"<< std::endl;
-		std::cout << " (1) Yes" << std::endl;
-		std::cout << " (2) No" << std::endl;
-		std::cin >> flag;
-	} while (flag < 1 || flag > 2);
-	benchmark = flag == 1 ? true : false;
+    int flag;
+    bool benchmark = false;
+    do
+    {
+        std::cout << "Benchmark?"<< std::endl;
+        std::cout << " (1) Yes" << std::endl;
+        std::cout << " (2) No" << std::endl;
+        std::cin >> flag;
+    } while (flag < 1 || flag > 2);
+    benchmark = flag == 1 ? true : false;
 
-	int choice;
-	do
-	{
-		std::cout << "Plan by: "<< std::endl;
-		std::cout << " (1) Pendulum" << std::endl;
-		std::cout << " (2) Car" << std::endl;
+    int choice;
+    do
+    {
+        std::cout << "Plan by: "<< std::endl;
+        std::cout << " (1) Pendulum" << std::endl;
+        std::cout << " (2) Car" << std::endl;
 
-		std::cin >> choice;
-	} while (choice < 1 || choice > 2);
+        std::cin >> choice;
+    } while (choice < 1 || choice > 2);
 
-	int alg;
+    int alg;
     if (!benchmark) {
-	    do
-	    {
-	    	std::cout << "Plan by: "<< std::endl;
-	    	std::cout << " (1) RRT" << std::endl;
-	    	std::cout << " (2) KPIECE" << std::endl;
-	    	std::cout << " (3) RG-RRT" << std::endl;
+        do
+        {
+            std::cout << "Plan by: "<< std::endl;
+            std::cout << " (1) RRT" << std::endl;
+            std::cout << " (2) KPIECE" << std::endl;
+            std::cout << " (3) RG-RRT" << std::endl;
 
-	    	std::cin >> alg;
-	    } while (alg < 1 || alg > 4);
+            std::cin >> alg;
+        } while (alg < 1 || alg > 4);
     } else {
         alg = 1;  // does not matter
     }
 
-	switch (choice)
-	{
-		case 1:
-			{
-				int torque;
-				std::cout << "Torque: "<< std::endl;
-				std::cin >> torque;
-				PlanPendulum(alg, choice, torque, benchmark); 
-				break;
-			}
-		case 2:
-			{
-				Robot startCar, goalCar;
-				double spaceLow, spaceHigh;
-				double speedLow, speedHigh;
-				double omegaLow, omegaHigh;
-				double accelerateLow, accelerateHigh;
-				std::vector<Rectangle> obstacles;
+    switch (choice)
+    {
+        case 1:
+            {
+                int torque;
+                std::cout << "Torque: "<< std::endl;
+                std::cin >> torque;
+                PlanPendulum(alg, choice, torque, benchmark); 
+                break;
+            }
+        case 2:
+            {
+                Robot startCar, goalCar;
+                double spaceLow, spaceHigh;
+                double speedLow, speedHigh;
+                double omegaLow, omegaHigh;
+                double accelerateLow, accelerateHigh;
+                std::vector<Rectangle> obstacles;
 
-				getStart(startCar);
-				getGoal(goalCar);
-				getBound(spaceLow, spaceHigh);
-				getSpeedBound(speedLow, speedHigh);
-				getOmegaBound(omegaLow, omegaHigh);
-				getAccelerateBound(accelerateLow, accelerateHigh);
-				getObstacles(obstacles);
+                getStart(startCar);
+                getGoal(goalCar);
+                getBound(spaceLow, spaceHigh);
+                getSpeedBound(speedLow, speedHigh);
+                getOmegaBound(omegaLow, omegaHigh);
+                getAccelerateBound(accelerateLow, accelerateHigh);
+                getObstacles(obstacles);
 
-				PlanCar(alg, choice,
-						startCar, goalCar,
-						obstacles,
-						spaceLow, spaceHigh,
-						speedLow, speedHigh,
-						omegaLow, omegaHigh,
-						accelerateLow, accelerateHigh,
+                PlanCar(alg, choice,
+                        startCar, goalCar,
+                        obstacles,
+                        spaceLow, spaceHigh,
+                        speedLow, speedHigh,
+                        omegaLow, omegaHigh,
+                        accelerateLow, accelerateHigh,
                         benchmark);
-				break;
-			}
-		default:
-			break;
-	}
+                break;
+            }
+        default:
+            break;
+    }
 
-	return 0;
+    return 0;
 }
 
