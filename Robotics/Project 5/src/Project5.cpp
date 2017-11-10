@@ -121,7 +121,7 @@ int main(int, char **)
             break;
         case 2:
             break;
-        defualt:
+        default:
             std::cerr << "No such option!" << std::endl;
             break;
     }
