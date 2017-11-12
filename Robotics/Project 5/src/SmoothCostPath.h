@@ -19,7 +19,6 @@ namespace ompl
         public:
             explicit SmoothCostPath(const base::SpaceInformationPtr &si) : CostPath(si) {}
 
-            // use PathGeometric copyConstructor
             explicit SmoothCostPath(const PathGeometric &path) : CostPath(path) {}
 
             virtual double cost(size_t index, base::State *state);

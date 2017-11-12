@@ -44,18 +44,19 @@ void planSimple(const std::vector<Rectangle>& obstacles,
 {
     ompl::base::StateSpacePtr r2(new ompl::base::RealVectorStateSpace(2));
 
-    // We need to set bounds on R^2
+    // Set bounds on R^2
     ompl::base::RealVectorBounds bounds(2);
-    bounds.setLow(low); // x and y have a minimum of -2
-    bounds.setHigh(high); // x and y have a maximum of 2
+    bounds.setLow(low);
+    bounds.setHigh(high);
 
-    // Cast the r2 pointer to the derived type, then set the bounds
     r2->as<ompl::base::RealVectorStateSpace>()->setBounds(bounds);
 
+    // Set validity checkers
     ompl::geometric::PerturbingSetup ps(r2);
 
     ps.setStateValidityChecker(std::bind(isValidStatePoint, std::placeholders::_1, obstacles));
 
+    // Set the start and goal states
     ompl::base::ScopedState<> start(r2);
     start[0] = rstart.x;
     start[1] = rstart.y;
@@ -64,32 +65,31 @@ void planSimple(const std::vector<Rectangle>& obstacles,
     goal[0] = rgoal.x;
     goal[1] = rgoal.y;
 
-    // set the start and goal states
     ps.setStartAndGoalStates(start, goal);
 
     ompl::base::PlannerPtr planner(new ompl::geometric::RRT(ps.getSpaceInformation()));
     ps.setPlanner(planner);
 
-    // Step 6) Attempt to solve the problem within the given time (seconds)
+    // Solve the problem within the given time (seconds)
     ompl::base::PlannerStatus solved = ps.solve(10.0);
 
-    // set costPath for optimization purpose
+    // Set costPath for optimization purpose
     auto costPath = std::static_pointer_cast<ompl::geometric::CostPath>(
         std::make_shared<ompl::geometric::SmoothCostPath>(ps.getSpaceInformation()));
     ps.setCostPath(costPath);
 
     if (solved)
     {
-        // Apply some heuristics to simplify (and prettify) the solution
+        // Simplify (and prettify) the solution
         ps.simplifySolution();
 
-        // print the path to screen
+        // Print the path to screen
         std::cout << "Found solution:" << std::endl;
         ompl::geometric::PathGeometric& path = ps.getSolutionPath();
         path.interpolate(50);
         path.printAsMatrix(std::cout);
 
-        // print path to file
+        // Print path to file
         std::ofstream fout("path.txt");
         fout << "Simple" << std::endl;
         path.printAsMatrix(fout);
@@ -102,36 +102,70 @@ void planSimple(const std::vector<Rectangle>& obstacles,
 
 int main(int, char **)
 {
+    //----------------------------
+    // Init environment
+    //----------------------------
     int choice;
     do
     {
         std::cout << "Plan for: "<< std::endl;
-        std::cout << " (1) A point in 2D" << std::endl;
-        std::cout << " (2) A rigid box in 2D" << std::endl;
+        std::cout << " (1) Simple environment" << std::endl;
+        std::cout << " (2) Complex environment" << std::endl;
 
         std::cin >> choice;
     } while (choice < 1 || choice > 2);
 
     std::vector<Rectangle> obstacles;
-    getObstacles(obstacles);
-
-    Robot start, goal;
-    double low, high;
-    switch(choice)
+    switch (choice)
     {
         case 1:
-            start.type = 'p';
-            goal.type = 'p';
-            getStart(start);
-            getGoal(goal);
-            getBound(low, high);
-            planSimple(obstacles, low, high, start, goal);
+            getObstacles(obstacles);
             break;
         case 2:
             break;
         default:
-            std::cerr << "No such option!" << std::endl;
+            std::cerr << "No such environment option!" << std::endl;
             break;
     }
+    
+    //----------------------------
+    // Init robot shape
+    //----------------------------
+    int shape;
+    do
+    {
+        std::cout << "Robot shape: "<< std::endl;
+        std::cout << " (1) Point" << std::endl;
+        std::cout << " (2) Square" << std::endl;
+
+        std::cin >> shape;
+    } while (shape < 1 || shape > 2);
+
+    Robot start, goal;
+    double low, high;
+    getStart(start);
+    getGoal(goal);
+    getBound(low, high);
+    switch (shape)
+    {
+        case 1:
+        {
+            start.type = 'p';
+            goal.type = 'p';
+            planSimple(obstacles, low, high, start, goal);
+            break;
+        }
+        case 2:
+        {
+            start.type = 's';
+            goal.type = 's';
+            break;
+        }
+        default:
+        {
+            std::cerr << "No such shape option!" << std::endl;
+        }
+    }
+
     return 0;
 }

@@ -14,17 +14,15 @@ namespace ompl
 {
     namespace geometric
     {
-        // A wrapper of PathGeometric
-        // do not use inheritation
+        // A wrapper of PathGeometric, do not use inheritation
         class CostPath
         {
         public:
             explicit CostPath(const base::SpaceInformationPtr &si) : path_(si), cost_(0.0) {}
 
-            // use PathGeometric copyConstructor
             explicit CostPath(const PathGeometric &path) : path_(path), cost_(0.0) {}
 
-            // copy path
+            // Copy path
             void setPath(const PathGeometric &path)
             {
                 this->path_ = path;
@@ -55,7 +53,7 @@ namespace ompl
                 return this->path_.getState(index);
             }
 
-            // compute cost
+            // Compute cost
             virtual double cost(size_t index, base::State *state) = 0;
 
             void updateCost(size_t index, base::State *state)
@@ -63,11 +61,12 @@ namespace ompl
                 std::vector<base::State *> &states = path_.getStates();
                 double oldCost = cost(index, states[index]);
                 double newCost = cost(index, state);
-                // special operation, save space
+                // Special operation, save space
                 std::swap(states[index], state);
                 cost_ += newCost - oldCost;
             }
 
+            // Init cost before using CostPath
             void initCost()
             {
                 std::vector<base::State *> &states = path_.getStates();

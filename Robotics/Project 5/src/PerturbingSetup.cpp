@@ -21,7 +21,7 @@ namespace ompl
                     time::point start = time::now();
                     auto &path = static_cast<geometric::PathGeometric &>(*p);
                     std::size_t numStates = path.getStateCount();
-                    // keep two copies of path
+                    // Keep two copies of path
                     if (costPath_)
                     {
                         costPath_->setPath(path);
@@ -36,12 +36,12 @@ namespace ompl
                         {
                             perturbeRandom(base::timedPlannerTerminationCondition(duration));
                         }
-                        // end perturbing
+                        // Find optimization
                         if (costPath_->getCost() < initCost)
                         {
                             path = costPath_->getPath();
                         }
-                        else  // no need to update path
+                        else  // No need to update path
                         {
                             OMPL_WARN("cost was not reduced");
                         } 
@@ -88,7 +88,8 @@ namespace ompl
         }
 
 
-        void PerturbingSetup::randomState(const base::State *startState, const base::State *endState, base::State *midState, base::State *newState)
+        void PerturbingSetup::randomState(const base::State *startState, const base::State *endState,
+                                          base::State *midState, base::State *newState)
         {
             double dist = si_->distance(startState, endState);
             // find middle point
