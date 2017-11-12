@@ -25,15 +25,15 @@ namespace ompl
                 double b = path_.getSpaceInformation()->distance(state, states[index + 1]);
                 double c = path_.getSpaceInformation()->distance(states[index - 1], states[index + 1]);
                 double acosValue = (a * a + b * b - c * c) / (2.0 * a * b);
-            	if (acosValue > -1.0 && acosValue < 1.0)
-				{
-					// the smoothness is actually the outside angle of the one we compute
-					double angle = (M_PI - acos(acosValue));
-					// and we normalize by the length of the segments
-					double k = 2.0 * angle / (a + b);
-					return k * k;
-				}
-				return 0;
+                if (acosValue > -1.0 && acosValue < 1.0)
+                {
+                    // the smoothness is actually the outside angle of the one we compute
+                    double angle = (M_PI - acos(acosValue));
+                    // and we normalize by the length of the segments
+                    double k = 2.0 * angle / (a + b);
+                    return k * k;
+                }
+                return 0;
             }
         }
     }
