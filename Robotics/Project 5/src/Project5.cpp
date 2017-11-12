@@ -18,6 +18,7 @@
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 #include <ompl/base/spaces/SO2StateSpace.h>
 
+#include "PerturbingSetup.h"
 #include "../utils/Setup.h"
 #include "../utils/CollisionChecking.h"
 
@@ -49,9 +50,9 @@ void planSimple(const std::vector<Rectangle>& obstacles,
     // Cast the r2 pointer to the derived type, then set the bounds
     r2->as<ompl::base::RealVectorStateSpace>()->setBounds(bounds);
 
-    ompl::geometric::SimpleSetup ss(r2);
+    ompl::tools::PerturbingSetup ps(r2);
 
-    ss.setStateValidityChecker(std::bind(isValidStatePoint, std::placeholders::_1, obstacles));
+    ps.setStateValidityChecker(std::bind(isValidStatePoint, std::placeholders::_1, obstacles));
 
     ompl::base::ScopedState<> start(r2);
     start[0] = rstart.x;
@@ -62,22 +63,22 @@ void planSimple(const std::vector<Rectangle>& obstacles,
     goal[1] = rgoal.y;
 
     // set the start and goal states
-    ss.setStartAndGoalStates(start, goal);
+    ps.setStartAndGoalStates(start, goal);
 
-    ompl::base::PlannerPtr planner(new ompl::geometric::RRT(ss.getSpaceInformation()));
-    ss.setPlanner(planner);
+    ompl::base::PlannerPtr planner(new ompl::geometric::RRT(ps.getSpaceInformation()));
+    ps.setPlanner(planner);
 
     // Step 6) Attempt to solve the problem within the given time (seconds)
-    ompl::base::PlannerStatus solved = ss.solve(10.0);
+    ompl::base::PlannerStatus solved = ps.solve(10.0);
 
     if (solved)
     {
         // Apply some heuristics to simplify (and prettify) the solution
-        ss.simplifySolution();
+        ps.simplifySolution();
 
         // print the path to screen
         std::cout << "Found solution:" << std::endl;
-        ompl::geometric::PathGeometric& path = ss.getSolutionPath();
+        ompl::geometric::PathGeometric& path = ps.getSolutionPath();
         path.interpolate(50);
         path.printAsMatrix(std::cout);
 
