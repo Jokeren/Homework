@@ -18,6 +18,8 @@
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 #include <ompl/base/spaces/SO2StateSpace.h>
 
+#include "SmoothCostPath.h"
+#include "CostPath.h"
 #include "PerturbingSetup.h"
 #include "../utils/Setup.h"
 #include "../utils/CollisionChecking.h"
@@ -50,7 +52,7 @@ void planSimple(const std::vector<Rectangle>& obstacles,
     // Cast the r2 pointer to the derived type, then set the bounds
     r2->as<ompl::base::RealVectorStateSpace>()->setBounds(bounds);
 
-    ompl::tools::PerturbingSetup ps(r2);
+    ompl::geometric::PerturbingSetup ps(r2);
 
     ps.setStateValidityChecker(std::bind(isValidStatePoint, std::placeholders::_1, obstacles));
 
@@ -70,6 +72,11 @@ void planSimple(const std::vector<Rectangle>& obstacles,
 
     // Step 6) Attempt to solve the problem within the given time (seconds)
     ompl::base::PlannerStatus solved = ps.solve(10.0);
+
+    // set costPath for optimization purpose
+    auto costPath = std::static_pointer_cast<ompl::geometric::CostPath>(
+        std::make_shared<ompl::geometric::SmoothCostPath>(ps.getSpaceInformation()));
+    ps.setCostPath(costPath);
 
     if (solved)
     {

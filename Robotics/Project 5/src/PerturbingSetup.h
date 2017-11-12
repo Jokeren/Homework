@@ -10,26 +10,27 @@
 
 #include <ompl/geometric/SimpleSetup.h>
 #include <ompl/geometric/PathSimplifier.h>
-#include <ompl/tools/config/MagicConstants.h>
+
+#include "CostPath.h"
 
 namespace ompl
 {
-    namespace tools
+    namespace geometric
     {
         OMPL_CLASS_FORWARD(PerturbingSetup);
 
-        class PerturbingSetup : public geometric::SimpleSetup
+        class PerturbingSetup : public SimpleSetup
         {
         public:
             /** \brief Constructor needs the state space used for planning. */
-            explicit PerturbingSetup(const base::SpaceInformationPtr &si) : geometric::SimpleSetup(si) {};
+            explicit PerturbingSetup(const base::SpaceInformationPtr &si) : SimpleSetup(si) {};
 
             /** \brief Constructor needs the state space used for planning. */
-            explicit PerturbingSetup(const base::StateSpacePtr &space) : geometric::SimpleSetup(space) {};
+            explicit PerturbingSetup(const base::StateSpacePtr &space) : SimpleSetup(space) {};
 
-            void setCostFunction(std::function<double(const geometric::PathGeometric&)> costFunction)
+            void setCostPath(std::shared_ptr<CostPath> costPath)
             {
-                this->costFunction_ = costFunction;
+                this->costPath_ = costPath;
             }
 
             void optimizeSolutionRandom(double duration = 0.0);
@@ -37,11 +38,19 @@ namespace ompl
             void optimizeSolutionGradient(double duration = 0.0);
 
         private:
-            void perturbeRandom(geometric::PathGeometric &path, const base::PlannerTerminationCondition &ptc);
+            void randomState(const base::State *startState, const base::State *endState, base::State *newState);
 
-            void perturbeGradient(geometric::PathGeometric &path, const base::PlannerTerminationCondition &ptc);
+            void perturbeRandom(const base::PlannerTerminationCondition &ptc);
 
-            std::function<double(const geometric::PathGeometric&)> costFunction_;
+            void perturbeGradient(const base::PlannerTerminationCondition &ptc);
+
+            std::shared_ptr<CostPath> costPath_;
+
+            base::StateSamplerPtr sampler_;
+
+            size_t MAX_ITERATIONS_ = 10;
+
+            size_t MAX_RANDOM_TIMES_ = 100;
         };
     }  // namespace tools
 }  // namespace ompl
