@@ -25,6 +25,7 @@ namespace ompl
                     if (costPath_)
                     {
                         costPath_->setPath(path);
+                        costPath_->initCost();
                         double initCost = costPath_->getCost();
                         if (duration < std::numeric_limits<double>::epsilon())
                         {
@@ -87,13 +88,14 @@ namespace ompl
         }
 
 
-        void PerturbingSetup::randomState(const base::State *startState, const base::State *endState, base::State *newState)
+        void PerturbingSetup::randomState(const base::State *startState, const base::State *endState, base::State *midState, base::State *newState)
         {
             double dist = si_->distance(startState, endState);
+            // find middle point
+            si_->getStateSpace()->interpolate(startState, endState, 0.5, midState);
             // TODO(keren): try other samplers
-            sampler_->sampleUniformNear(newState, startState, dist);
+            sampler_->sampleUniformNear(newState, midState, dist);
         }
-
 
         void PerturbingSetup::perturbeRandom(const base::PlannerTerminationCondition &ptc)
         {
@@ -108,6 +110,7 @@ namespace ompl
                 costPath_->interpolate();
 
             base::State *newState = si_->allocState();
+            base::State *midState = si_->allocState();
             for (size_t iter = 0; iter < MAX_ITERATIONS_ && ptc; ++iter)
             {
                 if (costPath_->getStateCount() > 2)
@@ -116,8 +119,10 @@ namespace ompl
                     {
                         for (size_t t = 0; t < MAX_RANDOM_TIMES_ && ptc; ++t)
                         {
-                            randomState(costPath_->getState(i), costPath_->getState(i - 2), newState);
-                            if (costPath_->cost(i - 1, newState) < costPath_->getCost())
+                            randomState(costPath_->getState(i), costPath_->getState(i - 2), midState, newState);
+                            if (si_->checkMotion(costPath_->getState(i), newState) && 
+                                si_->checkMotion(newState, costPath_->getState(i - 2)) &&
+                                costPath_->cost(i - 1, newState) < costPath_->getCost())
                             {
                                 costPath_->updateCost(i - 1, newState);
                                 break;
@@ -126,7 +131,8 @@ namespace ompl
                     }
                 }
             }
-            free(newState);
+            si_->freeState(midState);
+            si_->freeState(newState);
         }
 
 

@@ -38,7 +38,7 @@ namespace ompl
             void optimizeSolutionGradient(double duration = 0.0);
 
         private:
-            void randomState(const base::State *startState, const base::State *endState, base::State *newState);
+            void randomState(const base::State *startState, const base::State *endState, base::State *midState, base::State *newState);
 
             void perturbeRandom(const base::PlannerTerminationCondition &ptc);
 
