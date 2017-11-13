@@ -38,46 +38,30 @@ namespace ompl
                 return this->cost_;
             }
 
-            size_t getStateCount()
+            int getStateCount()
             {
                 return this->path_.getStateCount();
             }
 
-            void interpolate()
+            void interpolate(size_t count)
             {
-                this->path_.interpolate();
+                this->path_.interpolate(count);
             }
 
-            base::State *getState(size_t index)
+            base::State *getState(int index)
             {
                 return this->path_.getState(index);
             }
 
             // Compute cost
-            virtual double cost(size_t index, base::State *state) = 0;
-
-            void updateCost(size_t index, base::State *state)
-            {
-                std::vector<base::State *> &states = path_.getStates();
-                double oldCost = cost(index, states[index]);
-                double newCost = cost(index, state);
-                // Special operation, save space
-                std::swap(states[index], state);
-                cost_ += newCost - oldCost;
-            }
+            virtual bool updateCost(int index, base::State *&state) = 0;
 
             // Init cost before using CostPath
-            void initCost()
-            {
-                std::vector<base::State *> &states = path_.getStates();
-                for (size_t i = 0; i < states.size(); ++i)
-                {
-                    cost_ += this->cost(i, states[i]);
-                }
-            }
+            virtual void initCost() = 0;
 
         protected:
             PathGeometric path_;
+            std::vector<double> costs_;
             double cost_;
         };
     }  // namespace tools

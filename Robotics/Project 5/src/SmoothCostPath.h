@@ -21,7 +21,14 @@ namespace ompl
 
             explicit SmoothCostPath(const PathGeometric &path) : CostPath(path) {}
 
-            virtual double cost(size_t index, base::State *state);
+            // Compute cost
+            virtual bool updateCost(int index, base::State *&state);
+
+            // Init cost before using CostPath
+            virtual void initCost();
+        
+        protected:
+            const double LAMBDA_ = 0.01;
         };
     }  // namespace tools
 }  // namespace ompl

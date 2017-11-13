@@ -48,9 +48,11 @@ namespace ompl
 
             base::StateSamplerPtr sampler_;
 
-            size_t MAX_ITERATIONS_ = 10;
+            const size_t MAX_ITERATIONS_ = 1000;
 
-            size_t MAX_RANDOM_TIMES_ = 100;
+            const size_t MAX_RANDOM_TIMES_ = 10;
+
+            const size_t MAX_INTERPOLATION_ = 8;
         };
     }  // namespace tools
 }  // namespace ompl

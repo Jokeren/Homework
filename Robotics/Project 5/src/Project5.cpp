@@ -80,13 +80,17 @@ void planSimple(const std::vector<Rectangle>& obstacles,
 
     if (solved)
     {
-        // Simplify (and prettify) the solution
-        ps.simplifySolution();
-
         // Print the path to screen
         std::cout << "Found solution:" << std::endl;
         ompl::geometric::PathGeometric& path = ps.getSolutionPath();
-        path.interpolate(50);
+
+        // Initial solution
+        path.printAsMatrix(std::cout);
+
+        // Optimize solution
+        ps.optimizeSolutionRandom();
+        std::cout << "Optimized solution:" << std::endl;
+        path = ps.getSolutionPath();
         path.printAsMatrix(std::cout);
 
         // Print path to file
