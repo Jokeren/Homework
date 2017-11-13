@@ -38,7 +38,7 @@ bool isValidStatePoint(const ompl::base::State* state, const std::vector<Rectang
 }
 
 
-void planSimple(const std::vector<Rectangle>& obstacles,
+void planR2(const std::vector<Rectangle>& obstacles,
                 const double low, const double high,
                 const Robot rstart, const Robot rgoal)
 {
@@ -123,9 +123,10 @@ int main(int, char **)
     switch (choice)
     {
         case 1:
-            getObstacles(obstacles);
+            getSimpleObstacles(obstacles);
             break;
         case 2:
+            getComplexObstacles(obstacles);
             break;
         default:
             std::cerr << "No such environment option!" << std::endl;
@@ -156,7 +157,7 @@ int main(int, char **)
         {
             start.type = 'p';
             goal.type = 'p';
-            planSimple(obstacles, low, high, start, goal);
+            planR2(obstacles, low, high, start, goal);
             break;
         }
         case 2:

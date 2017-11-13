@@ -34,7 +34,9 @@ struct Robot
     double length;
 };
 
-void getObstacles(std::vector<Rectangle>& obstacles);
+void getSimpleObstacles(std::vector<Rectangle>& obstacles);
+
+void getComplexObstacles(std::vector<Rectangle>& obstacles);
 
 void getStart(Robot& robot);
 

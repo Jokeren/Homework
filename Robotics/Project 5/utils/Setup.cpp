@@ -10,7 +10,7 @@
 #include <cmath>
 
 // Retrieve a representation of the environment
-void getObstacles(std::vector<Rectangle>& obstacles) {
+void getSimpleObstacles(std::vector<Rectangle>& obstacles) {
     Rectangle rect;
     rect.x = -4;
     rect.y = 0;
@@ -19,15 +19,45 @@ void getObstacles(std::vector<Rectangle>& obstacles) {
     obstacles.push_back(rect);
 }
 
+
+void getComplexObstacles(std::vector<Rectangle>& obstacles) {
+    Rectangle rect;
+    rect.x = -1; 
+    rect.y = 1;
+    rect.height = 0.5;
+    rect.width = 4.5;
+    obstacles.push_back(rect);
+
+    rect.x = -1; 
+    rect.y = 1.5;
+    rect.height = 2.5;
+    rect.width = 0.5;
+    obstacles.push_back(rect);
+
+    rect.x = -1; 
+    rect.y = 4;
+    rect.height = 0.5;
+    rect.width = 4.5;
+    obstacles.push_back(rect);
+
+    rect.x = 3.4;
+    rect.y = 1.5;
+    rect.height = 1.5;
+    rect.width = 0.5;
+    obstacles.push_back(rect);
+}
+
+
 void getStart(Robot& robot)
 {
     robot.x = -4;
     robot.y = -4;
     if (robot.type == 's') {
         robot.theta = 0;
-        robot.length = 0.5;
+        robot.length = 0.2;
     }
 }
+
 
 void getGoal(Robot& robot)
 {
@@ -35,9 +65,10 @@ void getGoal(Robot& robot)
     robot.y = 3;
     if (robot.type == 's') {
         robot.theta = M_PI / 4;
-        robot.length = 0.5;
+        robot.length = 0.2;
     }
 }
+
 
 void getBound(double& low, double& high) {
     low = -5;
