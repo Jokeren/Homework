@@ -54,7 +54,7 @@ void getStart(Robot& robot)
     robot.y = -4;
     if (robot.type == 's') {
         robot.theta = 0;
-        robot.length = 0.2;
+        robot.length = SIDE_LENGTH;
     }
 }
 
@@ -65,7 +65,7 @@ void getGoal(Robot& robot)
     robot.y = 3;
     if (robot.type == 's') {
         robot.theta = M_PI / 4;
-        robot.length = 0.2;
+        robot.length = SIDE_LENGTH;
     }
 }
 

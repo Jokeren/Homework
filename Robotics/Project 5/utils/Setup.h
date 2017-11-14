@@ -10,6 +10,20 @@
 
 #include <vector>
 
+static const double SIDE_LENGTH = 0.2;
+
+enum MethodSetup
+{
+    PERTURBING = 1,
+    HYBRIDIZATION = 2
+};
+
+enum MetricSetup
+{
+    SMOOTH = 1,
+    CLEARANCE = 2
+};
+
 struct Rectangle
 {
     // Coordinate of the lower left corner of the rectangle
