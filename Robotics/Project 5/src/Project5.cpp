@@ -105,7 +105,6 @@ void planSmoothnessR2(const std::vector<Rectangle> &obstacles,
         // Initial solution
         path.printAsMatrix(std::cout);
         std::ofstream fout("original_path.txt");
-        fout << "Simple" << std::endl;
         path.printAsMatrix(fout);
         fout.close();
 
@@ -126,7 +125,6 @@ void planSmoothnessR2(const std::vector<Rectangle> &obstacles,
         // Optimized
         optimizedPath.printAsMatrix(std::cout);
         fout.open("optimized_path.txt");
-        fout << "Simple" << std::endl;
         optimizedPath.printAsMatrix(fout);
         fout.close();
     }
@@ -186,7 +184,6 @@ void planSmoothnessSE2(const std::vector<Rectangle>& obstacles,
         // Initial solution
         path.printAsMatrix(std::cout);
         std::ofstream fout("original_path.txt");
-        fout << "Complex" << std::endl;
         path.printAsMatrix(fout);
         fout.close();
 
@@ -205,7 +202,6 @@ void planSmoothnessSE2(const std::vector<Rectangle>& obstacles,
         // Optimized solution
         optimizedPath.printAsMatrix(std::cout);
         fout.open("optimized_path.txt");
-        fout << "Complex" << std::endl;
         optimizedPath.printAsMatrix(fout);
         fout.close();
     }
@@ -217,16 +213,16 @@ void planSmoothnessSE2(const std::vector<Rectangle>& obstacles,
 void planClearanceSE2(MethodSetup method)
 {
     // plan in SE2
-    ompl::app::SE2RigidBodyPlanning setup;
+    std::shared_ptr<ompl::app::SE2RigidBodyPlanning> setup(new ompl::app::SE2RigidBodyPlanning());
 
     // load the robot and the environment
     std::string robot_fname = std::string(OMPLAPP_RESOURCE_DIR) + "/2D/car1_planar_robot.dae";
     std::string env_fname = std::string(OMPLAPP_RESOURCE_DIR) + "/2D/Maze_planar_env.dae";
-    setup.setRobotMesh(robot_fname);
-    setup.setEnvironmentMesh(env_fname);
+    setup->setRobotMesh(robot_fname);
+    setup->setEnvironmentMesh(env_fname);
 
     // define starting state
-    ompl::base::ScopedState<ompl::base::SE2StateSpace> start(setup.getSpaceInformation());
+    ompl::base::ScopedState<ompl::base::SE2StateSpace> start(setup->getSpaceInformation());
     start->setX(0.0);
     start->setY(0.0);
 
@@ -236,23 +232,22 @@ void planClearanceSE2(MethodSetup method)
     goal->setY(0.0);
 
     // set the start & goal states
-    setup.setStartAndGoalStates(start, goal);
+    setup->setStartAndGoalStates(start, goal);
 
     // attempt to solve the problem, and print it to screen if a solution is found
-    if (setup.solve())
+    if (setup->solve())
     {
-        ompl::geometric::PathGeometric& path = setup.getSolutionPath();
+        ompl::geometric::PathGeometric& path = setup->getSolutionPath();
 
         // Print path out
         path.printAsMatrix(std::cout);
         // Print path to file
         std::ofstream fout("original_path.txt");
-        fout << "Rigid body" << std::endl;
         path.printAsMatrix(fout);
         fout.close();
 
         // Set costPath for optimization purpose
-        auto costPath = std::make_shared<ompl::geometric::ClearanceCostPath>(setup.getSpaceInformation());
+        auto costPath = std::make_shared<ompl::geometric::ClearanceCostPath>(setup->getSpaceInformation());
 
         std::shared_ptr<ompl::geometric::Optimizer> op = method == PERTURBING ?
             std::static_pointer_cast<ompl::geometric::Optimizer>(
@@ -261,13 +256,11 @@ void planClearanceSE2(MethodSetup method)
                     std::make_shared<ompl::geometric::HybridizationOptimizer>(costPath));
 
         std::cout << "Optimized solution:" << std::endl;
-        ompl::geometric::SimpleSetupPtr ss(&setup);
-        ompl::geometric::PathGeometric optimizedPath = op->optimizeSolution(ss);
+        ompl::geometric::PathGeometric optimizedPath = op->optimizeSolution(setup);
 
         // Optimized path
         optimizedPath.printAsMatrix(std::cout);
         fout.open("optimized_path.txt");
-        fout << "Rigid body" << std::endl;
         optimizedPath.printAsMatrix(fout);
         fout.close();
     }
@@ -315,19 +308,22 @@ int main(int, char **)
         do
         {
             std::cout << "Plan for: "<< std::endl;
-            std::cout << " (1) Simple environment" << std::endl;
-            std::cout << " (2) Complex environment" << std::endl;
+            std::cout << " (1) No obstacle environment" << std::endl;
+            std::cout << " (2) Simple environment" << std::endl;
+            std::cout << " (3) Complex environment" << std::endl;
 
             std::cin >> choice;
-        } while (choice < 1 || choice > 2);
+        } while (choice < 1 || choice > 3);
 
         std::vector<Rectangle> obstacles;
         switch (choice)
         {
             case 1:
-                getSimpleObstacles(obstacles);
                 break;
             case 2:
+                getSimpleObstacles(obstacles);
+                break;
+            case 3:
                 getComplexObstacles(obstacles);
                 break;
             default:

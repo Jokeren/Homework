@@ -15,20 +15,33 @@ namespace ompl
         void ClearanceCostPath::initCost()
         {
             std::vector<base::State *> &states = path_.getStates();
+            const base::SpaceInformationPtr si = path_.getSpaceInformation();
             costs_.resize(states.size());
             cost_ = 0;
             for (int i = 0; i < states.size(); ++i)
             {
-                // do whatever you want
-                // 
-                // code
-                costs_[i] = 0;
+                costs_[i] = -si->getStateValidityChecker()->clearance(states[i]);
                 cost_ += costs_[i];
+            }
+            if (states.empty())
+            {
+                cost_ = -std::numeric_limits<double>::infinity();
             }
         }
 
         bool ClearanceCostPath::updateCost(int index, base::State *&state)
         {
+            std::vector<base::State *> &states = path_.getStates();
+            const base::SpaceInformationPtr si = path_.getSpaceInformation();
+            double cost = -si->getStateValidityChecker()->clearance(state);
+            if (cost < costs_[index])
+            {
+                std::swap(states[index], state);
+                cost_ += cost - costs_[index];
+                costs_[index] = cost;
+                return true;
+            }
+            return false;
         }
     }
 }

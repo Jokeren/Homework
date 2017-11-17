@@ -93,15 +93,31 @@ namespace ompl
         }
 
 
-        void PerturbingOptimizer::randomState(const base::SpaceInformationPtr si,
-                const base::State *startState, const base::State *endState,
-                base::State *midState, base::State *newState)
+        template<>
+        void PerturbingOptimizer::randomState<UNIFORM>(
+            const base::SpaceInformationPtr si,
+            const base::State *startState, const base::State *endState,
+            base::State *midState, base::State *newState)
         {
             double dist = si->distance(startState, endState);
             // find middle point
             si->getStateSpace()->interpolate(startState, endState, 0.5, midState);
             // TODO(keren): try other samplers
             sampler_->sampleUniformNear(newState, midState, dist / 2);
+        }
+        
+
+        template<>
+        void PerturbingOptimizer::randomState<GAUSSIAN>(
+            const base::SpaceInformationPtr si,
+            const base::State *startState, const base::State *endState,
+            base::State *midState, base::State *newState)
+        {
+            double dist = si->distance(startState, endState);
+            // find middle point
+            si->getStateSpace()->interpolate(startState, endState, 0.5, midState);
+            // TODO(keren): try other samplers
+            sampler_->sampleGaussian(newState, midState, 0);
         }
 
 
@@ -123,9 +139,16 @@ namespace ompl
                     {
                         for (size_t t = 0; t < MAX_RANDOM_TIMES_ && !ptc; ++t)
                         {
-                            randomState(si, costPath_->getState(i), costPath_->getState(i - 2), midState, newState);
-                            if (si->checkMotion(costPath_->getState(i), newState) && 
-                                    si->checkMotion(newState, costPath_->getState(i - 2)))
+                            if (randomMethod_ == UNIFORM)
+                            {
+                                randomState<UNIFORM>(si, costPath_->getState(i), costPath_->getState(i - 2), midState, newState);
+                            }
+                            else
+                            {
+                                randomState<GAUSSIAN>(si, costPath_->getState(i), costPath_->getState(i - 2), midState, newState);
+                            }
+                            if (si->checkMotion(costPath_->getState(i), newState) &&
+                                si->checkMotion(newState, costPath_->getState(i - 2)))
                             {
                                 if (costPath_->updateCost(i - 1, newState))
                                     break;
