@@ -9,6 +9,7 @@
 #define UTILS_SETUP_H_
 
 #include <vector>
+#include <string>
 
 static const double SIDE_LENGTH = 0.2;
 
@@ -20,7 +21,7 @@ enum MethodSetup
 
 enum MetricSetup
 {
-    SMOOTH = 1,
+    SMOOTHNESS = 1,
     CLEARANCE = 2
 };
 
