@@ -17,52 +17,52 @@ namespace ompl
         // A wrapper of PathGeometric, do not use inheritation
         class CostPath
         {
-        public:
-            explicit CostPath(const base::SpaceInformationPtr &si) : path_(si), cost_(0.0) {}
+            public:
+                explicit CostPath(const base::SpaceInformationPtr &si) : path_(si), cost_(0.0) {}
 
-            explicit CostPath(const PathGeometric &path) : path_(path), cost_(0.0) {}
+                explicit CostPath(const PathGeometric &path) : path_(path), cost_(0.0) {}
 
-            // Copy path
-            void setPath(const PathGeometric &path)
-            {
-                this->path_ = path;
-            }
+                // Copy path
+                void setPath(const PathGeometric &path)
+                {
+                    this->path_ = path;
+                }
 
-            const PathGeometric &getPath()
-            {
-                return this->path_;
-            }
+                const PathGeometric &getPath()
+                {
+                    return this->path_;
+                }
 
-            double getCost()
-            {
-                return this->cost_;
-            }
+                double getCost()
+                {
+                    return this->cost_;
+                }
 
-            int getStateCount()
-            {
-                return this->path_.getStateCount();
-            }
+                int getStateCount()
+                {
+                    return this->path_.getStateCount();
+                }
 
-            void interpolate(size_t count)
-            {
-                this->path_.interpolate(count);
-            }
+                void interpolate(size_t count)
+                {
+                    this->path_.interpolate(count);
+                }
 
-            base::State *getState(int index)
-            {
-                return this->path_.getState(index);
-            }
+                base::State *getState(int index)
+                {
+                    return this->path_.getState(index);
+                }
 
-            // Compute cost
-            virtual bool updateCost(int index, base::State *&state) = 0;
+                // Compute cost
+                virtual bool updateCost(int index, base::State *&state) = 0;
 
-            // Init cost before using CostPath
-            virtual void initCost() = 0;
+                // Init cost before using CostPath
+                virtual void initCost() = 0;
 
-        protected:
-            PathGeometric path_;
-            std::vector<double> costs_;
-            double cost_;
+            protected:
+                PathGeometric path_;
+                std::vector<double> costs_;
+                double cost_;
         };
     }  // namespace tools
 }  // namespace ompl

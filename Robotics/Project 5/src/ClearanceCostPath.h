@@ -16,16 +16,16 @@ namespace ompl
     {
         class ClearanceCostPath : public CostPath
         {
-        public:
-            explicit ClearanceCostPath(const base::SpaceInformationPtr &si) : CostPath(si) {}
+            public:
+                explicit ClearanceCostPath(const base::SpaceInformationPtr &si) : CostPath(si) {}
 
-            explicit ClearanceCostPath(const PathGeometric &path) : CostPath(path) {}
+                explicit ClearanceCostPath(const PathGeometric &path) : CostPath(path) {}
 
-            // Compute cost
-            virtual bool updateCost(int index, base::State *&state);
+                // Compute cost
+                virtual bool updateCost(int index, base::State *&state);
 
-            // Init cost before using CostPath
-            virtual void initCost();
+                // Init cost before using CostPath
+                virtual void initCost();
         };
     }  // namespace tools
 }  // namespace ompl

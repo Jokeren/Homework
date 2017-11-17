@@ -19,14 +19,14 @@ namespace ompl
     {
         class Optimizer
         {
-        public:
-            explicit Optimizer(std::shared_ptr<CostPath> costPath) : costPath_(costPath) {};
+            public:
+                explicit Optimizer(std::shared_ptr<CostPath> costPath) : costPath_(costPath) {};
 
-            // RVO
-            virtual PathGeometric optimizeSolution(const SimpleSetupPtr ss, double duration = 0.0) = 0;
+                // RVO
+                virtual PathGeometric optimizeSolution(const SimpleSetupPtr ss, double duration = 0.0) = 0;
 
-        protected:
-            std::shared_ptr<CostPath> costPath_;
+            protected:
+                std::shared_ptr<CostPath> costPath_;
         };
     }  // namespace tools
 }  // namespace ompl

@@ -19,11 +19,11 @@ namespace ompl
     {
         class HybridizationOptimizer : public Optimizer
         {
-        public:
-            explicit HybridizationOptimizer(std::shared_ptr<CostPath> costPath) : Optimizer(costPath) {}
+            public:
+                explicit HybridizationOptimizer(std::shared_ptr<CostPath> costPath) : Optimizer(costPath) {}
 
-            // RVO
-            virtual PathGeometric optimizeSolution(const SimpleSetupPtr ss, double duration = 0.0);
+                // RVO
+                virtual PathGeometric optimizeSolution(const SimpleSetupPtr ss, double duration = 0.0);
         };
     }  // namespace tools
 }  // namespace ompl

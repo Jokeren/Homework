@@ -61,9 +61,9 @@ bool isValidStateSquare(const ompl::base::State* state, const std::vector<Rectan
 
 
 void planSmoothnessR2(const std::vector<Rectangle> &obstacles,
-                      const double low, const double high,
-                      const Robot rstart, const Robot rgoal,
-                      MethodSetup method)
+        const double low, const double high,
+        const Robot rstart, const Robot rgoal,
+        MethodSetup method)
 {
     ompl::base::StateSpacePtr r2(new ompl::base::RealVectorStateSpace(2));
 
@@ -114,9 +114,9 @@ void planSmoothnessR2(const std::vector<Rectangle> &obstacles,
 
         std::shared_ptr<ompl::geometric::Optimizer> op = method == PERTURBING ?
             std::static_pointer_cast<ompl::geometric::Optimizer>(
-            std::make_shared<ompl::geometric::PerturbingOptimizer>(costPath)) :
+                    std::make_shared<ompl::geometric::PerturbingOptimizer>(costPath)) :
             std::static_pointer_cast<ompl::geometric::Optimizer>(
-            std::make_shared<ompl::geometric::HybridizationOptimizer>(costPath));
+                    std::make_shared<ompl::geometric::HybridizationOptimizer>(costPath));
 
         // Optimize solution
         ompl::geometric::PathGeometric optimizedPath = op->optimizeSolution(ss);
@@ -136,9 +136,9 @@ void planSmoothnessR2(const std::vector<Rectangle> &obstacles,
 
 
 void planSmoothnessSE2(const std::vector<Rectangle>& obstacles,
-                       const double low, const double high,
-                       const Robot rstart, const Robot rgoal,
-                       MethodSetup method)
+        const double low, const double high,
+        const Robot rstart, const Robot rgoal,
+        MethodSetup method)
 {
     ompl::base::StateSpacePtr r2(new ompl::base::RealVectorStateSpace(2));
 
@@ -162,12 +162,12 @@ void planSmoothnessSE2(const std::vector<Rectangle>& obstacles,
     ompl::base::ScopedState<> start(se2);
     start[0] = rstart.x;
     start[1] = rstart.y;
-	start[2] = rstart.theta;
+    start[2] = rstart.theta;
 
     ompl::base::ScopedState<> goal(se2);
     goal[0] = rgoal.x;
     goal[1] = rgoal.y;
-	goal[2] = rgoal.theta;
+    goal[2] = rgoal.theta;
 
     ss->setStartAndGoalStates(start, goal);
 
@@ -195,9 +195,9 @@ void planSmoothnessSE2(const std::vector<Rectangle>& obstacles,
 
         std::shared_ptr<ompl::geometric::Optimizer> op = method == PERTURBING ?
             std::static_pointer_cast<ompl::geometric::Optimizer>(
-            std::make_shared<ompl::geometric::PerturbingOptimizer>(costPath)) :
+                    std::make_shared<ompl::geometric::PerturbingOptimizer>(costPath)) :
             std::static_pointer_cast<ompl::geometric::Optimizer>(
-            std::make_shared<ompl::geometric::HybridizationOptimizer>(costPath));
+                    std::make_shared<ompl::geometric::HybridizationOptimizer>(costPath));
 
         std::cout << "Optimized solution:" << std::endl;
         ompl::geometric::PathGeometric optimizedPath = op->optimizeSolution(ss);
@@ -216,7 +216,7 @@ void planSmoothnessSE2(const std::vector<Rectangle>& obstacles,
 
 void planClearanceSE2(MethodSetup method)
 {
-   // plan in SE2
+    // plan in SE2
     ompl::app::SE2RigidBodyPlanning setup;
 
     // load the robot and the environment
@@ -240,10 +240,10 @@ void planClearanceSE2(MethodSetup method)
 
     // attempt to solve the problem, and print it to screen if a solution is found
     if (setup.solve())
-	{
+    {
         ompl::geometric::PathGeometric& path = setup.getSolutionPath();
 
-		// Print path out
+        // Print path out
         path.printAsMatrix(std::cout);
         // Print path to file
         std::ofstream fout("original_path.txt");
@@ -256,9 +256,9 @@ void planClearanceSE2(MethodSetup method)
 
         std::shared_ptr<ompl::geometric::Optimizer> op = method == PERTURBING ?
             std::static_pointer_cast<ompl::geometric::Optimizer>(
-            std::make_shared<ompl::geometric::PerturbingOptimizer>(costPath)) :
+                    std::make_shared<ompl::geometric::PerturbingOptimizer>(costPath)) :
             std::static_pointer_cast<ompl::geometric::Optimizer>(
-            std::make_shared<ompl::geometric::HybridizationOptimizer>(costPath));
+                    std::make_shared<ompl::geometric::HybridizationOptimizer>(costPath));
 
         std::cout << "Optimized solution:" << std::endl;
         ompl::geometric::SimpleSetupPtr ss(&setup);
@@ -270,11 +270,11 @@ void planClearanceSE2(MethodSetup method)
         fout << "Rigid body" << std::endl;
         optimizedPath.printAsMatrix(fout);
         fout.close();
-	}
-	else
-	{
+    }
+    else
+    {
         std::cout << "No solution found" << std::endl;
-	}
+    }
 }
 
 
@@ -334,7 +334,7 @@ int main(int, char **)
                 std::cerr << "No such environment option!" << std::endl;
                 break;
         }
-        
+
         //----------------------------
         // Init robot shape
         //----------------------------
@@ -353,29 +353,29 @@ int main(int, char **)
         switch (shape)
         {
             case 1:
-            {
-                Robot start, goal;
-                start.type = 'p';
-                goal.type = 'p';
-                getStart(start);
-                getGoal(goal);
-                planSmoothnessR2(obstacles, low, high, start, goal, (MethodSetup)method);
-                break;
-            }
+                {
+                    Robot start, goal;
+                    start.type = 'p';
+                    goal.type = 'p';
+                    getStart(start);
+                    getGoal(goal);
+                    planSmoothnessR2(obstacles, low, high, start, goal, (MethodSetup)method);
+                    break;
+                }
             case 2:
-            {
-                Robot start, goal;
-                start.type = 's';
-                goal.type = 's';
-                getStart(start);
-                getGoal(goal);
-                planSmoothnessSE2(obstacles, low, high, start, goal, (MethodSetup)method);
-                break;
-            }
+                {
+                    Robot start, goal;
+                    start.type = 's';
+                    goal.type = 's';
+                    getStart(start);
+                    getGoal(goal);
+                    planSmoothnessSE2(obstacles, low, high, start, goal, (MethodSetup)method);
+                    break;
+                }
             default:
-            {
-                std::cerr << "No such shape option!" << std::endl;
-            }
+                {
+                    std::cerr << "No such shape option!" << std::endl;
+                }
         }
     }
     else  // default env

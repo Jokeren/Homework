@@ -20,26 +20,26 @@ namespace ompl
     {
         class PerturbingOptimizer : public Optimizer
         {
-        public:
-            explicit PerturbingOptimizer(std::shared_ptr<CostPath> costPath) : Optimizer(costPath) {}
+            public:
+                explicit PerturbingOptimizer(std::shared_ptr<CostPath> costPath) : Optimizer(costPath) {}
 
-            // RVO
-            virtual PathGeometric optimizeSolution(const SimpleSetupPtr ss, double duration = 0.0);
+                // RVO
+                virtual PathGeometric optimizeSolution(const SimpleSetupPtr ss, double duration = 0.0);
 
-        private:
-            void randomState(const base::SpaceInformationPtr si,
-                             const base::State *startState, const base::State *endState,
-                             base::State *midState, base::State *newState);
+            private:
+                void randomState(const base::SpaceInformationPtr si,
+                        const base::State *startState, const base::State *endState,
+                        base::State *midState, base::State *newState);
 
-            void perturbeRandom(const base::SpaceInformationPtr si, const base::PlannerTerminationCondition &ptc);
+                void perturbeRandom(const base::SpaceInformationPtr si, const base::PlannerTerminationCondition &ptc);
 
-            base::StateSamplerPtr sampler_;
+                base::StateSamplerPtr sampler_;
 
-            const size_t MAX_ITERATIONS_ = 1000;
+                const size_t MAX_ITERATIONS_ = 1000;
 
-            const size_t MAX_RANDOM_TIMES_ = 10;
+                const size_t MAX_RANDOM_TIMES_ = 10;
 
-            const size_t MAX_INTERPOLATION_ = 8;
+                const size_t MAX_INTERPOLATION_ = 8;
         };
     }  // namespace tools
 }  // namespace ompl

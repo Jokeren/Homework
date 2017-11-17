@@ -88,14 +88,14 @@ namespace ompl
             }
             double optimizeTime = time::seconds(time::now() - start);
             OMPL_INFORM("PerburbingSetup: Path optimization took %f seconds and changed from %d to %d states, from %f to %f cost",
-                        optimizeTime, initState, path.getStateCount(), initCost, bestCost);
+                    optimizeTime, initState, path.getStateCount(), initCost, bestCost);
             return bestPath;
         }
 
 
         void PerturbingOptimizer::randomState(const base::SpaceInformationPtr si,
-                                          const base::State *startState, const base::State *endState,
-                                          base::State *midState, base::State *newState)
+                const base::State *startState, const base::State *endState,
+                base::State *midState, base::State *newState)
         {
             double dist = si->distance(startState, endState);
             // find middle point
@@ -125,7 +125,7 @@ namespace ompl
                         {
                             randomState(si, costPath_->getState(i), costPath_->getState(i - 2), midState, newState);
                             if (si->checkMotion(costPath_->getState(i), newState) && 
-                                si->checkMotion(newState, costPath_->getState(i - 2)))
+                                    si->checkMotion(newState, costPath_->getState(i - 2)))
                             {
                                 if (costPath_->updateCost(i - 1, newState))
                                     break;

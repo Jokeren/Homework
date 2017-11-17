@@ -33,7 +33,7 @@ namespace ompl
             }
             double optimizeTime = time::seconds(time::now() - start);
             OMPL_INFORM("PerburbingSetup: Path optimization took %f seconds and changed from %d to %d states, from %f to %f cost",
-                        optimizeTime, initState, path.getStateCount(), initCost, bestCost);
+                    optimizeTime, initState, path.getStateCount(), initCost, bestCost);
             return bestPath;
         }
 
