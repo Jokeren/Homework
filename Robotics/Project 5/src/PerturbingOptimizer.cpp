@@ -133,26 +133,23 @@ namespace ompl
             base::State *midState = si->allocState();
             for (size_t iter = 0; iter < MAX_ITERATIONS_ && !ptc; ++iter)
             {
-                if (costPath_->getStateCount() > 2)
+                for (size_t i = 2; i < costPath_->getStateCount() && !ptc; ++i)
                 {
-                    for (size_t i = 2; i < costPath_->getStateCount() && !ptc; ++i)
+                    for (size_t t = 0; t < MAX_RANDOM_TIMES_ && !ptc; ++t)
                     {
-                        for (size_t t = 0; t < MAX_RANDOM_TIMES_ && !ptc; ++t)
+                        if (randomMethod_ == UNIFORM)
                         {
-                            if (randomMethod_ == UNIFORM)
-                            {
-                                randomState<UNIFORM>(si, costPath_->getState(i), costPath_->getState(i - 2), midState, newState);
-                            }
-                            else
-                            {
-                                randomState<GAUSSIAN>(si, costPath_->getState(i), costPath_->getState(i - 2), midState, newState);
-                            }
-                            if (si->checkMotion(costPath_->getState(i), newState) &&
+                            randomState<UNIFORM>(si, costPath_->getState(i), costPath_->getState(i - 2), midState, newState);
+                        }
+                        else
+                        {
+                            randomState<GAUSSIAN>(si, costPath_->getState(i), costPath_->getState(i - 2), midState, newState);
+                        }
+                        if (si->checkMotion(costPath_->getState(i), newState) &&
                                 si->checkMotion(newState, costPath_->getState(i - 2)))
-                            {
-                                if (costPath_->updateCost(i - 1, newState))
-                                    break;
-                            }
+                        {
+                            if (costPath_->updateCost(i - 1, newState))
+                                break;
                         }
                     }
                 }
