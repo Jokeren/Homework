@@ -113,7 +113,7 @@ void planSmoothnessR2(const std::vector<Rectangle> &obstacles,
 
         std::shared_ptr<ompl::geometric::Optimizer> op = method == PERTURBING ?
             std::static_pointer_cast<ompl::geometric::Optimizer>(
-                    std::make_shared<ompl::geometric::PerturbingOptimizer>(costPath)) :
+                    std::make_shared<ompl::geometric::PerturbingOptimizer>(costPath, 100)) :
             std::static_pointer_cast<ompl::geometric::Optimizer>(
                     std::make_shared<ompl::geometric::HybridizationOptimizer>(costPath));
 
@@ -192,7 +192,7 @@ void planSmoothnessSE2(const std::vector<Rectangle>& obstacles,
 
         std::shared_ptr<ompl::geometric::Optimizer> op = method == PERTURBING ?
             std::static_pointer_cast<ompl::geometric::Optimizer>(
-                    std::make_shared<ompl::geometric::PerturbingOptimizer>(costPath)) :
+                    std::make_shared<ompl::geometric::PerturbingOptimizer>(costPath, 100)) :
             std::static_pointer_cast<ompl::geometric::Optimizer>(
                     std::make_shared<ompl::geometric::HybridizationOptimizer>(costPath));
 
@@ -251,7 +251,7 @@ void planClearanceSE2(MethodSetup method)
 
         std::shared_ptr<ompl::geometric::Optimizer> op = method == PERTURBING ?
             std::static_pointer_cast<ompl::geometric::Optimizer>(
-                    std::make_shared<ompl::geometric::PerturbingOptimizer>(costPath)) :
+                    std::make_shared<ompl::geometric::PerturbingOptimizer>(costPath, 10)) :
             std::static_pointer_cast<ompl::geometric::Optimizer>(
                     std::make_shared<ompl::geometric::HybridizationOptimizer>(costPath));
 

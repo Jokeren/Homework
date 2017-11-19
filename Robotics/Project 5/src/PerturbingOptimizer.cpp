@@ -80,6 +80,7 @@ namespace ompl
                 {
                     bestCost = costPath_->getCost();
                     bestPath = costPath_->getPath();
+                    OMPL_WARN("cost %f was reduced by perturbing", costPath_->getCost());
                 }
                 else  // No need to update path
                 {
@@ -131,9 +132,9 @@ namespace ompl
 
             base::State *newState = si->allocState();
             base::State *midState = si->allocState();
-            for (size_t iter = 0; iter < MAX_ITERATIONS_ && !ptc; ++iter)
+            for (size_t iter = 0; iter < max_iterations_ && !ptc; ++iter)
             {
-                if (iter < MAX_ITERATIONS_ / 4 * 3)
+                if (iter < static_cast<size_t>(max_iterations_ * threshold_))
                 {
                     for (size_t i = 2; i < costPath_->getStateCount() && !ptc; ++i)
                     {

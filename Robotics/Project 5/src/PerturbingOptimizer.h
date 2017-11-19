@@ -27,9 +27,11 @@ namespace ompl
         class PerturbingOptimizer : public Optimizer
         {
             public:
-                explicit PerturbingOptimizer(std::shared_ptr<CostPath> costPath) : Optimizer(costPath), randomMethod_(UNIFORM) {}
+                explicit PerturbingOptimizer(std::shared_ptr<CostPath> costPath, size_t max_iterations, double threshold = 0.75) :
+                    Optimizer(costPath), randomMethod_(UNIFORM), max_iterations_(max_iterations), threshold_(threshold) {}
 
-                explicit PerturbingOptimizer(std::shared_ptr<CostPath> costPath, RandomMethod method) : Optimizer(costPath), randomMethod_(method) {}
+                explicit PerturbingOptimizer(std::shared_ptr<CostPath> costPath, RandomMethod method, size_t max_iterations, double threshold = 0.75) :
+                    Optimizer(costPath), randomMethod_(method), max_iterations_(max_iterations), threshold_(threshold) {}
 
                 // RVO
                 virtual PathGeometric optimizeSolution(const SimpleSetupPtr ss, double duration = 0.0);
@@ -46,7 +48,9 @@ namespace ompl
 
                 base::StateSamplerPtr sampler_;
 
-                const size_t MAX_ITERATIONS_ = 100;
+                size_t max_iterations_;
+
+                double threshold_;
 
                 const size_t MAX_RANDOM_TIMES_ = 10;
 
