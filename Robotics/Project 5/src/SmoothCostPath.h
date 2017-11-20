@@ -19,8 +19,6 @@ namespace ompl
             public:
                 explicit SmoothCostPath(const base::SpaceInformationPtr &si) : CostPath(si) {}
 
-                explicit SmoothCostPath(const PathGeometric &path) : CostPath(path) {}
-
                 // Compute cost
                 virtual bool updateCost(int index, base::State *&state);
 

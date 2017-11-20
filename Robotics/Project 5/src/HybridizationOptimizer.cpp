@@ -21,15 +21,16 @@ namespace ompl
 	{
 		PathGeometric HybridizationOptimizer::optimizeSolution(const SimpleSetupPtr sp, double duration)
 		{
-			PathGeometric &path = sp->getSolutionPath();
-			PathGeometric bestPath(path);
+			PathGeometric &initPath = sp->getSolutionPath();
+			PathGeometric bestPath(initPath);
 			double initCost = 0.0, bestCost = 0.0;
-			size_t initState = path.getStateCount();
+			size_t initState = initPath.getStateCount();
 			OMPL_INFORM("init %d points", initState);
 			time::point start = time::now();
 			if (costPath_)
 			{
-				costPath_->setPath(path);
+                std::shared_ptr<PathGeometric> pathPtr(new PathGeometric(initPath));
+                costPath_->setPath(pathPtr);
 				costPath_->initCost();
 				initCost = costPath_->getCost();
 				bestCost = costPath_->getCost();
@@ -41,7 +42,7 @@ namespace ompl
 			}
 			double optimizeTime = time::seconds(time::now() - start);
 			OMPL_INFORM("PerburbingSetup: Path optimization took %f seconds and changed from %d to %d states, from %f to %f cost",
-					optimizeTime, initState, path.getStateCount(), initCost, bestCost);
+					optimizeTime, initState, initPath.getStateCount(), initCost, bestCost);
 			return bestPath;
 		}
 

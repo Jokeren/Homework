@@ -19,8 +19,6 @@ namespace ompl
             public:
                 explicit ClearanceCostPath(const base::SpaceInformationPtr &si) : CostPath(si) {}
 
-                explicit ClearanceCostPath(const PathGeometric &path) : CostPath(path) {}
-
                 // Compute cost
                 virtual bool updateCost(int index, base::State *&state);
 

@@ -18,17 +18,15 @@ namespace ompl
         class CostPath
         {
             public:
-                explicit CostPath(const base::SpaceInformationPtr &si) : path_(si), cost_(0.0) {}
-
-                explicit CostPath(const PathGeometric &path) : path_(path), cost_(0.0) {}
+                explicit CostPath(const base::SpaceInformationPtr si) : si_(si), cost_(0.0) {}
 
                 // Copy path
-                void setPath(const PathGeometric &path)
+                void setPath(std::shared_ptr<PathGeometric> path)
                 {
                     this->path_ = path;
                 }
 
-                const PathGeometric &getPath()
+                const std::shared_ptr<PathGeometric> getPath()
                 {
                     return this->path_;
                 }
@@ -40,17 +38,17 @@ namespace ompl
 
                 int getStateCount()
                 {
-                    return this->path_.getStateCount();
+                    return this->path_->getStateCount();
                 }
 
                 void interpolate(size_t count)
                 {
-                    this->path_.interpolate(count);
+                    this->path_->interpolate(count);
                 }
 
                 base::State *getState(int index)
                 {
-                    return this->path_.getState(index);
+                    return this->path_->getState(index);
                 }
 
                 // Compute cost
@@ -60,7 +58,8 @@ namespace ompl
                 virtual void initCost() = 0;
 
             protected:
-                PathGeometric path_;
+                base::SpaceInformationPtr si_;
+                std::shared_ptr<PathGeometric> path_;
                 std::vector<double> costs_;
                 double cost_;
         };

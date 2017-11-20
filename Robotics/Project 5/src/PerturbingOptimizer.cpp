@@ -14,16 +14,17 @@ namespace ompl
         PathGeometric PerturbingOptimizer::optimizeSolution(const SimpleSetupPtr ss, double duration)
         {
             // Copy a path
-            PathGeometric &path = ss->getSolutionPath();
-            PathGeometric bestPath(path);
+            PathGeometric &initPath = ss->getSolutionPath();
+            PathGeometric bestPath(initPath);
             double initCost = 0.0, bestCost = 0.0;
-            size_t initState = path.getStateCount();
+            size_t initState = initPath.getStateCount();
             OMPL_INFORM("init %d points", initState);
             // Perturbing the initial path
             time::point start = time::now();
             if (costPath_)
             {
-                costPath_->setPath(path);
+                std::shared_ptr<PathGeometric> pathPtr(new PathGeometric(initPath));
+                costPath_->setPath(pathPtr);
                 costPath_->initCost();
                 initCost = costPath_->getCost();
                 bestCost = costPath_->getCost();
@@ -40,7 +41,7 @@ namespace ompl
                 if (costPath_->getCost() < bestCost)
                 {
                     bestCost = costPath_->getCost();
-                    bestPath = costPath_->getPath();
+                    bestPath = *costPath_->getPath();
                 }
                 else  // No need to update path
                 {
@@ -50,21 +51,22 @@ namespace ompl
             else
             {
                 OMPL_WARN("costPath has not been setup");
-                return path;
+                return bestPath;
             }
             // Perburbing and interpolation
             for (size_t i = 1; i < MAX_INTERPOLATION_; ++i)
             {
                 size_t interPoints = initState + (1 << i);
                 OMPL_INFORM("change to %d points", interPoints);
-                costPath_->setPath(path);
+                std::shared_ptr<PathGeometric> pathPtr(new PathGeometric(initPath));
+                costPath_->setPath(pathPtr);
                 costPath_->interpolate(interPoints);
                 costPath_->initCost();
                 // Find optimization without perturbing
                 if (costPath_->getCost() < bestCost)
                 {
                     bestCost = costPath_->getCost();
-                    bestPath = costPath_->getPath();
+                    bestPath = *costPath_->getPath();
                 }
                 if (duration < std::numeric_limits<double>::epsilon())
                 {
@@ -79,7 +81,7 @@ namespace ompl
                 if (costPath_->getCost() < bestCost)
                 {
                     bestCost = costPath_->getCost();
-                    bestPath = costPath_->getPath();
+                    bestPath = *costPath_->getPath();
                     OMPL_WARN("cost %f was reduced by perturbing", costPath_->getCost());
                 }
                 else  // No need to update path
@@ -89,7 +91,7 @@ namespace ompl
             }
             double optimizeTime = time::seconds(time::now() - start);
             OMPL_INFORM("PerburbingSetup: Path optimization took %f seconds and changed from %d to %d states, from %f to %f cost",
-                    optimizeTime, initState, path.getStateCount(), initCost, bestCost);
+                    optimizeTime, initState, initPath.getStateCount(), initCost, bestCost);
             return bestPath;
         }
 

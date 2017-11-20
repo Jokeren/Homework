@@ -28,14 +28,14 @@ namespace ompl
 
         void SmoothCostPath::initCost()
         {
-            std::vector<base::State *> &states = path_.getStates();
+            std::vector<base::State *> &states = path_->getStates();
             costs_.resize(states.size());
             cost_ = 0;
             for (int i = 1; i < states.size() - 1; ++i)
             {
-                double a = path_.getSpaceInformation()->distance(states[i - 1], states[i]);
-                double b = path_.getSpaceInformation()->distance(states[i], states[i + 1]);
-                double c = path_.getSpaceInformation()->distance(states[i - 1], states[i + 1]);
+                double a = si_->distance(states[i - 1], states[i]);
+                double b = si_->distance(states[i], states[i + 1]);
+                double c = si_->distance(states[i - 1], states[i + 1]);
                 costs_[i] = calculateSmoothness(a, b, c);
                 cost_ += costs_[i];
             }
@@ -44,7 +44,7 @@ namespace ompl
 
         bool SmoothCostPath::updateCost(int index, base::State *&state)
         {
-            if (index <= 0 || index >= path_.getStateCount() - 1)
+            if (index <= 0 || index >= path_->getStateCount() - 1)
             {
                 return false;
             }
@@ -57,34 +57,34 @@ namespace ompl
                     prevTotal += costs_[index - 1];
                 }
                 prevTotal += costs_[index];
-                if (index + 1 < path_.getStateCount() - 1)
+                if (index + 1 < path_->getStateCount() - 1)
                 {
                     prevTotal += costs_[index + 1];
                 }
 
-                std::vector<base::State *> &states = path_.getStates();
+                std::vector<base::State *> &states = path_->getStates();
 
                 double total = 0.0;
                 double a = 0.0, b = 0.0, c = 0.0;
                 double cost1 = 0.0, cost2 = 0.0, cost3 = 0.0;
                 if (index - 1 > 0)
                 {
-                    a = path_.getSpaceInformation()->distance(states[index - 2], states[index - 1]);
-                    b = path_.getSpaceInformation()->distance(states[index - 1], states[index]);
-                    c = path_.getSpaceInformation()->distance(states[index - 2], states[index]);
+                    a = si_->distance(states[index - 2], states[index - 1]);
+                    b = si_->distance(states[index - 1], states[index]);
+                    c = si_->distance(states[index - 2], states[index]);
                     cost1 = calculateSmoothness(a, b, c);
                     total += cost1;
                 }
-                a = path_.getSpaceInformation()->distance(states[index - 1], state);
-                b = path_.getSpaceInformation()->distance(state, states[index + 1]);
-                c = path_.getSpaceInformation()->distance(states[index - 1], states[index + 1]);
+                a = si_->distance(states[index - 1], state);
+                b = si_->distance(state, states[index + 1]);
+                c = si_->distance(states[index - 1], states[index + 1]);
                 cost2 = calculateSmoothness(a, b, c);
                 total += cost2;
-                if (index + 1 < path_.getStateCount() - 1)
+                if (index + 1 < path_->getStateCount() - 1)
                 {
-                    a = path_.getSpaceInformation()->distance(states[index], states[index + 1]);
-                    b = path_.getSpaceInformation()->distance(states[index + 1], states[index + 2]);
-                    c = path_.getSpaceInformation()->distance(states[index], states[index + 2]);
+                    a = si_->distance(states[index], states[index + 1]);
+                    b = si_->distance(states[index + 1], states[index + 2]);
+                    c = si_->distance(states[index], states[index + 2]);
                     cost3 = calculateSmoothness(a, b, c);
                     total += cost3;
                 }
