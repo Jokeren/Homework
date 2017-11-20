@@ -91,7 +91,6 @@ namespace ompl
 				void attemptNewEdge(const PathInfo &p, const PathInfo &q, int indexP, int indexQ);
 
 				base::SpaceInformationPtr si_;
-				std::shared_ptr<CostPath> costPath_;
 				HGraph g_;
 				boost::property_map<HGraph, vertex_state_t>::type stateProperty_;
 				Vertex root_;
