@@ -38,24 +38,34 @@ namespace ompl
             double a = si_->distance(from, mid);
             double b = si_->distance(mid, to);
             double c = si_->distance(from, to);
-            return calculateSmoothness(a, b, c);
+            return calculateSmoothness(a, b, c) + LAMBDA_;
         }
 
 
         void SmoothCostPath::initCost()
         {
+            if (!path_)
+                return;
+
             std::vector<base::State *> &states = path_->getStates();
-            costs_.resize(states.size());
-            cost_ = 0;
-            for (int i = 1; i < states.size() - 1; ++i)
+            if (states.size() != 0)
             {
-                double a = si_->distance(states[i - 1], states[i]);
-                double b = si_->distance(states[i], states[i + 1]);
-                double c = si_->distance(states[i - 1], states[i + 1]);
-                costs_[i] = calculateSmoothness(a, b, c);
-                cost_ += costs_[i];
+                costs_.resize(states.size());
+                cost_ = 0;
+                for (int i = 1; i < states.size() - 1; ++i)
+                {
+                    double a = si_->distance(states[i - 1], states[i]);
+                    double b = si_->distance(states[i], states[i + 1]);
+                    double c = si_->distance(states[i - 1], states[i + 1]);
+                    costs_[i] = calculateSmoothness(a, b, c);
+                    cost_ += costs_[i];
+                }
+                cost_ += states.size() * LAMBDA_;
             }
-            cost_ += states.size() * LAMBDA_;
+            else
+            {
+                cost_ = 0.0;
+            }
         }
 
         bool SmoothCostPath::updateCost(int index, base::State *&state)

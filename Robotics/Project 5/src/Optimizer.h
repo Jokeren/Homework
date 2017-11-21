@@ -11,6 +11,7 @@
 #include <ompl/geometric/SimpleSetup.h>
 #include <ompl/geometric/PathSimplifier.h>
 
+#include "../utils/Setup.h"
 #include "CostPath.h"
 
 namespace ompl
@@ -23,7 +24,7 @@ namespace ompl
                 explicit Optimizer(std::shared_ptr<CostPath> costPath) : costPath_(costPath) {};
 
                 // RVO
-                virtual PathGeometric optimizeSolution(const SimpleSetupPtr ss, double duration = 0.0) = 0;
+                virtual PathGeometric optimizeSolution(const SimpleSetupPtr ss, MetricSetup metric = SMOOTHNESS, double duration = 0.0) = 0;
 
             protected:
                 std::shared_ptr<CostPath> costPath_;

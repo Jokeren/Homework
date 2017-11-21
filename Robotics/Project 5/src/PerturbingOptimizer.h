@@ -34,7 +34,7 @@ namespace ompl
                     Optimizer(costPath), randomMethod_(method), max_iterations_(max_iterations), threshold_(threshold) {}
 
                 // RVO
-                virtual PathGeometric optimizeSolution(const SimpleSetupPtr ss, double duration = 0.0);
+                virtual PathGeometric optimizeSolution(const SimpleSetupPtr ss, MetricSetup metric = SMOOTHNESS, double duration = 0.0);
 
             private:
                 template<RandomMethod method>

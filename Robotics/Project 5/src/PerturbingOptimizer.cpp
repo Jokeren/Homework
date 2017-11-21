@@ -11,7 +11,7 @@ namespace ompl
 {
     namespace geometric
     {
-        PathGeometric PerturbingOptimizer::optimizeSolution(const SimpleSetupPtr ss, double duration)
+        PathGeometric PerturbingOptimizer::optimizeSolution(const SimpleSetupPtr ss, MetricSetup metric, double duration)
         {
             // Copy a path
             PathGeometric &initPath = ss->getSolutionPath();

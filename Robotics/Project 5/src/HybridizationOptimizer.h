@@ -31,7 +31,9 @@ namespace ompl
 
 				const base::PathPtr &getHybridPath() const;
 
-				void computeHybridPath();
+				void computeHybridPathClearance();
+
+				void computeHybridPathSmoothness();
 
 				unsigned int recordPath(const std::shared_ptr<PathGeometric> pp, bool matchAcrossGaps);
 
@@ -41,7 +43,7 @@ namespace ompl
 						std::vector<int> &indexP, std::vector<int> &indexQ) const;
 
 				// RVO
-				virtual PathGeometric optimizeSolution(const SimpleSetupPtr ss, double duration = 0.0);
+				virtual PathGeometric optimizeSolution(const SimpleSetupPtr ss, MetricSetup metric = SMOOTHNESS, double duration = 0.0);
 
 				void clear();
 
@@ -50,6 +52,8 @@ namespace ompl
 				const std::string &getName() const;
 
 			private:
+
+
 				struct vertex_state_t
 				{
 					typedef boost::vertex_property_tag kind;
@@ -73,6 +77,10 @@ namespace ompl
 
 				typedef boost::graph_traits<HGraph>::vertex_descriptor Vertex;
 				typedef boost::graph_traits<HGraph>::edge_descriptor Edge;
+
+                void dfs(Vertex u, std::vector<Vertex> &path, std::vector<Vertex> &bestPath,
+                        double &cost, double &bestCost, bool* visited, int nvertices,
+                        const base::PlannerTerminationCondition &ptc);
 
 				struct PathInfo
 				{
@@ -107,6 +115,8 @@ namespace ompl
 				Vertex goal_;
 				std::set<PathInfo> paths_;
                 std::shared_ptr<PathGeometric> hpath_;
+                std::shared_ptr<PathGeometric> bestPath_;
+                double bestCost_ = std::numeric_limits<double>::max();
 
 				std::string name_;
 		};

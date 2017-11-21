@@ -121,17 +121,17 @@ void planSmoothnessR2(const std::vector<Rectangle> &obstacles,
         {
             auto hop = std::dynamic_pointer_cast<ompl::geometric::HybridizationOptimizer>(op);
             hop->recordPath(std::make_shared<ompl::geometric::PathGeometric>(path), true);
-            for (size_t i = 0; i < 20; ++i)
+            for (size_t i = 0; i < MAX_SOLUTIONS; ++i)
             {
                 ss->clear();
-                ss->solve();
+                ss->solve(10.0);
                 ompl::geometric::PathGeometric& newPath = ss->getSolutionPath();
                 hop->recordPath(std::make_shared<ompl::geometric::PathGeometric>(newPath), true);
             }
         }
 
         // Optimize solution
-        ompl::geometric::PathGeometric optimizedPath = op->optimizeSolution(ss);
+        ompl::geometric::PathGeometric optimizedPath = op->optimizeSolution(ss, SMOOTHNESS);
 
         std::cout << "Optimized solution:" << std::endl;
 
@@ -213,17 +213,17 @@ void planSmoothnessSE2(const std::vector<Rectangle>& obstacles,
         {
             auto hop = std::dynamic_pointer_cast<ompl::geometric::HybridizationOptimizer>(op);
             hop->recordPath(std::make_shared<ompl::geometric::PathGeometric>(path), true);
-            for (size_t i = 0; i < 20; ++i)
+            for (size_t i = 0; i < MAX_SOLUTIONS; ++i)
             {
                 ss->clear();
-                ss->solve();
+                ss->solve(10.0);
                 ompl::geometric::PathGeometric& newPath = ss->getSolutionPath();
                 hop->recordPath(std::make_shared<ompl::geometric::PathGeometric>(newPath), true);
             }
         }
 
         std::cout << "Optimized solution:" << std::endl;
-        ompl::geometric::PathGeometric optimizedPath = op->optimizeSolution(ss);
+        ompl::geometric::PathGeometric optimizedPath = op->optimizeSolution(ss, SMOOTHNESS);
 
         // Optimized solution
         optimizedPath.printAsMatrix(std::cout);
@@ -285,7 +285,7 @@ void planClearanceSE2(MethodSetup method)
         {
             auto hop = std::dynamic_pointer_cast<ompl::geometric::HybridizationOptimizer>(op);
             hop->recordPath(std::make_shared<ompl::geometric::PathGeometric>(path), true);
-            for (size_t i = 0; i < 20; ++i)
+            for (size_t i = 0; i < MAX_SOLUTIONS; ++i)
             {
                 setup->clear();
                 setup->solve();
@@ -295,7 +295,7 @@ void planClearanceSE2(MethodSetup method)
         }
 
         std::cout << "Optimized solution:" << std::endl;
-        ompl::geometric::PathGeometric optimizedPath = op->optimizeSolution(setup);
+        ompl::geometric::PathGeometric optimizedPath = op->optimizeSolution(setup, CLEARANCE);
 
         // Optimized path
         optimizedPath.printAsMatrix(std::cout);
