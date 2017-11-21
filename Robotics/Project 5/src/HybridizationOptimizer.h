@@ -12,6 +12,8 @@
 #include <ompl/geometric/PathSimplifier.h>
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/adjacency_matrix.hpp>
+#include <boost/graph/copy.hpp>
 #include <iostream>
 #include <set>
 
@@ -31,7 +33,7 @@ namespace ompl
 
 				void computeHybridPath();
 
-				unsigned int recordPath(const base::PathPtr &pp, bool matchAcrossGaps);
+				unsigned int recordPath(const std::shared_ptr<PathGeometric> pp, bool matchAcrossGaps);
 
 				std::size_t pathCount() const;
 
@@ -60,6 +62,14 @@ namespace ompl
 					boost::property<boost::vertex_rank_t, unsigned long int>>>,
 					boost::property<boost::edge_weight_t, double>>
 						HGraph;
+
+				typedef boost::adjacency_matrix<
+					boost::undirectedS,
+					boost::property<vertex_state_t, base::State *,
+					boost::property<boost::vertex_predecessor_t, unsigned long int,
+					boost::property<boost::vertex_rank_t, unsigned long int>>>,
+					boost::property<boost::edge_weight_t, double>>
+						MGraph;
 
 				typedef boost::graph_traits<HGraph>::vertex_descriptor Vertex;
 				typedef boost::graph_traits<HGraph>::edge_descriptor Edge;
@@ -96,7 +106,7 @@ namespace ompl
 				Vertex root_;
 				Vertex goal_;
 				std::set<PathInfo> paths_;
-				base::PathPtr hpath_;
+                std::shared_ptr<PathGeometric> hpath_;
 
 				std::string name_;
 		};

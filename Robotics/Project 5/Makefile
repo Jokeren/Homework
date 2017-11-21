@@ -5,8 +5,8 @@
 OMPL_DIR      = /usr/local
 
 # Change -O2 to -g when you are debugging your code
-#CXXFLAGS      = -std=c++11 -g
-CXXFLAGS      = -std=c++11 -O2
+CXXFLAGS      = -std=c++11 -g
+#CXXFLAGS      = -std=c++11 -O2
 
 # Include directories
 INCLUDE_FLAGS = -I${OMPL_DIR}/include

@@ -36,6 +36,7 @@ namespace ompl
                     return this->cost_;
                 }
 
+
                 int getStateCount()
                 {
                     return this->path_->getStateCount();
@@ -51,7 +52,21 @@ namespace ompl
                     return this->path_->getState(index);
                 }
 
+                std::vector<base::State *> &getStates()
+                {
+                    return this->path_->getStates();
+                }
+
+                base::SpaceInformationPtr getSpaceInformation()
+                {
+                    return this->si_;
+                }
+
                 // Compute cost
+                virtual double computeCost(const base::State *from, const base::State *to) = 0;
+
+                virtual double computeCost(const base::State *from, const base::State *mid, const base::State *to) = 0;
+
                 virtual bool updateCost(int index, base::State *&state) = 0;
 
                 // Init cost before using CostPath

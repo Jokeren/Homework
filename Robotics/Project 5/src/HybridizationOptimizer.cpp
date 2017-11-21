@@ -34,6 +34,14 @@ namespace ompl
 				costPath_->initCost();
 				initCost = costPath_->getCost();
 				bestCost = costPath_->getCost();
+                computeHybridPath();
+                costPath_->setPath(hpath_); 
+                costPath_->initCost();
+                if (bestCost > costPath_->getCost())
+                {
+                    bestCost = costPath_->getCost();
+                    bestPath = *hpath_;
+                }
 			}
 			else
 			{
@@ -41,7 +49,7 @@ namespace ompl
 				return bestPath;
 			}
 			double optimizeTime = time::seconds(time::now() - start);
-			OMPL_INFORM("PerburbingSetup: Path optimization took %f seconds and changed from %d to %d states, from %f to %f cost",
+			OMPL_INFORM("HybridizationSetup: Path optimization took %f seconds and changed from %d to %d states, from %f to %f cost",
 					optimizeTime, initState, initPath.getStateCount(), initCost, bestCost);
 			return bestPath;
 		}
@@ -85,16 +93,90 @@ namespace ompl
 
 		void HybridizationOptimizer::computeHybridPath()
 		{
-			boost::vector_property_map<Vertex> prev(boost::num_vertices(g_));
-			boost::dijkstra_shortest_paths(g_, root_, boost::predecessor_map(prev));
-			if (prev[goal_] != goal_)
-			{
-				auto h(std::make_shared<PathGeometric>(si_));
-				for (Vertex pos = prev[goal_]; prev[pos] != pos; pos = prev[pos])
-					h->append(stateProperty_[pos]);
-				h->reverse();
-				hpath_ = h;
-			}
+			//boost::vector_property_map<Vertex> prev(boost::num_vertices(g_));
+			//boost::dijkstra_shortest_paths(g_, root_, boost::predecessor_map(prev));
+			//if (prev[goal_] != goal_)
+			//{
+			//	auto h(std::make_shared<PathGeometric>(si_));
+			//	for (Vertex pos = prev[goal_]; prev[pos] != pos; pos = prev[pos])
+			//		h->append(stateProperty_[pos]);
+			//	h->reverse();
+			//	hpath_ = h;
+			//}
+            size_t nvertices = boost::num_vertices(g_);
+            double *dis = (double *)malloc(nvertices * nvertices * sizeof(double));
+            size_t *next = (size_t *)malloc(nvertices * nvertices * sizeof(size_t));
+
+            for (Vertex u = 0; u < boost::num_vertices(g_); ++u)
+            {
+                for (Vertex v = 0; v < boost::num_vertices(g_); ++v)
+                {
+                    std::pair<Edge, bool> p = boost::edge(u, v, g_);
+                    if (u == v)
+                    {
+                        dis[u * nvertices + v] = 0;
+                    }
+                    else if (p.second == true)
+                    {
+                        base::State *stateU = stateProperty_[u];
+                        base::State *stateV = stateProperty_[v];
+                        if (stateU == NULL || stateV == NULL)
+                        {
+                            dis[u * nvertices + v] = 0;
+                        }
+                        else
+                        {
+                            double cost = costPath_->computeCost(stateU, stateV);
+                            dis[u * nvertices + v] = cost;
+                        }
+                        next[u * nvertices + v] = v;
+                    }
+                    else
+                    {
+                        dis[u * nvertices + v] = std::numeric_limits<double>::max() / 2 - 1;
+                    }
+                }
+            }
+
+            for (Vertex i = 0; i < nvertices; ++i)
+            {
+                for (Vertex u = 0; u < nvertices; ++u)
+                {
+                    for (Vertex v = 0; v < nvertices; ++v)
+                    {
+                        if (u == v)
+                            continue;
+
+                        base::State *stateU = stateProperty_[u];
+                        base::State *stateV = stateProperty_[v];
+                        base::State *stateI = stateProperty_[i];
+
+                        if (dis[u * nvertices + i] != std::numeric_limits<double>::max() && dis[i * nvertices + v] != std::numeric_limits<double>::max())
+                        {
+                            double angleCost = 0.0;
+                            if (stateU != NULL && stateV != NULL && stateI != NULL)
+                            {
+                                angleCost = costPath_->computeCost(stateU, stateI, stateV);
+                            }
+                            if (dis[u * nvertices + v] > dis[u * nvertices + i] + dis[i * nvertices + v] + angleCost)
+                            {
+                                dis[u * nvertices + v] = dis[u * nvertices + i] + dis[i * nvertices + v] + angleCost;
+                                next[u * nvertices + v] = next[u * nvertices + i];
+                            } 
+                        }
+                    }
+                }
+            }
+			auto h(std::make_shared<PathGeometric>(costPath_->getSpaceInformation()));
+            Vertex pos = next[root_ * nvertices + goal_];
+            while (pos != goal_)
+            {
+                h->append(stateProperty_[pos]);
+                pos = next[pos * nvertices + goal_];
+            }
+            hpath_ = h;
+            free(next);
+            free(dis);
 		}
 
 		const ompl::base::PathPtr &HybridizationOptimizer::getHybridPath() const
@@ -102,9 +184,9 @@ namespace ompl
 			return hpath_;
 		}
 
-		unsigned int HybridizationOptimizer::recordPath(const base::PathPtr &pp, bool matchAcrossGaps)
+		unsigned int HybridizationOptimizer::recordPath(const std::shared_ptr<PathGeometric> pp, bool matchAcrossGaps)
 		{
-			auto *p = dynamic_cast<PathGeometric *>(pp.get());
+			auto *p = pp.get();
 			if (!p)
 			{
 				OMPL_ERROR("Path hybridization only works for geometric paths");

@@ -12,6 +12,16 @@ namespace ompl
 {
     namespace geometric
     {
+        double ClearanceCostPath::computeCost(const base::State *from, const base::State *to)
+        {
+            return 1 / si_->getStateValidityChecker()->clearance(to);
+        }
+
+        double ClearanceCostPath::computeCost(const base::State *from, const base::State *mid, const base::State *to)
+        {
+            return 0.0;
+        }
+
         void ClearanceCostPath::initCost()
         {
             std::vector<base::State *> &states = path_->getStates();
@@ -19,19 +29,19 @@ namespace ompl
             cost_ = 0;
             for (int i = 0; i < states.size(); ++i)
             {
-                costs_[i] = -si_->getStateValidityChecker()->clearance(states[i]);
+                costs_[i] = 1 / si_->getStateValidityChecker()->clearance(states[i]);
                 cost_ += costs_[i];
             }
             if (states.empty())
             {
-                cost_ = -std::numeric_limits<double>::infinity();
+                cost_ = 0;
             }
         }
 
         bool ClearanceCostPath::updateCost(int index, base::State *&state)
         {
             std::vector<base::State *> &states = path_->getStates();
-            double cost = -si_->getStateValidityChecker()->clearance(state);
+            double cost = 1 / si_->getStateValidityChecker()->clearance(state);
             if (cost < costs_[index])
             {
                 std::swap(states[index], state);

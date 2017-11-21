@@ -26,6 +26,22 @@ namespace ompl
             return 0;
         }
 
+
+        double SmoothCostPath::computeCost(const base::State *from, const base::State *to)
+        {
+            return 0.0;
+        }
+
+
+        double SmoothCostPath::computeCost(const base::State *from, const base::State *mid, const base::State *to)
+        {
+            double a = si_->distance(from, mid);
+            double b = si_->distance(mid, to);
+            double c = si_->distance(from, to);
+            return calculateSmoothness(a, b, c);
+        }
+
+
         void SmoothCostPath::initCost()
         {
             std::vector<base::State *> &states = path_->getStates();
