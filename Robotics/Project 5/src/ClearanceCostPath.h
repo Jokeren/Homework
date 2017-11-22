@@ -24,7 +24,7 @@ namespace ompl
 
                 // Init cost before using CostPath
                 virtual void initCost();
-                
+
                 virtual double computeCost(const base::State *from, const base::State *to);
 
                 virtual double computeCost(const base::State *from, const base::State *mid, const base::State *to);

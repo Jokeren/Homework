@@ -12,6 +12,7 @@
 #include <string>
 
 static const double SIDE_LENGTH = 0.2;
+static const int MAX_SOLUTIONS = 5;
 
 enum MethodSetup
 {

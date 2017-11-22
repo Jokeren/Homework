@@ -97,31 +97,31 @@ namespace ompl
 
 
         template<>
-        void PerturbingOptimizer::randomState<UNIFORM>(
-            const base::SpaceInformationPtr si,
-            const base::State *startState, const base::State *endState,
-            base::State *midState, base::State *newState)
-        {
-            double dist = si->distance(startState, endState);
-            // find middle point
-            si->getStateSpace()->interpolate(startState, endState, 0.5, midState);
-            // TODO(keren): try other samplers
-            sampler_->sampleUniformNear(newState, midState, dist / 2);
-        }
-        
+            void PerturbingOptimizer::randomState<UNIFORM>(
+                    const base::SpaceInformationPtr si,
+                    const base::State *startState, const base::State *endState,
+                    base::State *midState, base::State *newState)
+            {
+                double dist = si->distance(startState, endState);
+                // find middle point
+                si->getStateSpace()->interpolate(startState, endState, 0.5, midState);
+                // TODO(keren): try other samplers
+                sampler_->sampleUniformNear(newState, midState, dist / 2);
+            }
+
 
         template<>
-        void PerturbingOptimizer::randomState<GAUSSIAN>(
-            const base::SpaceInformationPtr si,
-            const base::State *startState, const base::State *endState,
-            base::State *midState, base::State *newState)
-        {
-            double dist = si->distance(startState, endState);
-            // find middle point
-            si->getStateSpace()->interpolate(startState, endState, 0.5, midState);
-            // TODO(keren): try other samplers
-            sampler_->sampleGaussian(newState, midState, 0);
-        }
+            void PerturbingOptimizer::randomState<GAUSSIAN>(
+                    const base::SpaceInformationPtr si,
+                    const base::State *startState, const base::State *endState,
+                    base::State *midState, base::State *newState)
+            {
+                double dist = si->distance(startState, endState);
+                // find middle point
+                si->getStateSpace()->interpolate(startState, endState, 0.5, midState);
+                // TODO(keren): try other samplers
+                sampler_->sampleGaussian(newState, midState, 0);
+            }
 
 
         void PerturbingOptimizer::perturbeRandom(const base::SpaceInformationPtr si, const base::PlannerTerminationCondition &ptc)

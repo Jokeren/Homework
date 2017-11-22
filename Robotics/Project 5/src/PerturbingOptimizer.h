@@ -38,9 +38,9 @@ namespace ompl
 
             private:
                 template<RandomMethod method>
-                void randomState(const base::SpaceInformationPtr si,
-                    const base::State *startState, const base::State *endState,
-                    base::State *midState, base::State *newState);
+                    void randomState(const base::SpaceInformationPtr si,
+                            const base::State *startState, const base::State *endState,
+                            base::State *midState, base::State *newState);
 
                 void perturbeRandom(const base::SpaceInformationPtr si, const base::PlannerTerminationCondition &ptc);
 

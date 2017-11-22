@@ -21,106 +21,106 @@
 
 namespace ompl
 {
-	namespace geometric
-	{
+    namespace geometric
+    {
 
-		class HybridizationOptimizer : public Optimizer
-		{
-			public:
-				HybridizationOptimizer(std::shared_ptr<CostPath> costPath, base::SpaceInformationPtr si);
+        class HybridizationOptimizer : public Optimizer
+        {
+            public:
+                HybridizationOptimizer(std::shared_ptr<CostPath> costPath, base::SpaceInformationPtr si);
 
-				const base::PathPtr &getHybridPath() const;
+                const base::PathPtr &getHybridPath() const;
 
-				void computeHybridPathClearance();
+                void computeHybridPathClearance();
 
-				void computeHybridPathSmoothness();
+                void computeHybridPathSmoothness();
 
-				unsigned int recordPath(const std::shared_ptr<PathGeometric> pp, bool matchAcrossGaps);
+                unsigned int recordPath(const std::shared_ptr<PathGeometric> pp, bool matchAcrossGaps);
 
-				std::size_t pathCount() const;
+                std::size_t pathCount() const;
 
-				void matchPaths(const geometric::PathGeometric &p, const geometric::PathGeometric &q, double gapCost,
-						std::vector<int> &indexP, std::vector<int> &indexQ) const;
+                void matchPaths(const geometric::PathGeometric &p, const geometric::PathGeometric &q, double gapCost,
+                        std::vector<int> &indexP, std::vector<int> &indexQ) const;
 
-				// RVO
-				virtual PathGeometric optimizeSolution(const SimpleSetupPtr ss, MetricSetup metric = SMOOTHNESS, double duration = 0.0);
+                // RVO
+                virtual PathGeometric optimizeSolution(const SimpleSetupPtr ss, MetricSetup metric = SMOOTHNESS, double duration = 0.0);
 
-				void clear();
+                void clear();
 
-				void print(std::ostream &out = std::cout) const;
+                void print(std::ostream &out = std::cout) const;
 
-				const std::string &getName() const;
+                const std::string &getName() const;
 
-			private:
+            private:
 
 
-				struct vertex_state_t
-				{
-					typedef boost::vertex_property_tag kind;
-				};
+                struct vertex_state_t
+                {
+                    typedef boost::vertex_property_tag kind;
+                };
 
-				typedef boost::adjacency_list<
-					boost::vecS, boost::vecS, boost::undirectedS,
-					boost::property<vertex_state_t, base::State *,
-					boost::property<boost::vertex_predecessor_t, unsigned long int,
-					boost::property<boost::vertex_rank_t, unsigned long int>>>,
-					boost::property<boost::edge_weight_t, double>>
-						HGraph;
+                typedef boost::adjacency_list<
+                    boost::vecS, boost::vecS, boost::undirectedS,
+                    boost::property<vertex_state_t, base::State *,
+                    boost::property<boost::vertex_predecessor_t, unsigned long int,
+                    boost::property<boost::vertex_rank_t, unsigned long int>>>,
+                    boost::property<boost::edge_weight_t, double>>
+                        HGraph;
 
-				typedef boost::adjacency_matrix<
-					boost::undirectedS,
-					boost::property<vertex_state_t, base::State *,
-					boost::property<boost::vertex_predecessor_t, unsigned long int,
-					boost::property<boost::vertex_rank_t, unsigned long int>>>,
-					boost::property<boost::edge_weight_t, double>>
-						MGraph;
+                typedef boost::adjacency_matrix<
+                    boost::undirectedS,
+                    boost::property<vertex_state_t, base::State *,
+                    boost::property<boost::vertex_predecessor_t, unsigned long int,
+                    boost::property<boost::vertex_rank_t, unsigned long int>>>,
+                    boost::property<boost::edge_weight_t, double>>
+                        MGraph;
 
-				typedef boost::graph_traits<HGraph>::vertex_descriptor Vertex;
-				typedef boost::graph_traits<HGraph>::edge_descriptor Edge;
+                typedef boost::graph_traits<HGraph>::vertex_descriptor Vertex;
+                typedef boost::graph_traits<HGraph>::edge_descriptor Edge;
 
                 void dfs(Vertex u, std::vector<Vertex> &path, std::vector<Vertex> &bestPath,
                         double &cost, double &bestCost, bool* visited, int nvertices,
                         const base::PlannerTerminationCondition &ptc);
 
-				struct PathInfo
-				{
-					PathInfo(const base::PathPtr &path)
-						: path_(path), states_(static_cast<PathGeometric *>(path.get())->getStates()), length_(0.0)
-					{
-						vertices_.reserve(states_.size());
-					}
+                struct PathInfo
+                {
+                    PathInfo(const base::PathPtr &path)
+                        : path_(path), states_(static_cast<PathGeometric *>(path.get())->getStates()), length_(0.0)
+                    {
+                        vertices_.reserve(states_.size());
+                    }
 
-					bool operator==(const PathInfo &other) const
-					{
-						return path_ == other.path_;
-					}
+                    bool operator==(const PathInfo &other) const
+                    {
+                        return path_ == other.path_;
+                    }
 
-					bool operator<(const PathInfo &other) const
-					{
-						return path_ < other.path_;
-					}
+                    bool operator<(const PathInfo &other) const
+                    {
+                        return path_ < other.path_;
+                    }
 
-					base::PathPtr path_;
-					const std::vector<base::State *> &states_;
-					double length_;
-					std::vector<Vertex> vertices_;
-				};
+                    base::PathPtr path_;
+                    const std::vector<base::State *> &states_;
+                    double length_;
+                    std::vector<Vertex> vertices_;
+                };
 
-				void attemptNewEdge(const PathInfo &p, const PathInfo &q, int indexP, int indexQ);
+                void attemptNewEdge(const PathInfo &p, const PathInfo &q, int indexP, int indexQ);
 
-				base::SpaceInformationPtr si_;
-				HGraph g_;
-				boost::property_map<HGraph, vertex_state_t>::type stateProperty_;
-				Vertex root_;
-				Vertex goal_;
-				std::set<PathInfo> paths_;
+                base::SpaceInformationPtr si_;
+                HGraph g_;
+                boost::property_map<HGraph, vertex_state_t>::type stateProperty_;
+                Vertex root_;
+                Vertex goal_;
+                std::set<PathInfo> paths_;
                 std::shared_ptr<PathGeometric> hpath_;
                 std::shared_ptr<PathGeometric> bestPath_;
                 double bestCost_ = std::numeric_limits<double>::max();
 
-				std::string name_;
-		};
-	}  // namespace tools
+                std::string name_;
+        };
+    }  // namespace tools
 }  // namespace ompl
 
 #endif
