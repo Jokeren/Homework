@@ -31,7 +31,7 @@ int *record(int *q, int type, FILE *fp){
 }
 
 
-dochunk(int *data, FILE *fp)
+void dochunk(int *data, FILE *fp)
 {
   int i;
   int *p;

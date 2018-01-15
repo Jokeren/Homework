@@ -19,7 +19,7 @@ double lastMemoryIdleTime = 0.0;
 
 
 extern struct genericQueueEntry * getFromQueue(int);
-extern struct queueNode * getLastEntry(int, int);
+extern struct genericQueueEntry * getLastEntry(int, int);
 
 double totalTimeCPUBusy[MAX_NUM_THREADS] = {0.0};
 double  lastTimeCPUBusy[MAX_NUM_THREADS] = {0.0};
@@ -105,6 +105,7 @@ void memorywriter(){
       printf("Memory Write Thread: Granted  memory semaphore at time %5.2f\n", GetSimTime());
 
     totalMemoryIdleTime += GetSimTime() - lastMemoryIdleTime;
+    printf("totalMemoryIdleTime %5.2f\n", totalMemoryIdleTime);
 
     ProcessDelay((double) MEMORY_WRITE_TIME);
     totalWritebacksCompleted++;
@@ -149,19 +150,20 @@ Be careful not to create possibilities for deadlock by locking access to the Wri
 
 /* ************************************************  */
 int * MemoryRead(struct genericQueueEntry *memreq) {
-  struct queueNode *ptr;
+  struct genericQueueEntry *ptr;
 
   if (TRACE)
     printf("In function MemoryRead at time %5.2f\n", GetSimTime());
   
   SemaphoreWait(sem_writebackQueue); 
-  ptr = getLastEntry(WRITEBACK_QUEUE, (int)memreq);
+  printf("Search for request in writequeue at time %5.2f\n", GetSimTime());
+  ptr = getLastEntry(WRITEBACK_QUEUE, memreq->reqAddress);
+  ProcessDelay(WRITE_BUFFER_SEARCH_DELAY);
   SemaphoreSignal(sem_writebackQueue); 
 
-  if (ptr) {
+  if (ptr != NULL) {
     if (TRACE)
       printf("Found request in Write Queue: Time: %5.2f\n",  GetSimTime());   
-    ProcessDelay(WRITE_BUFFER_SEARCH_DELAY);
   } else {
     if (TRACE)
       printf("Memory Reader Contend for memory semaphore at time %5.2f\n", GetSimTime());
@@ -169,7 +171,8 @@ int * MemoryRead(struct genericQueueEntry *memreq) {
     if (TRACE)
       printf("Memory Reader got memory semaphore at time %5.2f\n", GetSimTime());
     totalMemoryIdleTime += GetSimTime() - lastMemoryIdleTime;   // memory no longer idle
-    ProcessDelay(MEMORY_WRITE_TIME);
+    printf("totalMemoryIdleTime %5.2f\n", totalMemoryIdleTime);
+    ProcessDelay(MEMORY_READ_TIME);
     totalMemoryReadTime += MEMORY_READ_TIME;  // Accumulate total time spent reading memory
     lastMemoryIdleTime = GetSimTime();  //Memory idle unless other request reactivates it
     SemaphoreSignal(sem_memory);
@@ -263,6 +266,7 @@ int LookupCache(unsigned address, unsigned type) {
         CACHE[set_index][way].BLKDATA = (int *) NULL;
       }
       ProcessDelay(CACHE_LOOKUP_TIME);	// Delay for accessing cache
+      if (TRACE) printf("\nCache HIT for address %x at time %5.2f\n",address, GetSimTime());
       SemaphoreSignal(sem_cache);
       return(TRUE);
     }
@@ -311,13 +315,14 @@ void    doMemAccess(struct tracerecord *mem_ref,int thread_num) {
   if (TRACE)
     printf("Thread: %d  Cache HIT  for Address %x at time %5.2f\n", thread_num, mem_ref->address, GetSimTime());          
   Hits[thread_num]++;	     
+  return;
 }
 
 /* ***********n *************************************  */
 // Thread  model
 void processor()
 {
-  struct tracerecord  *mem_ref = malloc(sizeof(struct tracerecord));  // Record from trace file 
+  struct tracerecord *mem_ref = malloc(sizeof(struct tracerecord));  // Record from trace file 
 
   // Yacsim specific commands
   int thread_num;   // ID for this thread
