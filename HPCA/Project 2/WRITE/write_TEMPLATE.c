@@ -139,10 +139,28 @@ void FlushDirtyBlock(struct genericQueueEntry * writeBlk) {
 void checkAndFlush(struct genericQueueEntry * req) {
   struct genericQueueEntry * writeReq;
   unsigned set_index;
+  unsigned way;
 
   SemaphoreWait(sem_cache);  
   set_index = (req->reqAddress /  BLKSIZE)% NUMSETS;
+  way = GetVictim(set_index);
 
+  CACHE[set_index][way].V = FALSE;
+  if (CACHE[set_index][way].D == TRUE) {
+    if (TRACE) 
+      printf("\nCheckAndFlush: Evicted block at index %d is DIRTY -- flush to memory. Time: %5.2f\n", set_index, GetSimTime());
+
+    totalDirtyEvictions++;
+    writeReq = (struct genericQueueEntry *) malloc(sizeof (struct genericQueueEntry));
+    writeReq->reqAddress = (CACHE[set_index][way].TAG  * NUMSETS  + set_index) * BLKSIZE; 
+    writeReq->type = WRITE;
+    writeReq->data = CACHE[set_index][way].BLKDATA;
+    writeReq->startTime = GetSimTime();
+    FlushDirtyBlock(writeReq);
+  } else {
+    if (TRACE) 
+      printf("CheckAndFlush: Evicted block at index %d is CLEAN. Time: %5.2f\n", set_index, GetSimTime());
+  }
 
   /*
      1.Compute block address  of cache block to be evicted
@@ -158,14 +176,6 @@ void checkAndFlush(struct genericQueueEntry * req) {
      (c) Call FlushDirtyBlock( ) to perform the write
      6. Use the statements below in appropriate places in your code.
      */
-
-  if (TRACE) 
-    printf("\nCheckAndFlush: Evicted block at index %d is DIRTY -- flush to memory. Time: %5.2f\n", set_index, GetSimTime());
-
-  if (TRACE) 
-    printf("CheckAndFlush: Evicted block at index %d is CLEAN. Time: %5.2f\n", set_index, GetSimTime());
-
-
   SemaphoreSignal(sem_cache);  
 }
 
@@ -242,6 +252,7 @@ int ServiceMemRequest() {
   blockdata = (unsigned *) MemoryRead(req);   // Read the missed block. Returns after memory read delay.
   if (TRACE)
     printf("\nCompleted Memory Read for Thread: %d Block %x at Time %5.2f\n", req->threadId, (req->reqAddress)/BLKSIZE, GetSimTime()); 
+  checkAndFlush(req);
   installBlockInCache(req);
   SemaphoreSignal(sem_memdone[req->threadId]);  // Wake up processor and go back to waiting for next request.
 }
@@ -253,7 +264,7 @@ int ServiceMemRequest() {
 int LookupCache(unsigned address, unsigned type) {
   unsigned block_num, set_index, my_tag;
   unsigned way;
-  struct genericQueueEntry *writeReq;
+  struct genericQueueEntry *writeReq = (struct genericQueueEntry *)malloc(sizeof(struct genericQueueEntry));
 
   SemaphoreWait(sem_cache);
   block_num =  address/ BLKSIZE;
@@ -274,8 +285,8 @@ int LookupCache(unsigned address, unsigned type) {
   }
 
   ProcessDelay(CACHE_LOOKUP_TIME);
-  totalMisses++;
   SemaphoreSignal(sem_cache);
+  totalMisses++;
   return(FALSE);
 }
 
