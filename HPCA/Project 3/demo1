@@ -1,0 +1,4012 @@
+
+********************************************************************************
+********************************************************************************
+**                                                                            **
+**                      YACSIM Version 2.0, 3/6/93                            **
+**                                                                            **
+**            Copyright 1993 by Rice University, Houston, Texas               **
+**                                                                            **
+**        Send comments to: J. Robert Jump, ECE Dept., Rice University        **
+**       P.O. Box 1892, Houston, TX 77251; (713) 527-8101; jrj@rice.edu       **
+**                                                                            **
+********************************************************************************
+********************************************************************************
+
+
+In WRITE Stage at time  0
+In EXECUTE Stage at time  0
+In DISPATCH Stage at time  0
+	Could not find any instruction to dipatch. Time:  0.00
+In ISSUE  Stage at time  0
+	Instruction is NOP. Will not issue into RS. Time:  0.00
+In FETCH  Stage at time  0
+	PC: 4 INSTRUCTION: 10200000
+In DISPLAY  Stage at time  0
+
+
+In WRITE Stage at time  1
+In EXECUTE Stage at time  1
+In DISPATCH Stage at time  1
+	Could not find any instruction to dipatch. Time:  1.00
+In ISSUE  Stage at time  1
+	OPCODE: LOADFP  Adding to RS index 0
+In FETCH  Stage at time  1
+	PC: 8 INSTRUCTION: 15094000
+In DISPLAY  Stage at time  1
+
+
+In WRITE Stage at time  2
+In EXECUTE Stage at time  2
+In DISPATCH Stage at time  2
+	Activating FU LOADFP with instruction tag  0 at time  2.00
+	RS[0]	FREE: FALSE  BUSY: TRUE FU: LOADFP Destination Register: 0
+		op1RDY: TRUE tag1: -1  operand1: 0
+		op2RDY: TRUE, tag2: -1 operand2: 0
+In ISSUE  Stage at time  2
+	No free Reservation Stations! Setting IFstall. Time:  2.00
+In FETCH  Stage at time  2
+	stallIF: TRUE  INSTRUCTION: 15094000
+	PC: 8 INSTRUCTION: 15094000
+In DISPLAY  Stage at time  2
+
+
+In WRITE Stage at time  3
+In EXECUTE Stage at time  3
+	FU  LOADFP (id: 4) woken up at time  3
+In DISPATCH Stage at time  3
+	Could not find any instruction to dipatch. Time:  3.00
+In ISSUE  Stage at time  3
+	No free Reservation Stations! Setting IFstall. Time:  3.00
+In FETCH  Stage at time  3
+	stallIF: TRUE  INSTRUCTION: 15094000
+	PC: 8 INSTRUCTION: 15094000
+In DISPLAY  Stage at time  3
+
+
+In WRITE Stage at time  4
+In EXECUTE Stage at time  4
+In DISPATCH Stage at time  4
+	Could not find any instruction to dipatch. Time:  4.00
+In ISSUE  Stage at time  4
+	No free Reservation Stations! Setting IFstall. Time:  4.00
+In FETCH  Stage at time  4
+	stallIF: TRUE  INSTRUCTION: 15094000
+	PC: 8 INSTRUCTION: 15094000
+In DISPLAY  Stage at time  4
+
+		FU Unit LOADFP completed execution at time  5.00-
+		RS[0]	FREE: FALSE  BUSY: TRUE FU: LOADFP Destination Register: 0
+		op1RDY: TRUE tag1: -1  operand1: 0
+		op2RDY: TRUE, tag2: -1 operand2: 0
+
+In WRITE Stage at time  5
+Writing to Register 0 value 500
+	Completed CDB Broadcast of instruction in  RS[0]:  Result: 500  
+	Completed Instruction: LOADFP. Result: 500 Num Instructions Completed: 1
+In EXECUTE Stage at time  5
+In DISPATCH Stage at time  5
+	Could not find any instruction to dipatch. Time:  5.00
+In ISSUE  Stage at time  5
+	OPCODE: INTADD  Adding to RS index 0
+In FETCH  Stage at time  5
+	PC: 12 INSTRUCTION: 4401000
+In DISPLAY  Stage at time  5
+
+
+In WRITE Stage at time  6
+In EXECUTE Stage at time  6
+In DISPATCH Stage at time  6
+	Activating FU INTADD with instruction tag  0 at time  6.00
+	RS[0]	FREE: FALSE  BUSY: TRUE FU: INTADD Destination Register: 8
+		op1RDY: TRUE tag1: -1  operand1: 10
+		op2RDY: TRUE, tag2: -1 operand2: -1
+In ISSUE  Stage at time  6
+	No free Reservation Stations! Setting IFstall. Time:  6.00
+In FETCH  Stage at time  6
+	stallIF: TRUE  INSTRUCTION: 4401000
+	PC: 12 INSTRUCTION: 4401000
+In DISPLAY  Stage at time  6
+
+
+In WRITE Stage at time  7
+In EXECUTE Stage at time  7
+	FU  INTADD (id: 5) woken up at time  7
+In DISPATCH Stage at time  7
+	Could not find any instruction to dipatch. Time:  7.00
+In ISSUE  Stage at time  7
+	No free Reservation Stations! Setting IFstall. Time:  7.00
+In FETCH  Stage at time  7
+	stallIF: TRUE  INSTRUCTION: 4401000
+	PC: 12 INSTRUCTION: 4401000
+In DISPLAY  Stage at time  7
+
+		FU Unit INTADD completed execution at time  8.00-
+		RS[0]	FREE: FALSE  BUSY: TRUE FU: INTADD Destination Register: 8
+		op1RDY: TRUE tag1: -1  operand1: 10
+		op2RDY: TRUE, tag2: -1 operand2: -1
+
+In WRITE Stage at time  8
+Writing to Register 8 value 9
+	Completed CDB Broadcast of instruction in  RS[0]:  Result: 9  
+	Completed Instruction: INTADD. Result: 9 Num Instructions Completed: 2
+In EXECUTE Stage at time  8
+In DISPATCH Stage at time  8
+	Could not find any instruction to dipatch. Time:  8.00
+In ISSUE  Stage at time  8
+	OPCODE: ADDFP  Adding to RS index 0
+In FETCH  Stage at time  8
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time  8
+
+
+In WRITE Stage at time  9
+In EXECUTE Stage at time  9
+In DISPATCH Stage at time  9
+	Activating FU ADDFP with instruction tag  0 at time  9.00
+	RS[0]	FREE: FALSE  BUSY: TRUE FU: ADDFP Destination Register: 2
+		op1RDY: TRUE tag1: -1  operand1: 0
+		op2RDY: TRUE, tag2: -1 operand2: 500
+In ISSUE  Stage at time  9
+	No free Reservation Stations! Setting IFstall. Time:  9.00
+In FETCH  Stage at time  9
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time  9
+
+
+In WRITE Stage at time 10
+In EXECUTE Stage at time 10
+	FU  ADDFP (id: 1) woken up at time 10
+In DISPATCH Stage at time 10
+	Could not find any instruction to dipatch. Time: 10.00
+In ISSUE  Stage at time 10
+	No free Reservation Stations! Setting IFstall. Time: 10.00
+In FETCH  Stage at time 10
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 10
+
+
+In WRITE Stage at time 11
+In EXECUTE Stage at time 11
+In DISPATCH Stage at time 11
+	Could not find any instruction to dipatch. Time: 11.00
+In ISSUE  Stage at time 11
+	No free Reservation Stations! Setting IFstall. Time: 11.00
+In FETCH  Stage at time 11
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 11
+
+
+In WRITE Stage at time 12
+In EXECUTE Stage at time 12
+In DISPATCH Stage at time 12
+	Could not find any instruction to dipatch. Time: 12.00
+In ISSUE  Stage at time 12
+	No free Reservation Stations! Setting IFstall. Time: 12.00
+In FETCH  Stage at time 12
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 12
+
+
+In WRITE Stage at time 13
+In EXECUTE Stage at time 13
+In DISPATCH Stage at time 13
+	Could not find any instruction to dipatch. Time: 13.00
+In ISSUE  Stage at time 13
+	No free Reservation Stations! Setting IFstall. Time: 13.00
+In FETCH  Stage at time 13
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 13
+
+
+In WRITE Stage at time 14
+In EXECUTE Stage at time 14
+In DISPATCH Stage at time 14
+	Could not find any instruction to dipatch. Time: 14.00
+In ISSUE  Stage at time 14
+	No free Reservation Stations! Setting IFstall. Time: 14.00
+In FETCH  Stage at time 14
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 14
+
+
+In WRITE Stage at time 15
+In EXECUTE Stage at time 15
+In DISPATCH Stage at time 15
+	Could not find any instruction to dipatch. Time: 15.00
+In ISSUE  Stage at time 15
+	No free Reservation Stations! Setting IFstall. Time: 15.00
+In FETCH  Stage at time 15
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 15
+
+
+In WRITE Stage at time 16
+In EXECUTE Stage at time 16
+In DISPATCH Stage at time 16
+	Could not find any instruction to dipatch. Time: 16.00
+In ISSUE  Stage at time 16
+	No free Reservation Stations! Setting IFstall. Time: 16.00
+In FETCH  Stage at time 16
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 16
+
+
+In WRITE Stage at time 17
+In EXECUTE Stage at time 17
+In DISPATCH Stage at time 17
+	Could not find any instruction to dipatch. Time: 17.00
+In ISSUE  Stage at time 17
+	No free Reservation Stations! Setting IFstall. Time: 17.00
+In FETCH  Stage at time 17
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 17
+
+
+In WRITE Stage at time 18
+In EXECUTE Stage at time 18
+In DISPATCH Stage at time 18
+	Could not find any instruction to dipatch. Time: 18.00
+In ISSUE  Stage at time 18
+	No free Reservation Stations! Setting IFstall. Time: 18.00
+In FETCH  Stage at time 18
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 18
+
+
+In WRITE Stage at time 19
+In EXECUTE Stage at time 19
+In DISPATCH Stage at time 19
+	Could not find any instruction to dipatch. Time: 19.00
+In ISSUE  Stage at time 19
+	No free Reservation Stations! Setting IFstall. Time: 19.00
+In FETCH  Stage at time 19
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 19
+
+
+In WRITE Stage at time 20
+In EXECUTE Stage at time 20
+In DISPATCH Stage at time 20
+	Could not find any instruction to dipatch. Time: 20.00
+In ISSUE  Stage at time 20
+	No free Reservation Stations! Setting IFstall. Time: 20.00
+In FETCH  Stage at time 20
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 20
+
+
+In WRITE Stage at time 21
+In EXECUTE Stage at time 21
+In DISPATCH Stage at time 21
+	Could not find any instruction to dipatch. Time: 21.00
+In ISSUE  Stage at time 21
+	No free Reservation Stations! Setting IFstall. Time: 21.00
+In FETCH  Stage at time 21
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 21
+
+
+In WRITE Stage at time 22
+In EXECUTE Stage at time 22
+In DISPATCH Stage at time 22
+	Could not find any instruction to dipatch. Time: 22.00
+In ISSUE  Stage at time 22
+	No free Reservation Stations! Setting IFstall. Time: 22.00
+In FETCH  Stage at time 22
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 22
+
+
+In WRITE Stage at time 23
+In EXECUTE Stage at time 23
+In DISPATCH Stage at time 23
+	Could not find any instruction to dipatch. Time: 23.00
+In ISSUE  Stage at time 23
+	No free Reservation Stations! Setting IFstall. Time: 23.00
+In FETCH  Stage at time 23
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 23
+
+
+In WRITE Stage at time 24
+In EXECUTE Stage at time 24
+In DISPATCH Stage at time 24
+	Could not find any instruction to dipatch. Time: 24.00
+In ISSUE  Stage at time 24
+	No free Reservation Stations! Setting IFstall. Time: 24.00
+In FETCH  Stage at time 24
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 24
+
+
+In WRITE Stage at time 25
+In EXECUTE Stage at time 25
+In DISPATCH Stage at time 25
+	Could not find any instruction to dipatch. Time: 25.00
+In ISSUE  Stage at time 25
+	No free Reservation Stations! Setting IFstall. Time: 25.00
+In FETCH  Stage at time 25
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 25
+
+		FU Unit ADDFP completed execution at time 26.00-
+		RS[0]	FREE: FALSE  BUSY: TRUE FU: ADDFP Destination Register: 2
+		op1RDY: TRUE tag1: -1  operand1: 0
+		op2RDY: TRUE, tag2: -1 operand2: 500
+
+In WRITE Stage at time 26
+Writing to Register 2 value 500
+	Completed CDB Broadcast of instruction in  RS[0]:  Result: 500  
+	Completed Instruction: ADDFP. Result: 500 Num Instructions Completed: 3
+In EXECUTE Stage at time 26
+In DISPATCH Stage at time 26
+	Could not find any instruction to dipatch. Time: 26.00
+In ISSUE  Stage at time 26
+	OPCODE: INTADD  Adding to RS index 0
+In FETCH  Stage at time 26
+	PC: 20 INSTRUCTION: 2500ffec
+In DISPLAY  Stage at time 26
+
+
+In WRITE Stage at time 27
+In EXECUTE Stage at time 27
+In DISPATCH Stage at time 27
+	Activating FU INTADD with instruction tag  0 at time 27.00
+	RS[0]	FREE: FALSE  BUSY: TRUE FU: INTADD Destination Register: 1
+		op1RDY: TRUE tag1: -1  operand1: 0
+		op2RDY: TRUE, tag2: -1 operand2: 1
+In ISSUE  Stage at time 27
+	Completed Instruction: BNEZ.  Time: 27.00 Number Instructions Completed: 4
+In FETCH  Stage at time 27
+	PC: 0 INSTRUCTION: 0
+In DISPLAY  Stage at time 27
+
+
+In WRITE Stage at time 28
+In EXECUTE Stage at time 28
+	FU  INTADD (id: 5) woken up at time 28
+In DISPATCH Stage at time 28
+	Could not find any instruction to dipatch. Time: 28.00
+In ISSUE  Stage at time 28
+	Instruction is NOP. Will not issue into RS. Time: 28.00
+In FETCH  Stage at time 28
+	PC: 4 INSTRUCTION: 10200000
+In DISPLAY  Stage at time 28
+
+		FU Unit INTADD completed execution at time 29.00-
+		RS[0]	FREE: FALSE  BUSY: TRUE FU: INTADD Destination Register: 1
+		op1RDY: TRUE tag1: -1  operand1: 0
+		op2RDY: TRUE, tag2: -1 operand2: 1
+
+In WRITE Stage at time 29
+Writing to Register 1 value 1
+	Completed CDB Broadcast of instruction in  RS[0]:  Result: 1  
+	Completed Instruction: INTADD. Result: 1 Num Instructions Completed: 5
+In EXECUTE Stage at time 29
+In DISPATCH Stage at time 29
+	Could not find any instruction to dipatch. Time: 29.00
+In ISSUE  Stage at time 29
+	OPCODE: LOADFP  Adding to RS index 0
+In FETCH  Stage at time 29
+	PC: 8 INSTRUCTION: 15094000
+In DISPLAY  Stage at time 29
+
+
+In WRITE Stage at time 30
+In EXECUTE Stage at time 30
+In DISPATCH Stage at time 30
+	Activating FU LOADFP with instruction tag  0 at time 30.00
+	RS[0]	FREE: FALSE  BUSY: TRUE FU: LOADFP Destination Register: 0
+		op1RDY: TRUE tag1: -1  operand1: 1
+		op2RDY: TRUE, tag2: -1 operand2: 1
+In ISSUE  Stage at time 30
+	No free Reservation Stations! Setting IFstall. Time: 30.00
+In FETCH  Stage at time 30
+	stallIF: TRUE  INSTRUCTION: 15094000
+	PC: 8 INSTRUCTION: 15094000
+In DISPLAY  Stage at time 30
+
+
+In WRITE Stage at time 31
+In EXECUTE Stage at time 31
+	FU  LOADFP (id: 4) woken up at time 31
+In DISPATCH Stage at time 31
+	Could not find any instruction to dipatch. Time: 31.00
+In ISSUE  Stage at time 31
+	No free Reservation Stations! Setting IFstall. Time: 31.00
+In FETCH  Stage at time 31
+	stallIF: TRUE  INSTRUCTION: 15094000
+	PC: 8 INSTRUCTION: 15094000
+In DISPLAY  Stage at time 31
+
+
+In WRITE Stage at time 32
+In EXECUTE Stage at time 32
+In DISPATCH Stage at time 32
+	Could not find any instruction to dipatch. Time: 32.00
+In ISSUE  Stage at time 32
+	No free Reservation Stations! Setting IFstall. Time: 32.00
+In FETCH  Stage at time 32
+	stallIF: TRUE  INSTRUCTION: 15094000
+	PC: 8 INSTRUCTION: 15094000
+In DISPLAY  Stage at time 32
+
+		FU Unit LOADFP completed execution at time 33.00-
+		RS[0]	FREE: FALSE  BUSY: TRUE FU: LOADFP Destination Register: 0
+		op1RDY: TRUE tag1: -1  operand1: 1
+		op2RDY: TRUE, tag2: -1 operand2: 1
+
+In WRITE Stage at time 33
+Writing to Register 0 value 501
+	Completed CDB Broadcast of instruction in  RS[0]:  Result: 501  
+	Completed Instruction: LOADFP. Result: 501 Num Instructions Completed: 6
+In EXECUTE Stage at time 33
+In DISPATCH Stage at time 33
+	Could not find any instruction to dipatch. Time: 33.00
+In ISSUE  Stage at time 33
+	OPCODE: INTADD  Adding to RS index 0
+In FETCH  Stage at time 33
+	PC: 12 INSTRUCTION: 4401000
+In DISPLAY  Stage at time 33
+
+
+In WRITE Stage at time 34
+In EXECUTE Stage at time 34
+In DISPATCH Stage at time 34
+	Activating FU INTADD with instruction tag  0 at time 34.00
+	RS[0]	FREE: FALSE  BUSY: TRUE FU: INTADD Destination Register: 8
+		op1RDY: TRUE tag1: -1  operand1: 9
+		op2RDY: TRUE, tag2: -1 operand2: -1
+In ISSUE  Stage at time 34
+	No free Reservation Stations! Setting IFstall. Time: 34.00
+In FETCH  Stage at time 34
+	stallIF: TRUE  INSTRUCTION: 4401000
+	PC: 12 INSTRUCTION: 4401000
+In DISPLAY  Stage at time 34
+
+
+In WRITE Stage at time 35
+In EXECUTE Stage at time 35
+	FU  INTADD (id: 5) woken up at time 35
+In DISPATCH Stage at time 35
+	Could not find any instruction to dipatch. Time: 35.00
+In ISSUE  Stage at time 35
+	No free Reservation Stations! Setting IFstall. Time: 35.00
+In FETCH  Stage at time 35
+	stallIF: TRUE  INSTRUCTION: 4401000
+	PC: 12 INSTRUCTION: 4401000
+In DISPLAY  Stage at time 35
+
+		FU Unit INTADD completed execution at time 36.00-
+		RS[0]	FREE: FALSE  BUSY: TRUE FU: INTADD Destination Register: 8
+		op1RDY: TRUE tag1: -1  operand1: 9
+		op2RDY: TRUE, tag2: -1 operand2: -1
+
+In WRITE Stage at time 36
+Writing to Register 8 value 8
+	Completed CDB Broadcast of instruction in  RS[0]:  Result: 8  
+	Completed Instruction: INTADD. Result: 8 Num Instructions Completed: 7
+In EXECUTE Stage at time 36
+In DISPATCH Stage at time 36
+	Could not find any instruction to dipatch. Time: 36.00
+In ISSUE  Stage at time 36
+	OPCODE: ADDFP  Adding to RS index 0
+In FETCH  Stage at time 36
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 36
+
+
+In WRITE Stage at time 37
+In EXECUTE Stage at time 37
+In DISPATCH Stage at time 37
+	Activating FU ADDFP with instruction tag  0 at time 37.00
+	RS[0]	FREE: FALSE  BUSY: TRUE FU: ADDFP Destination Register: 2
+		op1RDY: TRUE tag1: -1  operand1: 500
+		op2RDY: TRUE, tag2: -1 operand2: 501
+In ISSUE  Stage at time 37
+	No free Reservation Stations! Setting IFstall. Time: 37.00
+In FETCH  Stage at time 37
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 37
+
+
+In WRITE Stage at time 38
+In EXECUTE Stage at time 38
+	FU  ADDFP (id: 1) woken up at time 38
+In DISPATCH Stage at time 38
+	Could not find any instruction to dipatch. Time: 38.00
+In ISSUE  Stage at time 38
+	No free Reservation Stations! Setting IFstall. Time: 38.00
+In FETCH  Stage at time 38
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 38
+
+
+In WRITE Stage at time 39
+In EXECUTE Stage at time 39
+In DISPATCH Stage at time 39
+	Could not find any instruction to dipatch. Time: 39.00
+In ISSUE  Stage at time 39
+	No free Reservation Stations! Setting IFstall. Time: 39.00
+In FETCH  Stage at time 39
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 39
+
+
+In WRITE Stage at time 40
+In EXECUTE Stage at time 40
+In DISPATCH Stage at time 40
+	Could not find any instruction to dipatch. Time: 40.00
+In ISSUE  Stage at time 40
+	No free Reservation Stations! Setting IFstall. Time: 40.00
+In FETCH  Stage at time 40
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 40
+
+
+In WRITE Stage at time 41
+In EXECUTE Stage at time 41
+In DISPATCH Stage at time 41
+	Could not find any instruction to dipatch. Time: 41.00
+In ISSUE  Stage at time 41
+	No free Reservation Stations! Setting IFstall. Time: 41.00
+In FETCH  Stage at time 41
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 41
+
+
+In WRITE Stage at time 42
+In EXECUTE Stage at time 42
+In DISPATCH Stage at time 42
+	Could not find any instruction to dipatch. Time: 42.00
+In ISSUE  Stage at time 42
+	No free Reservation Stations! Setting IFstall. Time: 42.00
+In FETCH  Stage at time 42
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 42
+
+
+In WRITE Stage at time 43
+In EXECUTE Stage at time 43
+In DISPATCH Stage at time 43
+	Could not find any instruction to dipatch. Time: 43.00
+In ISSUE  Stage at time 43
+	No free Reservation Stations! Setting IFstall. Time: 43.00
+In FETCH  Stage at time 43
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 43
+
+
+In WRITE Stage at time 44
+In EXECUTE Stage at time 44
+In DISPATCH Stage at time 44
+	Could not find any instruction to dipatch. Time: 44.00
+In ISSUE  Stage at time 44
+	No free Reservation Stations! Setting IFstall. Time: 44.00
+In FETCH  Stage at time 44
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 44
+
+
+In WRITE Stage at time 45
+In EXECUTE Stage at time 45
+In DISPATCH Stage at time 45
+	Could not find any instruction to dipatch. Time: 45.00
+In ISSUE  Stage at time 45
+	No free Reservation Stations! Setting IFstall. Time: 45.00
+In FETCH  Stage at time 45
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 45
+
+
+In WRITE Stage at time 46
+In EXECUTE Stage at time 46
+In DISPATCH Stage at time 46
+	Could not find any instruction to dipatch. Time: 46.00
+In ISSUE  Stage at time 46
+	No free Reservation Stations! Setting IFstall. Time: 46.00
+In FETCH  Stage at time 46
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 46
+
+
+In WRITE Stage at time 47
+In EXECUTE Stage at time 47
+In DISPATCH Stage at time 47
+	Could not find any instruction to dipatch. Time: 47.00
+In ISSUE  Stage at time 47
+	No free Reservation Stations! Setting IFstall. Time: 47.00
+In FETCH  Stage at time 47
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 47
+
+
+In WRITE Stage at time 48
+In EXECUTE Stage at time 48
+In DISPATCH Stage at time 48
+	Could not find any instruction to dipatch. Time: 48.00
+In ISSUE  Stage at time 48
+	No free Reservation Stations! Setting IFstall. Time: 48.00
+In FETCH  Stage at time 48
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 48
+
+
+In WRITE Stage at time 49
+In EXECUTE Stage at time 49
+In DISPATCH Stage at time 49
+	Could not find any instruction to dipatch. Time: 49.00
+In ISSUE  Stage at time 49
+	No free Reservation Stations! Setting IFstall. Time: 49.00
+In FETCH  Stage at time 49
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 49
+
+
+In WRITE Stage at time 50
+In EXECUTE Stage at time 50
+In DISPATCH Stage at time 50
+	Could not find any instruction to dipatch. Time: 50.00
+In ISSUE  Stage at time 50
+	No free Reservation Stations! Setting IFstall. Time: 50.00
+In FETCH  Stage at time 50
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 50
+
+
+In WRITE Stage at time 51
+In EXECUTE Stage at time 51
+In DISPATCH Stage at time 51
+	Could not find any instruction to dipatch. Time: 51.00
+In ISSUE  Stage at time 51
+	No free Reservation Stations! Setting IFstall. Time: 51.00
+In FETCH  Stage at time 51
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 51
+
+
+In WRITE Stage at time 52
+In EXECUTE Stage at time 52
+In DISPATCH Stage at time 52
+	Could not find any instruction to dipatch. Time: 52.00
+In ISSUE  Stage at time 52
+	No free Reservation Stations! Setting IFstall. Time: 52.00
+In FETCH  Stage at time 52
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 52
+
+
+In WRITE Stage at time 53
+In EXECUTE Stage at time 53
+In DISPATCH Stage at time 53
+	Could not find any instruction to dipatch. Time: 53.00
+In ISSUE  Stage at time 53
+	No free Reservation Stations! Setting IFstall. Time: 53.00
+In FETCH  Stage at time 53
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 53
+
+		FU Unit ADDFP completed execution at time 54.00-
+		RS[0]	FREE: FALSE  BUSY: TRUE FU: ADDFP Destination Register: 2
+		op1RDY: TRUE tag1: -1  operand1: 500
+		op2RDY: TRUE, tag2: -1 operand2: 501
+
+In WRITE Stage at time 54
+Writing to Register 2 value 1001
+	Completed CDB Broadcast of instruction in  RS[0]:  Result: 1001  
+	Completed Instruction: ADDFP. Result: 1001 Num Instructions Completed: 8
+In EXECUTE Stage at time 54
+In DISPATCH Stage at time 54
+	Could not find any instruction to dipatch. Time: 54.00
+In ISSUE  Stage at time 54
+	OPCODE: INTADD  Adding to RS index 0
+In FETCH  Stage at time 54
+	PC: 20 INSTRUCTION: 2500ffec
+In DISPLAY  Stage at time 54
+
+
+In WRITE Stage at time 55
+In EXECUTE Stage at time 55
+In DISPATCH Stage at time 55
+	Activating FU INTADD with instruction tag  0 at time 55.00
+	RS[0]	FREE: FALSE  BUSY: TRUE FU: INTADD Destination Register: 1
+		op1RDY: TRUE tag1: -1  operand1: 1
+		op2RDY: TRUE, tag2: -1 operand2: 1
+In ISSUE  Stage at time 55
+	Completed Instruction: BNEZ.  Time: 55.00 Number Instructions Completed: 9
+In FETCH  Stage at time 55
+	PC: 0 INSTRUCTION: 0
+In DISPLAY  Stage at time 55
+
+
+In WRITE Stage at time 56
+In EXECUTE Stage at time 56
+	FU  INTADD (id: 5) woken up at time 56
+In DISPATCH Stage at time 56
+	Could not find any instruction to dipatch. Time: 56.00
+In ISSUE  Stage at time 56
+	Instruction is NOP. Will not issue into RS. Time: 56.00
+In FETCH  Stage at time 56
+	PC: 4 INSTRUCTION: 10200000
+In DISPLAY  Stage at time 56
+
+		FU Unit INTADD completed execution at time 57.00-
+		RS[0]	FREE: FALSE  BUSY: TRUE FU: INTADD Destination Register: 1
+		op1RDY: TRUE tag1: -1  operand1: 1
+		op2RDY: TRUE, tag2: -1 operand2: 1
+
+In WRITE Stage at time 57
+Writing to Register 1 value 2
+	Completed CDB Broadcast of instruction in  RS[0]:  Result: 2  
+	Completed Instruction: INTADD. Result: 2 Num Instructions Completed: 10
+In EXECUTE Stage at time 57
+In DISPATCH Stage at time 57
+	Could not find any instruction to dipatch. Time: 57.00
+In ISSUE  Stage at time 57
+	OPCODE: LOADFP  Adding to RS index 0
+In FETCH  Stage at time 57
+	PC: 8 INSTRUCTION: 15094000
+In DISPLAY  Stage at time 57
+
+
+In WRITE Stage at time 58
+In EXECUTE Stage at time 58
+In DISPATCH Stage at time 58
+	Activating FU LOADFP with instruction tag  0 at time 58.00
+	RS[0]	FREE: FALSE  BUSY: TRUE FU: LOADFP Destination Register: 0
+		op1RDY: TRUE tag1: -1  operand1: 2
+		op2RDY: TRUE, tag2: -1 operand2: 1
+In ISSUE  Stage at time 58
+	No free Reservation Stations! Setting IFstall. Time: 58.00
+In FETCH  Stage at time 58
+	stallIF: TRUE  INSTRUCTION: 15094000
+	PC: 8 INSTRUCTION: 15094000
+In DISPLAY  Stage at time 58
+
+
+In WRITE Stage at time 59
+In EXECUTE Stage at time 59
+	FU  LOADFP (id: 4) woken up at time 59
+In DISPATCH Stage at time 59
+	Could not find any instruction to dipatch. Time: 59.00
+In ISSUE  Stage at time 59
+	No free Reservation Stations! Setting IFstall. Time: 59.00
+In FETCH  Stage at time 59
+	stallIF: TRUE  INSTRUCTION: 15094000
+	PC: 8 INSTRUCTION: 15094000
+In DISPLAY  Stage at time 59
+
+
+In WRITE Stage at time 60
+In EXECUTE Stage at time 60
+In DISPATCH Stage at time 60
+	Could not find any instruction to dipatch. Time: 60.00
+In ISSUE  Stage at time 60
+	No free Reservation Stations! Setting IFstall. Time: 60.00
+In FETCH  Stage at time 60
+	stallIF: TRUE  INSTRUCTION: 15094000
+	PC: 8 INSTRUCTION: 15094000
+In DISPLAY  Stage at time 60
+
+		FU Unit LOADFP completed execution at time 61.00-
+		RS[0]	FREE: FALSE  BUSY: TRUE FU: LOADFP Destination Register: 0
+		op1RDY: TRUE tag1: -1  operand1: 2
+		op2RDY: TRUE, tag2: -1 operand2: 1
+
+In WRITE Stage at time 61
+Writing to Register 0 value 502
+	Completed CDB Broadcast of instruction in  RS[0]:  Result: 502  
+	Completed Instruction: LOADFP. Result: 502 Num Instructions Completed: 11
+In EXECUTE Stage at time 61
+In DISPATCH Stage at time 61
+	Could not find any instruction to dipatch. Time: 61.00
+In ISSUE  Stage at time 61
+	OPCODE: INTADD  Adding to RS index 0
+In FETCH  Stage at time 61
+	PC: 12 INSTRUCTION: 4401000
+In DISPLAY  Stage at time 61
+
+
+In WRITE Stage at time 62
+In EXECUTE Stage at time 62
+In DISPATCH Stage at time 62
+	Activating FU INTADD with instruction tag  0 at time 62.00
+	RS[0]	FREE: FALSE  BUSY: TRUE FU: INTADD Destination Register: 8
+		op1RDY: TRUE tag1: -1  operand1: 8
+		op2RDY: TRUE, tag2: -1 operand2: -1
+In ISSUE  Stage at time 62
+	No free Reservation Stations! Setting IFstall. Time: 62.00
+In FETCH  Stage at time 62
+	stallIF: TRUE  INSTRUCTION: 4401000
+	PC: 12 INSTRUCTION: 4401000
+In DISPLAY  Stage at time 62
+
+
+In WRITE Stage at time 63
+In EXECUTE Stage at time 63
+	FU  INTADD (id: 5) woken up at time 63
+In DISPATCH Stage at time 63
+	Could not find any instruction to dipatch. Time: 63.00
+In ISSUE  Stage at time 63
+	No free Reservation Stations! Setting IFstall. Time: 63.00
+In FETCH  Stage at time 63
+	stallIF: TRUE  INSTRUCTION: 4401000
+	PC: 12 INSTRUCTION: 4401000
+In DISPLAY  Stage at time 63
+
+		FU Unit INTADD completed execution at time 64.00-
+		RS[0]	FREE: FALSE  BUSY: TRUE FU: INTADD Destination Register: 8
+		op1RDY: TRUE tag1: -1  operand1: 8
+		op2RDY: TRUE, tag2: -1 operand2: -1
+
+In WRITE Stage at time 64
+Writing to Register 8 value 7
+	Completed CDB Broadcast of instruction in  RS[0]:  Result: 7  
+	Completed Instruction: INTADD. Result: 7 Num Instructions Completed: 12
+In EXECUTE Stage at time 64
+In DISPATCH Stage at time 64
+	Could not find any instruction to dipatch. Time: 64.00
+In ISSUE  Stage at time 64
+	OPCODE: ADDFP  Adding to RS index 0
+In FETCH  Stage at time 64
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 64
+
+
+In WRITE Stage at time 65
+In EXECUTE Stage at time 65
+In DISPATCH Stage at time 65
+	Activating FU ADDFP with instruction tag  0 at time 65.00
+	RS[0]	FREE: FALSE  BUSY: TRUE FU: ADDFP Destination Register: 2
+		op1RDY: TRUE tag1: -1  operand1: 1001
+		op2RDY: TRUE, tag2: -1 operand2: 502
+In ISSUE  Stage at time 65
+	No free Reservation Stations! Setting IFstall. Time: 65.00
+In FETCH  Stage at time 65
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 65
+
+
+In WRITE Stage at time 66
+In EXECUTE Stage at time 66
+	FU  ADDFP (id: 1) woken up at time 66
+In DISPATCH Stage at time 66
+	Could not find any instruction to dipatch. Time: 66.00
+In ISSUE  Stage at time 66
+	No free Reservation Stations! Setting IFstall. Time: 66.00
+In FETCH  Stage at time 66
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 66
+
+
+In WRITE Stage at time 67
+In EXECUTE Stage at time 67
+In DISPATCH Stage at time 67
+	Could not find any instruction to dipatch. Time: 67.00
+In ISSUE  Stage at time 67
+	No free Reservation Stations! Setting IFstall. Time: 67.00
+In FETCH  Stage at time 67
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 67
+
+
+In WRITE Stage at time 68
+In EXECUTE Stage at time 68
+In DISPATCH Stage at time 68
+	Could not find any instruction to dipatch. Time: 68.00
+In ISSUE  Stage at time 68
+	No free Reservation Stations! Setting IFstall. Time: 68.00
+In FETCH  Stage at time 68
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 68
+
+
+In WRITE Stage at time 69
+In EXECUTE Stage at time 69
+In DISPATCH Stage at time 69
+	Could not find any instruction to dipatch. Time: 69.00
+In ISSUE  Stage at time 69
+	No free Reservation Stations! Setting IFstall. Time: 69.00
+In FETCH  Stage at time 69
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 69
+
+
+In WRITE Stage at time 70
+In EXECUTE Stage at time 70
+In DISPATCH Stage at time 70
+	Could not find any instruction to dipatch. Time: 70.00
+In ISSUE  Stage at time 70
+	No free Reservation Stations! Setting IFstall. Time: 70.00
+In FETCH  Stage at time 70
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 70
+
+
+In WRITE Stage at time 71
+In EXECUTE Stage at time 71
+In DISPATCH Stage at time 71
+	Could not find any instruction to dipatch. Time: 71.00
+In ISSUE  Stage at time 71
+	No free Reservation Stations! Setting IFstall. Time: 71.00
+In FETCH  Stage at time 71
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 71
+
+
+In WRITE Stage at time 72
+In EXECUTE Stage at time 72
+In DISPATCH Stage at time 72
+	Could not find any instruction to dipatch. Time: 72.00
+In ISSUE  Stage at time 72
+	No free Reservation Stations! Setting IFstall. Time: 72.00
+In FETCH  Stage at time 72
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 72
+
+
+In WRITE Stage at time 73
+In EXECUTE Stage at time 73
+In DISPATCH Stage at time 73
+	Could not find any instruction to dipatch. Time: 73.00
+In ISSUE  Stage at time 73
+	No free Reservation Stations! Setting IFstall. Time: 73.00
+In FETCH  Stage at time 73
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 73
+
+
+In WRITE Stage at time 74
+In EXECUTE Stage at time 74
+In DISPATCH Stage at time 74
+	Could not find any instruction to dipatch. Time: 74.00
+In ISSUE  Stage at time 74
+	No free Reservation Stations! Setting IFstall. Time: 74.00
+In FETCH  Stage at time 74
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 74
+
+
+In WRITE Stage at time 75
+In EXECUTE Stage at time 75
+In DISPATCH Stage at time 75
+	Could not find any instruction to dipatch. Time: 75.00
+In ISSUE  Stage at time 75
+	No free Reservation Stations! Setting IFstall. Time: 75.00
+In FETCH  Stage at time 75
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 75
+
+
+In WRITE Stage at time 76
+In EXECUTE Stage at time 76
+In DISPATCH Stage at time 76
+	Could not find any instruction to dipatch. Time: 76.00
+In ISSUE  Stage at time 76
+	No free Reservation Stations! Setting IFstall. Time: 76.00
+In FETCH  Stage at time 76
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 76
+
+
+In WRITE Stage at time 77
+In EXECUTE Stage at time 77
+In DISPATCH Stage at time 77
+	Could not find any instruction to dipatch. Time: 77.00
+In ISSUE  Stage at time 77
+	No free Reservation Stations! Setting IFstall. Time: 77.00
+In FETCH  Stage at time 77
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 77
+
+
+In WRITE Stage at time 78
+In EXECUTE Stage at time 78
+In DISPATCH Stage at time 78
+	Could not find any instruction to dipatch. Time: 78.00
+In ISSUE  Stage at time 78
+	No free Reservation Stations! Setting IFstall. Time: 78.00
+In FETCH  Stage at time 78
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 78
+
+
+In WRITE Stage at time 79
+In EXECUTE Stage at time 79
+In DISPATCH Stage at time 79
+	Could not find any instruction to dipatch. Time: 79.00
+In ISSUE  Stage at time 79
+	No free Reservation Stations! Setting IFstall. Time: 79.00
+In FETCH  Stage at time 79
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 79
+
+
+In WRITE Stage at time 80
+In EXECUTE Stage at time 80
+In DISPATCH Stage at time 80
+	Could not find any instruction to dipatch. Time: 80.00
+In ISSUE  Stage at time 80
+	No free Reservation Stations! Setting IFstall. Time: 80.00
+In FETCH  Stage at time 80
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 80
+
+
+In WRITE Stage at time 81
+In EXECUTE Stage at time 81
+In DISPATCH Stage at time 81
+	Could not find any instruction to dipatch. Time: 81.00
+In ISSUE  Stage at time 81
+	No free Reservation Stations! Setting IFstall. Time: 81.00
+In FETCH  Stage at time 81
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 81
+
+		FU Unit ADDFP completed execution at time 82.00-
+		RS[0]	FREE: FALSE  BUSY: TRUE FU: ADDFP Destination Register: 2
+		op1RDY: TRUE tag1: -1  operand1: 1001
+		op2RDY: TRUE, tag2: -1 operand2: 502
+
+In WRITE Stage at time 82
+Writing to Register 2 value 1503
+	Completed CDB Broadcast of instruction in  RS[0]:  Result: 1503  
+	Completed Instruction: ADDFP. Result: 1503 Num Instructions Completed: 13
+In EXECUTE Stage at time 82
+In DISPATCH Stage at time 82
+	Could not find any instruction to dipatch. Time: 82.00
+In ISSUE  Stage at time 82
+	OPCODE: INTADD  Adding to RS index 0
+In FETCH  Stage at time 82
+	PC: 20 INSTRUCTION: 2500ffec
+In DISPLAY  Stage at time 82
+
+
+In WRITE Stage at time 83
+In EXECUTE Stage at time 83
+In DISPATCH Stage at time 83
+	Activating FU INTADD with instruction tag  0 at time 83.00
+	RS[0]	FREE: FALSE  BUSY: TRUE FU: INTADD Destination Register: 1
+		op1RDY: TRUE tag1: -1  operand1: 2
+		op2RDY: TRUE, tag2: -1 operand2: 1
+In ISSUE  Stage at time 83
+	Completed Instruction: BNEZ.  Time: 83.00 Number Instructions Completed: 14
+In FETCH  Stage at time 83
+	PC: 0 INSTRUCTION: 0
+In DISPLAY  Stage at time 83
+
+
+In WRITE Stage at time 84
+In EXECUTE Stage at time 84
+	FU  INTADD (id: 5) woken up at time 84
+In DISPATCH Stage at time 84
+	Could not find any instruction to dipatch. Time: 84.00
+In ISSUE  Stage at time 84
+	Instruction is NOP. Will not issue into RS. Time: 84.00
+In FETCH  Stage at time 84
+	PC: 4 INSTRUCTION: 10200000
+In DISPLAY  Stage at time 84
+
+		FU Unit INTADD completed execution at time 85.00-
+		RS[0]	FREE: FALSE  BUSY: TRUE FU: INTADD Destination Register: 1
+		op1RDY: TRUE tag1: -1  operand1: 2
+		op2RDY: TRUE, tag2: -1 operand2: 1
+
+In WRITE Stage at time 85
+Writing to Register 1 value 3
+	Completed CDB Broadcast of instruction in  RS[0]:  Result: 3  
+	Completed Instruction: INTADD. Result: 3 Num Instructions Completed: 15
+In EXECUTE Stage at time 85
+In DISPATCH Stage at time 85
+	Could not find any instruction to dipatch. Time: 85.00
+In ISSUE  Stage at time 85
+	OPCODE: LOADFP  Adding to RS index 0
+In FETCH  Stage at time 85
+	PC: 8 INSTRUCTION: 15094000
+In DISPLAY  Stage at time 85
+
+
+In WRITE Stage at time 86
+In EXECUTE Stage at time 86
+In DISPATCH Stage at time 86
+	Activating FU LOADFP with instruction tag  0 at time 86.00
+	RS[0]	FREE: FALSE  BUSY: TRUE FU: LOADFP Destination Register: 0
+		op1RDY: TRUE tag1: -1  operand1: 3
+		op2RDY: TRUE, tag2: -1 operand2: 1
+In ISSUE  Stage at time 86
+	No free Reservation Stations! Setting IFstall. Time: 86.00
+In FETCH  Stage at time 86
+	stallIF: TRUE  INSTRUCTION: 15094000
+	PC: 8 INSTRUCTION: 15094000
+In DISPLAY  Stage at time 86
+
+
+In WRITE Stage at time 87
+In EXECUTE Stage at time 87
+	FU  LOADFP (id: 4) woken up at time 87
+In DISPATCH Stage at time 87
+	Could not find any instruction to dipatch. Time: 87.00
+In ISSUE  Stage at time 87
+	No free Reservation Stations! Setting IFstall. Time: 87.00
+In FETCH  Stage at time 87
+	stallIF: TRUE  INSTRUCTION: 15094000
+	PC: 8 INSTRUCTION: 15094000
+In DISPLAY  Stage at time 87
+
+
+In WRITE Stage at time 88
+In EXECUTE Stage at time 88
+In DISPATCH Stage at time 88
+	Could not find any instruction to dipatch. Time: 88.00
+In ISSUE  Stage at time 88
+	No free Reservation Stations! Setting IFstall. Time: 88.00
+In FETCH  Stage at time 88
+	stallIF: TRUE  INSTRUCTION: 15094000
+	PC: 8 INSTRUCTION: 15094000
+In DISPLAY  Stage at time 88
+
+		FU Unit LOADFP completed execution at time 89.00-
+		RS[0]	FREE: FALSE  BUSY: TRUE FU: LOADFP Destination Register: 0
+		op1RDY: TRUE tag1: -1  operand1: 3
+		op2RDY: TRUE, tag2: -1 operand2: 1
+
+In WRITE Stage at time 89
+Writing to Register 0 value 503
+	Completed CDB Broadcast of instruction in  RS[0]:  Result: 503  
+	Completed Instruction: LOADFP. Result: 503 Num Instructions Completed: 16
+In EXECUTE Stage at time 89
+In DISPATCH Stage at time 89
+	Could not find any instruction to dipatch. Time: 89.00
+In ISSUE  Stage at time 89
+	OPCODE: INTADD  Adding to RS index 0
+In FETCH  Stage at time 89
+	PC: 12 INSTRUCTION: 4401000
+In DISPLAY  Stage at time 89
+
+
+In WRITE Stage at time 90
+In EXECUTE Stage at time 90
+In DISPATCH Stage at time 90
+	Activating FU INTADD with instruction tag  0 at time 90.00
+	RS[0]	FREE: FALSE  BUSY: TRUE FU: INTADD Destination Register: 8
+		op1RDY: TRUE tag1: -1  operand1: 7
+		op2RDY: TRUE, tag2: -1 operand2: -1
+In ISSUE  Stage at time 90
+	No free Reservation Stations! Setting IFstall. Time: 90.00
+In FETCH  Stage at time 90
+	stallIF: TRUE  INSTRUCTION: 4401000
+	PC: 12 INSTRUCTION: 4401000
+In DISPLAY  Stage at time 90
+
+
+In WRITE Stage at time 91
+In EXECUTE Stage at time 91
+	FU  INTADD (id: 5) woken up at time 91
+In DISPATCH Stage at time 91
+	Could not find any instruction to dipatch. Time: 91.00
+In ISSUE  Stage at time 91
+	No free Reservation Stations! Setting IFstall. Time: 91.00
+In FETCH  Stage at time 91
+	stallIF: TRUE  INSTRUCTION: 4401000
+	PC: 12 INSTRUCTION: 4401000
+In DISPLAY  Stage at time 91
+
+		FU Unit INTADD completed execution at time 92.00-
+		RS[0]	FREE: FALSE  BUSY: TRUE FU: INTADD Destination Register: 8
+		op1RDY: TRUE tag1: -1  operand1: 7
+		op2RDY: TRUE, tag2: -1 operand2: -1
+
+In WRITE Stage at time 92
+Writing to Register 8 value 6
+	Completed CDB Broadcast of instruction in  RS[0]:  Result: 6  
+	Completed Instruction: INTADD. Result: 6 Num Instructions Completed: 17
+In EXECUTE Stage at time 92
+In DISPATCH Stage at time 92
+	Could not find any instruction to dipatch. Time: 92.00
+In ISSUE  Stage at time 92
+	OPCODE: ADDFP  Adding to RS index 0
+In FETCH  Stage at time 92
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 92
+
+
+In WRITE Stage at time 93
+In EXECUTE Stage at time 93
+In DISPATCH Stage at time 93
+	Activating FU ADDFP with instruction tag  0 at time 93.00
+	RS[0]	FREE: FALSE  BUSY: TRUE FU: ADDFP Destination Register: 2
+		op1RDY: TRUE tag1: -1  operand1: 1503
+		op2RDY: TRUE, tag2: -1 operand2: 503
+In ISSUE  Stage at time 93
+	No free Reservation Stations! Setting IFstall. Time: 93.00
+In FETCH  Stage at time 93
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 93
+
+
+In WRITE Stage at time 94
+In EXECUTE Stage at time 94
+	FU  ADDFP (id: 1) woken up at time 94
+In DISPATCH Stage at time 94
+	Could not find any instruction to dipatch. Time: 94.00
+In ISSUE  Stage at time 94
+	No free Reservation Stations! Setting IFstall. Time: 94.00
+In FETCH  Stage at time 94
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 94
+
+
+In WRITE Stage at time 95
+In EXECUTE Stage at time 95
+In DISPATCH Stage at time 95
+	Could not find any instruction to dipatch. Time: 95.00
+In ISSUE  Stage at time 95
+	No free Reservation Stations! Setting IFstall. Time: 95.00
+In FETCH  Stage at time 95
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 95
+
+
+In WRITE Stage at time 96
+In EXECUTE Stage at time 96
+In DISPATCH Stage at time 96
+	Could not find any instruction to dipatch. Time: 96.00
+In ISSUE  Stage at time 96
+	No free Reservation Stations! Setting IFstall. Time: 96.00
+In FETCH  Stage at time 96
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 96
+
+
+In WRITE Stage at time 97
+In EXECUTE Stage at time 97
+In DISPATCH Stage at time 97
+	Could not find any instruction to dipatch. Time: 97.00
+In ISSUE  Stage at time 97
+	No free Reservation Stations! Setting IFstall. Time: 97.00
+In FETCH  Stage at time 97
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 97
+
+
+In WRITE Stage at time 98
+In EXECUTE Stage at time 98
+In DISPATCH Stage at time 98
+	Could not find any instruction to dipatch. Time: 98.00
+In ISSUE  Stage at time 98
+	No free Reservation Stations! Setting IFstall. Time: 98.00
+In FETCH  Stage at time 98
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 98
+
+
+In WRITE Stage at time 99
+In EXECUTE Stage at time 99
+In DISPATCH Stage at time 99
+	Could not find any instruction to dipatch. Time: 99.00
+In ISSUE  Stage at time 99
+	No free Reservation Stations! Setting IFstall. Time: 99.00
+In FETCH  Stage at time 99
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 99
+
+
+In WRITE Stage at time 100
+In EXECUTE Stage at time 100
+In DISPATCH Stage at time 100
+	Could not find any instruction to dipatch. Time: 100.00
+In ISSUE  Stage at time 100
+	No free Reservation Stations! Setting IFstall. Time: 100.00
+In FETCH  Stage at time 100
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 100
+
+
+In WRITE Stage at time 101
+In EXECUTE Stage at time 101
+In DISPATCH Stage at time 101
+	Could not find any instruction to dipatch. Time: 101.00
+In ISSUE  Stage at time 101
+	No free Reservation Stations! Setting IFstall. Time: 101.00
+In FETCH  Stage at time 101
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 101
+
+
+In WRITE Stage at time 102
+In EXECUTE Stage at time 102
+In DISPATCH Stage at time 102
+	Could not find any instruction to dipatch. Time: 102.00
+In ISSUE  Stage at time 102
+	No free Reservation Stations! Setting IFstall. Time: 102.00
+In FETCH  Stage at time 102
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 102
+
+
+In WRITE Stage at time 103
+In EXECUTE Stage at time 103
+In DISPATCH Stage at time 103
+	Could not find any instruction to dipatch. Time: 103.00
+In ISSUE  Stage at time 103
+	No free Reservation Stations! Setting IFstall. Time: 103.00
+In FETCH  Stage at time 103
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 103
+
+
+In WRITE Stage at time 104
+In EXECUTE Stage at time 104
+In DISPATCH Stage at time 104
+	Could not find any instruction to dipatch. Time: 104.00
+In ISSUE  Stage at time 104
+	No free Reservation Stations! Setting IFstall. Time: 104.00
+In FETCH  Stage at time 104
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 104
+
+
+In WRITE Stage at time 105
+In EXECUTE Stage at time 105
+In DISPATCH Stage at time 105
+	Could not find any instruction to dipatch. Time: 105.00
+In ISSUE  Stage at time 105
+	No free Reservation Stations! Setting IFstall. Time: 105.00
+In FETCH  Stage at time 105
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 105
+
+
+In WRITE Stage at time 106
+In EXECUTE Stage at time 106
+In DISPATCH Stage at time 106
+	Could not find any instruction to dipatch. Time: 106.00
+In ISSUE  Stage at time 106
+	No free Reservation Stations! Setting IFstall. Time: 106.00
+In FETCH  Stage at time 106
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 106
+
+
+In WRITE Stage at time 107
+In EXECUTE Stage at time 107
+In DISPATCH Stage at time 107
+	Could not find any instruction to dipatch. Time: 107.00
+In ISSUE  Stage at time 107
+	No free Reservation Stations! Setting IFstall. Time: 107.00
+In FETCH  Stage at time 107
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 107
+
+
+In WRITE Stage at time 108
+In EXECUTE Stage at time 108
+In DISPATCH Stage at time 108
+	Could not find any instruction to dipatch. Time: 108.00
+In ISSUE  Stage at time 108
+	No free Reservation Stations! Setting IFstall. Time: 108.00
+In FETCH  Stage at time 108
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 108
+
+
+In WRITE Stage at time 109
+In EXECUTE Stage at time 109
+In DISPATCH Stage at time 109
+	Could not find any instruction to dipatch. Time: 109.00
+In ISSUE  Stage at time 109
+	No free Reservation Stations! Setting IFstall. Time: 109.00
+In FETCH  Stage at time 109
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 109
+
+		FU Unit ADDFP completed execution at time 110.00-
+		RS[0]	FREE: FALSE  BUSY: TRUE FU: ADDFP Destination Register: 2
+		op1RDY: TRUE tag1: -1  operand1: 1503
+		op2RDY: TRUE, tag2: -1 operand2: 503
+
+In WRITE Stage at time 110
+Writing to Register 2 value 2006
+	Completed CDB Broadcast of instruction in  RS[0]:  Result: 2006  
+	Completed Instruction: ADDFP. Result: 2006 Num Instructions Completed: 18
+In EXECUTE Stage at time 110
+In DISPATCH Stage at time 110
+	Could not find any instruction to dipatch. Time: 110.00
+In ISSUE  Stage at time 110
+	OPCODE: INTADD  Adding to RS index 0
+In FETCH  Stage at time 110
+	PC: 20 INSTRUCTION: 2500ffec
+In DISPLAY  Stage at time 110
+
+
+In WRITE Stage at time 111
+In EXECUTE Stage at time 111
+In DISPATCH Stage at time 111
+	Activating FU INTADD with instruction tag  0 at time 111.00
+	RS[0]	FREE: FALSE  BUSY: TRUE FU: INTADD Destination Register: 1
+		op1RDY: TRUE tag1: -1  operand1: 3
+		op2RDY: TRUE, tag2: -1 operand2: 1
+In ISSUE  Stage at time 111
+	Completed Instruction: BNEZ.  Time: 111.00 Number Instructions Completed: 19
+In FETCH  Stage at time 111
+	PC: 0 INSTRUCTION: 0
+In DISPLAY  Stage at time 111
+
+
+In WRITE Stage at time 112
+In EXECUTE Stage at time 112
+	FU  INTADD (id: 5) woken up at time 112
+In DISPATCH Stage at time 112
+	Could not find any instruction to dipatch. Time: 112.00
+In ISSUE  Stage at time 112
+	Instruction is NOP. Will not issue into RS. Time: 112.00
+In FETCH  Stage at time 112
+	PC: 4 INSTRUCTION: 10200000
+In DISPLAY  Stage at time 112
+
+		FU Unit INTADD completed execution at time 113.00-
+		RS[0]	FREE: FALSE  BUSY: TRUE FU: INTADD Destination Register: 1
+		op1RDY: TRUE tag1: -1  operand1: 3
+		op2RDY: TRUE, tag2: -1 operand2: 1
+
+In WRITE Stage at time 113
+Writing to Register 1 value 4
+	Completed CDB Broadcast of instruction in  RS[0]:  Result: 4  
+	Completed Instruction: INTADD. Result: 4 Num Instructions Completed: 20
+In EXECUTE Stage at time 113
+In DISPATCH Stage at time 113
+	Could not find any instruction to dipatch. Time: 113.00
+In ISSUE  Stage at time 113
+	OPCODE: LOADFP  Adding to RS index 0
+In FETCH  Stage at time 113
+	PC: 8 INSTRUCTION: 15094000
+In DISPLAY  Stage at time 113
+
+
+In WRITE Stage at time 114
+In EXECUTE Stage at time 114
+In DISPATCH Stage at time 114
+	Activating FU LOADFP with instruction tag  0 at time 114.00
+	RS[0]	FREE: FALSE  BUSY: TRUE FU: LOADFP Destination Register: 0
+		op1RDY: TRUE tag1: -1  operand1: 4
+		op2RDY: TRUE, tag2: -1 operand2: 1
+In ISSUE  Stage at time 114
+	No free Reservation Stations! Setting IFstall. Time: 114.00
+In FETCH  Stage at time 114
+	stallIF: TRUE  INSTRUCTION: 15094000
+	PC: 8 INSTRUCTION: 15094000
+In DISPLAY  Stage at time 114
+
+
+In WRITE Stage at time 115
+In EXECUTE Stage at time 115
+	FU  LOADFP (id: 4) woken up at time 115
+In DISPATCH Stage at time 115
+	Could not find any instruction to dipatch. Time: 115.00
+In ISSUE  Stage at time 115
+	No free Reservation Stations! Setting IFstall. Time: 115.00
+In FETCH  Stage at time 115
+	stallIF: TRUE  INSTRUCTION: 15094000
+	PC: 8 INSTRUCTION: 15094000
+In DISPLAY  Stage at time 115
+
+
+In WRITE Stage at time 116
+In EXECUTE Stage at time 116
+In DISPATCH Stage at time 116
+	Could not find any instruction to dipatch. Time: 116.00
+In ISSUE  Stage at time 116
+	No free Reservation Stations! Setting IFstall. Time: 116.00
+In FETCH  Stage at time 116
+	stallIF: TRUE  INSTRUCTION: 15094000
+	PC: 8 INSTRUCTION: 15094000
+In DISPLAY  Stage at time 116
+
+		FU Unit LOADFP completed execution at time 117.00-
+		RS[0]	FREE: FALSE  BUSY: TRUE FU: LOADFP Destination Register: 0
+		op1RDY: TRUE tag1: -1  operand1: 4
+		op2RDY: TRUE, tag2: -1 operand2: 1
+
+In WRITE Stage at time 117
+Writing to Register 0 value 504
+	Completed CDB Broadcast of instruction in  RS[0]:  Result: 504  
+	Completed Instruction: LOADFP. Result: 504 Num Instructions Completed: 21
+In EXECUTE Stage at time 117
+In DISPATCH Stage at time 117
+	Could not find any instruction to dipatch. Time: 117.00
+In ISSUE  Stage at time 117
+	OPCODE: INTADD  Adding to RS index 0
+In FETCH  Stage at time 117
+	PC: 12 INSTRUCTION: 4401000
+In DISPLAY  Stage at time 117
+
+
+In WRITE Stage at time 118
+In EXECUTE Stage at time 118
+In DISPATCH Stage at time 118
+	Activating FU INTADD with instruction tag  0 at time 118.00
+	RS[0]	FREE: FALSE  BUSY: TRUE FU: INTADD Destination Register: 8
+		op1RDY: TRUE tag1: -1  operand1: 6
+		op2RDY: TRUE, tag2: -1 operand2: -1
+In ISSUE  Stage at time 118
+	No free Reservation Stations! Setting IFstall. Time: 118.00
+In FETCH  Stage at time 118
+	stallIF: TRUE  INSTRUCTION: 4401000
+	PC: 12 INSTRUCTION: 4401000
+In DISPLAY  Stage at time 118
+
+
+In WRITE Stage at time 119
+In EXECUTE Stage at time 119
+	FU  INTADD (id: 5) woken up at time 119
+In DISPATCH Stage at time 119
+	Could not find any instruction to dipatch. Time: 119.00
+In ISSUE  Stage at time 119
+	No free Reservation Stations! Setting IFstall. Time: 119.00
+In FETCH  Stage at time 119
+	stallIF: TRUE  INSTRUCTION: 4401000
+	PC: 12 INSTRUCTION: 4401000
+In DISPLAY  Stage at time 119
+
+		FU Unit INTADD completed execution at time 120.00-
+		RS[0]	FREE: FALSE  BUSY: TRUE FU: INTADD Destination Register: 8
+		op1RDY: TRUE tag1: -1  operand1: 6
+		op2RDY: TRUE, tag2: -1 operand2: -1
+
+In WRITE Stage at time 120
+Writing to Register 8 value 5
+	Completed CDB Broadcast of instruction in  RS[0]:  Result: 5  
+	Completed Instruction: INTADD. Result: 5 Num Instructions Completed: 22
+In EXECUTE Stage at time 120
+In DISPATCH Stage at time 120
+	Could not find any instruction to dipatch. Time: 120.00
+In ISSUE  Stage at time 120
+	OPCODE: ADDFP  Adding to RS index 0
+In FETCH  Stage at time 120
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 120
+
+
+In WRITE Stage at time 121
+In EXECUTE Stage at time 121
+In DISPATCH Stage at time 121
+	Activating FU ADDFP with instruction tag  0 at time 121.00
+	RS[0]	FREE: FALSE  BUSY: TRUE FU: ADDFP Destination Register: 2
+		op1RDY: TRUE tag1: -1  operand1: 2006
+		op2RDY: TRUE, tag2: -1 operand2: 504
+In ISSUE  Stage at time 121
+	No free Reservation Stations! Setting IFstall. Time: 121.00
+In FETCH  Stage at time 121
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 121
+
+
+In WRITE Stage at time 122
+In EXECUTE Stage at time 122
+	FU  ADDFP (id: 1) woken up at time 122
+In DISPATCH Stage at time 122
+	Could not find any instruction to dipatch. Time: 122.00
+In ISSUE  Stage at time 122
+	No free Reservation Stations! Setting IFstall. Time: 122.00
+In FETCH  Stage at time 122
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 122
+
+
+In WRITE Stage at time 123
+In EXECUTE Stage at time 123
+In DISPATCH Stage at time 123
+	Could not find any instruction to dipatch. Time: 123.00
+In ISSUE  Stage at time 123
+	No free Reservation Stations! Setting IFstall. Time: 123.00
+In FETCH  Stage at time 123
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 123
+
+
+In WRITE Stage at time 124
+In EXECUTE Stage at time 124
+In DISPATCH Stage at time 124
+	Could not find any instruction to dipatch. Time: 124.00
+In ISSUE  Stage at time 124
+	No free Reservation Stations! Setting IFstall. Time: 124.00
+In FETCH  Stage at time 124
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 124
+
+
+In WRITE Stage at time 125
+In EXECUTE Stage at time 125
+In DISPATCH Stage at time 125
+	Could not find any instruction to dipatch. Time: 125.00
+In ISSUE  Stage at time 125
+	No free Reservation Stations! Setting IFstall. Time: 125.00
+In FETCH  Stage at time 125
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 125
+
+
+In WRITE Stage at time 126
+In EXECUTE Stage at time 126
+In DISPATCH Stage at time 126
+	Could not find any instruction to dipatch. Time: 126.00
+In ISSUE  Stage at time 126
+	No free Reservation Stations! Setting IFstall. Time: 126.00
+In FETCH  Stage at time 126
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 126
+
+
+In WRITE Stage at time 127
+In EXECUTE Stage at time 127
+In DISPATCH Stage at time 127
+	Could not find any instruction to dipatch. Time: 127.00
+In ISSUE  Stage at time 127
+	No free Reservation Stations! Setting IFstall. Time: 127.00
+In FETCH  Stage at time 127
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 127
+
+
+In WRITE Stage at time 128
+In EXECUTE Stage at time 128
+In DISPATCH Stage at time 128
+	Could not find any instruction to dipatch. Time: 128.00
+In ISSUE  Stage at time 128
+	No free Reservation Stations! Setting IFstall. Time: 128.00
+In FETCH  Stage at time 128
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 128
+
+
+In WRITE Stage at time 129
+In EXECUTE Stage at time 129
+In DISPATCH Stage at time 129
+	Could not find any instruction to dipatch. Time: 129.00
+In ISSUE  Stage at time 129
+	No free Reservation Stations! Setting IFstall. Time: 129.00
+In FETCH  Stage at time 129
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 129
+
+
+In WRITE Stage at time 130
+In EXECUTE Stage at time 130
+In DISPATCH Stage at time 130
+	Could not find any instruction to dipatch. Time: 130.00
+In ISSUE  Stage at time 130
+	No free Reservation Stations! Setting IFstall. Time: 130.00
+In FETCH  Stage at time 130
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 130
+
+
+In WRITE Stage at time 131
+In EXECUTE Stage at time 131
+In DISPATCH Stage at time 131
+	Could not find any instruction to dipatch. Time: 131.00
+In ISSUE  Stage at time 131
+	No free Reservation Stations! Setting IFstall. Time: 131.00
+In FETCH  Stage at time 131
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 131
+
+
+In WRITE Stage at time 132
+In EXECUTE Stage at time 132
+In DISPATCH Stage at time 132
+	Could not find any instruction to dipatch. Time: 132.00
+In ISSUE  Stage at time 132
+	No free Reservation Stations! Setting IFstall. Time: 132.00
+In FETCH  Stage at time 132
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 132
+
+
+In WRITE Stage at time 133
+In EXECUTE Stage at time 133
+In DISPATCH Stage at time 133
+	Could not find any instruction to dipatch. Time: 133.00
+In ISSUE  Stage at time 133
+	No free Reservation Stations! Setting IFstall. Time: 133.00
+In FETCH  Stage at time 133
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 133
+
+
+In WRITE Stage at time 134
+In EXECUTE Stage at time 134
+In DISPATCH Stage at time 134
+	Could not find any instruction to dipatch. Time: 134.00
+In ISSUE  Stage at time 134
+	No free Reservation Stations! Setting IFstall. Time: 134.00
+In FETCH  Stage at time 134
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 134
+
+
+In WRITE Stage at time 135
+In EXECUTE Stage at time 135
+In DISPATCH Stage at time 135
+	Could not find any instruction to dipatch. Time: 135.00
+In ISSUE  Stage at time 135
+	No free Reservation Stations! Setting IFstall. Time: 135.00
+In FETCH  Stage at time 135
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 135
+
+
+In WRITE Stage at time 136
+In EXECUTE Stage at time 136
+In DISPATCH Stage at time 136
+	Could not find any instruction to dipatch. Time: 136.00
+In ISSUE  Stage at time 136
+	No free Reservation Stations! Setting IFstall. Time: 136.00
+In FETCH  Stage at time 136
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 136
+
+
+In WRITE Stage at time 137
+In EXECUTE Stage at time 137
+In DISPATCH Stage at time 137
+	Could not find any instruction to dipatch. Time: 137.00
+In ISSUE  Stage at time 137
+	No free Reservation Stations! Setting IFstall. Time: 137.00
+In FETCH  Stage at time 137
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 137
+
+		FU Unit ADDFP completed execution at time 138.00-
+		RS[0]	FREE: FALSE  BUSY: TRUE FU: ADDFP Destination Register: 2
+		op1RDY: TRUE tag1: -1  operand1: 2006
+		op2RDY: TRUE, tag2: -1 operand2: 504
+
+In WRITE Stage at time 138
+Writing to Register 2 value 2510
+	Completed CDB Broadcast of instruction in  RS[0]:  Result: 2510  
+	Completed Instruction: ADDFP. Result: 2510 Num Instructions Completed: 23
+In EXECUTE Stage at time 138
+In DISPATCH Stage at time 138
+	Could not find any instruction to dipatch. Time: 138.00
+In ISSUE  Stage at time 138
+	OPCODE: INTADD  Adding to RS index 0
+In FETCH  Stage at time 138
+	PC: 20 INSTRUCTION: 2500ffec
+In DISPLAY  Stage at time 138
+
+
+In WRITE Stage at time 139
+In EXECUTE Stage at time 139
+In DISPATCH Stage at time 139
+	Activating FU INTADD with instruction tag  0 at time 139.00
+	RS[0]	FREE: FALSE  BUSY: TRUE FU: INTADD Destination Register: 1
+		op1RDY: TRUE tag1: -1  operand1: 4
+		op2RDY: TRUE, tag2: -1 operand2: 1
+In ISSUE  Stage at time 139
+	Completed Instruction: BNEZ.  Time: 139.00 Number Instructions Completed: 24
+In FETCH  Stage at time 139
+	PC: 0 INSTRUCTION: 0
+In DISPLAY  Stage at time 139
+
+
+In WRITE Stage at time 140
+In EXECUTE Stage at time 140
+	FU  INTADD (id: 5) woken up at time 140
+In DISPATCH Stage at time 140
+	Could not find any instruction to dipatch. Time: 140.00
+In ISSUE  Stage at time 140
+	Instruction is NOP. Will not issue into RS. Time: 140.00
+In FETCH  Stage at time 140
+	PC: 4 INSTRUCTION: 10200000
+In DISPLAY  Stage at time 140
+
+		FU Unit INTADD completed execution at time 141.00-
+		RS[0]	FREE: FALSE  BUSY: TRUE FU: INTADD Destination Register: 1
+		op1RDY: TRUE tag1: -1  operand1: 4
+		op2RDY: TRUE, tag2: -1 operand2: 1
+
+In WRITE Stage at time 141
+Writing to Register 1 value 5
+	Completed CDB Broadcast of instruction in  RS[0]:  Result: 5  
+	Completed Instruction: INTADD. Result: 5 Num Instructions Completed: 25
+In EXECUTE Stage at time 141
+In DISPATCH Stage at time 141
+	Could not find any instruction to dipatch. Time: 141.00
+In ISSUE  Stage at time 141
+	OPCODE: LOADFP  Adding to RS index 0
+In FETCH  Stage at time 141
+	PC: 8 INSTRUCTION: 15094000
+In DISPLAY  Stage at time 141
+
+
+In WRITE Stage at time 142
+In EXECUTE Stage at time 142
+In DISPATCH Stage at time 142
+	Activating FU LOADFP with instruction tag  0 at time 142.00
+	RS[0]	FREE: FALSE  BUSY: TRUE FU: LOADFP Destination Register: 0
+		op1RDY: TRUE tag1: -1  operand1: 5
+		op2RDY: TRUE, tag2: -1 operand2: 1
+In ISSUE  Stage at time 142
+	No free Reservation Stations! Setting IFstall. Time: 142.00
+In FETCH  Stage at time 142
+	stallIF: TRUE  INSTRUCTION: 15094000
+	PC: 8 INSTRUCTION: 15094000
+In DISPLAY  Stage at time 142
+
+
+In WRITE Stage at time 143
+In EXECUTE Stage at time 143
+	FU  LOADFP (id: 4) woken up at time 143
+In DISPATCH Stage at time 143
+	Could not find any instruction to dipatch. Time: 143.00
+In ISSUE  Stage at time 143
+	No free Reservation Stations! Setting IFstall. Time: 143.00
+In FETCH  Stage at time 143
+	stallIF: TRUE  INSTRUCTION: 15094000
+	PC: 8 INSTRUCTION: 15094000
+In DISPLAY  Stage at time 143
+
+
+In WRITE Stage at time 144
+In EXECUTE Stage at time 144
+In DISPATCH Stage at time 144
+	Could not find any instruction to dipatch. Time: 144.00
+In ISSUE  Stage at time 144
+	No free Reservation Stations! Setting IFstall. Time: 144.00
+In FETCH  Stage at time 144
+	stallIF: TRUE  INSTRUCTION: 15094000
+	PC: 8 INSTRUCTION: 15094000
+In DISPLAY  Stage at time 144
+
+		FU Unit LOADFP completed execution at time 145.00-
+		RS[0]	FREE: FALSE  BUSY: TRUE FU: LOADFP Destination Register: 0
+		op1RDY: TRUE tag1: -1  operand1: 5
+		op2RDY: TRUE, tag2: -1 operand2: 1
+
+In WRITE Stage at time 145
+Writing to Register 0 value 505
+	Completed CDB Broadcast of instruction in  RS[0]:  Result: 505  
+	Completed Instruction: LOADFP. Result: 505 Num Instructions Completed: 26
+In EXECUTE Stage at time 145
+In DISPATCH Stage at time 145
+	Could not find any instruction to dipatch. Time: 145.00
+In ISSUE  Stage at time 145
+	OPCODE: INTADD  Adding to RS index 0
+In FETCH  Stage at time 145
+	PC: 12 INSTRUCTION: 4401000
+In DISPLAY  Stage at time 145
+
+
+In WRITE Stage at time 146
+In EXECUTE Stage at time 146
+In DISPATCH Stage at time 146
+	Activating FU INTADD with instruction tag  0 at time 146.00
+	RS[0]	FREE: FALSE  BUSY: TRUE FU: INTADD Destination Register: 8
+		op1RDY: TRUE tag1: -1  operand1: 5
+		op2RDY: TRUE, tag2: -1 operand2: -1
+In ISSUE  Stage at time 146
+	No free Reservation Stations! Setting IFstall. Time: 146.00
+In FETCH  Stage at time 146
+	stallIF: TRUE  INSTRUCTION: 4401000
+	PC: 12 INSTRUCTION: 4401000
+In DISPLAY  Stage at time 146
+
+
+In WRITE Stage at time 147
+In EXECUTE Stage at time 147
+	FU  INTADD (id: 5) woken up at time 147
+In DISPATCH Stage at time 147
+	Could not find any instruction to dipatch. Time: 147.00
+In ISSUE  Stage at time 147
+	No free Reservation Stations! Setting IFstall. Time: 147.00
+In FETCH  Stage at time 147
+	stallIF: TRUE  INSTRUCTION: 4401000
+	PC: 12 INSTRUCTION: 4401000
+In DISPLAY  Stage at time 147
+
+		FU Unit INTADD completed execution at time 148.00-
+		RS[0]	FREE: FALSE  BUSY: TRUE FU: INTADD Destination Register: 8
+		op1RDY: TRUE tag1: -1  operand1: 5
+		op2RDY: TRUE, tag2: -1 operand2: -1
+
+In WRITE Stage at time 148
+Writing to Register 8 value 4
+	Completed CDB Broadcast of instruction in  RS[0]:  Result: 4  
+	Completed Instruction: INTADD. Result: 4 Num Instructions Completed: 27
+In EXECUTE Stage at time 148
+In DISPATCH Stage at time 148
+	Could not find any instruction to dipatch. Time: 148.00
+In ISSUE  Stage at time 148
+	OPCODE: ADDFP  Adding to RS index 0
+In FETCH  Stage at time 148
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 148
+
+
+In WRITE Stage at time 149
+In EXECUTE Stage at time 149
+In DISPATCH Stage at time 149
+	Activating FU ADDFP with instruction tag  0 at time 149.00
+	RS[0]	FREE: FALSE  BUSY: TRUE FU: ADDFP Destination Register: 2
+		op1RDY: TRUE tag1: -1  operand1: 2510
+		op2RDY: TRUE, tag2: -1 operand2: 505
+In ISSUE  Stage at time 149
+	No free Reservation Stations! Setting IFstall. Time: 149.00
+In FETCH  Stage at time 149
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 149
+
+
+In WRITE Stage at time 150
+In EXECUTE Stage at time 150
+	FU  ADDFP (id: 1) woken up at time 150
+In DISPATCH Stage at time 150
+	Could not find any instruction to dipatch. Time: 150.00
+In ISSUE  Stage at time 150
+	No free Reservation Stations! Setting IFstall. Time: 150.00
+In FETCH  Stage at time 150
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 150
+
+
+In WRITE Stage at time 151
+In EXECUTE Stage at time 151
+In DISPATCH Stage at time 151
+	Could not find any instruction to dipatch. Time: 151.00
+In ISSUE  Stage at time 151
+	No free Reservation Stations! Setting IFstall. Time: 151.00
+In FETCH  Stage at time 151
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 151
+
+
+In WRITE Stage at time 152
+In EXECUTE Stage at time 152
+In DISPATCH Stage at time 152
+	Could not find any instruction to dipatch. Time: 152.00
+In ISSUE  Stage at time 152
+	No free Reservation Stations! Setting IFstall. Time: 152.00
+In FETCH  Stage at time 152
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 152
+
+
+In WRITE Stage at time 153
+In EXECUTE Stage at time 153
+In DISPATCH Stage at time 153
+	Could not find any instruction to dipatch. Time: 153.00
+In ISSUE  Stage at time 153
+	No free Reservation Stations! Setting IFstall. Time: 153.00
+In FETCH  Stage at time 153
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 153
+
+
+In WRITE Stage at time 154
+In EXECUTE Stage at time 154
+In DISPATCH Stage at time 154
+	Could not find any instruction to dipatch. Time: 154.00
+In ISSUE  Stage at time 154
+	No free Reservation Stations! Setting IFstall. Time: 154.00
+In FETCH  Stage at time 154
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 154
+
+
+In WRITE Stage at time 155
+In EXECUTE Stage at time 155
+In DISPATCH Stage at time 155
+	Could not find any instruction to dipatch. Time: 155.00
+In ISSUE  Stage at time 155
+	No free Reservation Stations! Setting IFstall. Time: 155.00
+In FETCH  Stage at time 155
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 155
+
+
+In WRITE Stage at time 156
+In EXECUTE Stage at time 156
+In DISPATCH Stage at time 156
+	Could not find any instruction to dipatch. Time: 156.00
+In ISSUE  Stage at time 156
+	No free Reservation Stations! Setting IFstall. Time: 156.00
+In FETCH  Stage at time 156
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 156
+
+
+In WRITE Stage at time 157
+In EXECUTE Stage at time 157
+In DISPATCH Stage at time 157
+	Could not find any instruction to dipatch. Time: 157.00
+In ISSUE  Stage at time 157
+	No free Reservation Stations! Setting IFstall. Time: 157.00
+In FETCH  Stage at time 157
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 157
+
+
+In WRITE Stage at time 158
+In EXECUTE Stage at time 158
+In DISPATCH Stage at time 158
+	Could not find any instruction to dipatch. Time: 158.00
+In ISSUE  Stage at time 158
+	No free Reservation Stations! Setting IFstall. Time: 158.00
+In FETCH  Stage at time 158
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 158
+
+
+In WRITE Stage at time 159
+In EXECUTE Stage at time 159
+In DISPATCH Stage at time 159
+	Could not find any instruction to dipatch. Time: 159.00
+In ISSUE  Stage at time 159
+	No free Reservation Stations! Setting IFstall. Time: 159.00
+In FETCH  Stage at time 159
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 159
+
+
+In WRITE Stage at time 160
+In EXECUTE Stage at time 160
+In DISPATCH Stage at time 160
+	Could not find any instruction to dipatch. Time: 160.00
+In ISSUE  Stage at time 160
+	No free Reservation Stations! Setting IFstall. Time: 160.00
+In FETCH  Stage at time 160
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 160
+
+
+In WRITE Stage at time 161
+In EXECUTE Stage at time 161
+In DISPATCH Stage at time 161
+	Could not find any instruction to dipatch. Time: 161.00
+In ISSUE  Stage at time 161
+	No free Reservation Stations! Setting IFstall. Time: 161.00
+In FETCH  Stage at time 161
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 161
+
+
+In WRITE Stage at time 162
+In EXECUTE Stage at time 162
+In DISPATCH Stage at time 162
+	Could not find any instruction to dipatch. Time: 162.00
+In ISSUE  Stage at time 162
+	No free Reservation Stations! Setting IFstall. Time: 162.00
+In FETCH  Stage at time 162
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 162
+
+
+In WRITE Stage at time 163
+In EXECUTE Stage at time 163
+In DISPATCH Stage at time 163
+	Could not find any instruction to dipatch. Time: 163.00
+In ISSUE  Stage at time 163
+	No free Reservation Stations! Setting IFstall. Time: 163.00
+In FETCH  Stage at time 163
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 163
+
+
+In WRITE Stage at time 164
+In EXECUTE Stage at time 164
+In DISPATCH Stage at time 164
+	Could not find any instruction to dipatch. Time: 164.00
+In ISSUE  Stage at time 164
+	No free Reservation Stations! Setting IFstall. Time: 164.00
+In FETCH  Stage at time 164
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 164
+
+
+In WRITE Stage at time 165
+In EXECUTE Stage at time 165
+In DISPATCH Stage at time 165
+	Could not find any instruction to dipatch. Time: 165.00
+In ISSUE  Stage at time 165
+	No free Reservation Stations! Setting IFstall. Time: 165.00
+In FETCH  Stage at time 165
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 165
+
+		FU Unit ADDFP completed execution at time 166.00-
+		RS[0]	FREE: FALSE  BUSY: TRUE FU: ADDFP Destination Register: 2
+		op1RDY: TRUE tag1: -1  operand1: 2510
+		op2RDY: TRUE, tag2: -1 operand2: 505
+
+In WRITE Stage at time 166
+Writing to Register 2 value 3015
+	Completed CDB Broadcast of instruction in  RS[0]:  Result: 3015  
+	Completed Instruction: ADDFP. Result: 3015 Num Instructions Completed: 28
+In EXECUTE Stage at time 166
+In DISPATCH Stage at time 166
+	Could not find any instruction to dipatch. Time: 166.00
+In ISSUE  Stage at time 166
+	OPCODE: INTADD  Adding to RS index 0
+In FETCH  Stage at time 166
+	PC: 20 INSTRUCTION: 2500ffec
+In DISPLAY  Stage at time 166
+
+
+In WRITE Stage at time 167
+In EXECUTE Stage at time 167
+In DISPATCH Stage at time 167
+	Activating FU INTADD with instruction tag  0 at time 167.00
+	RS[0]	FREE: FALSE  BUSY: TRUE FU: INTADD Destination Register: 1
+		op1RDY: TRUE tag1: -1  operand1: 5
+		op2RDY: TRUE, tag2: -1 operand2: 1
+In ISSUE  Stage at time 167
+	Completed Instruction: BNEZ.  Time: 167.00 Number Instructions Completed: 29
+In FETCH  Stage at time 167
+	PC: 0 INSTRUCTION: 0
+In DISPLAY  Stage at time 167
+
+
+In WRITE Stage at time 168
+In EXECUTE Stage at time 168
+	FU  INTADD (id: 5) woken up at time 168
+In DISPATCH Stage at time 168
+	Could not find any instruction to dipatch. Time: 168.00
+In ISSUE  Stage at time 168
+	Instruction is NOP. Will not issue into RS. Time: 168.00
+In FETCH  Stage at time 168
+	PC: 4 INSTRUCTION: 10200000
+In DISPLAY  Stage at time 168
+
+		FU Unit INTADD completed execution at time 169.00-
+		RS[0]	FREE: FALSE  BUSY: TRUE FU: INTADD Destination Register: 1
+		op1RDY: TRUE tag1: -1  operand1: 5
+		op2RDY: TRUE, tag2: -1 operand2: 1
+
+In WRITE Stage at time 169
+Writing to Register 1 value 6
+	Completed CDB Broadcast of instruction in  RS[0]:  Result: 6  
+	Completed Instruction: INTADD. Result: 6 Num Instructions Completed: 30
+In EXECUTE Stage at time 169
+In DISPATCH Stage at time 169
+	Could not find any instruction to dipatch. Time: 169.00
+In ISSUE  Stage at time 169
+	OPCODE: LOADFP  Adding to RS index 0
+In FETCH  Stage at time 169
+	PC: 8 INSTRUCTION: 15094000
+In DISPLAY  Stage at time 169
+
+
+In WRITE Stage at time 170
+In EXECUTE Stage at time 170
+In DISPATCH Stage at time 170
+	Activating FU LOADFP with instruction tag  0 at time 170.00
+	RS[0]	FREE: FALSE  BUSY: TRUE FU: LOADFP Destination Register: 0
+		op1RDY: TRUE tag1: -1  operand1: 6
+		op2RDY: TRUE, tag2: -1 operand2: 1
+In ISSUE  Stage at time 170
+	No free Reservation Stations! Setting IFstall. Time: 170.00
+In FETCH  Stage at time 170
+	stallIF: TRUE  INSTRUCTION: 15094000
+	PC: 8 INSTRUCTION: 15094000
+In DISPLAY  Stage at time 170
+
+
+In WRITE Stage at time 171
+In EXECUTE Stage at time 171
+	FU  LOADFP (id: 4) woken up at time 171
+In DISPATCH Stage at time 171
+	Could not find any instruction to dipatch. Time: 171.00
+In ISSUE  Stage at time 171
+	No free Reservation Stations! Setting IFstall. Time: 171.00
+In FETCH  Stage at time 171
+	stallIF: TRUE  INSTRUCTION: 15094000
+	PC: 8 INSTRUCTION: 15094000
+In DISPLAY  Stage at time 171
+
+
+In WRITE Stage at time 172
+In EXECUTE Stage at time 172
+In DISPATCH Stage at time 172
+	Could not find any instruction to dipatch. Time: 172.00
+In ISSUE  Stage at time 172
+	No free Reservation Stations! Setting IFstall. Time: 172.00
+In FETCH  Stage at time 172
+	stallIF: TRUE  INSTRUCTION: 15094000
+	PC: 8 INSTRUCTION: 15094000
+In DISPLAY  Stage at time 172
+
+		FU Unit LOADFP completed execution at time 173.00-
+		RS[0]	FREE: FALSE  BUSY: TRUE FU: LOADFP Destination Register: 0
+		op1RDY: TRUE tag1: -1  operand1: 6
+		op2RDY: TRUE, tag2: -1 operand2: 1
+
+In WRITE Stage at time 173
+Writing to Register 0 value 506
+	Completed CDB Broadcast of instruction in  RS[0]:  Result: 506  
+	Completed Instruction: LOADFP. Result: 506 Num Instructions Completed: 31
+In EXECUTE Stage at time 173
+In DISPATCH Stage at time 173
+	Could not find any instruction to dipatch. Time: 173.00
+In ISSUE  Stage at time 173
+	OPCODE: INTADD  Adding to RS index 0
+In FETCH  Stage at time 173
+	PC: 12 INSTRUCTION: 4401000
+In DISPLAY  Stage at time 173
+
+
+In WRITE Stage at time 174
+In EXECUTE Stage at time 174
+In DISPATCH Stage at time 174
+	Activating FU INTADD with instruction tag  0 at time 174.00
+	RS[0]	FREE: FALSE  BUSY: TRUE FU: INTADD Destination Register: 8
+		op1RDY: TRUE tag1: -1  operand1: 4
+		op2RDY: TRUE, tag2: -1 operand2: -1
+In ISSUE  Stage at time 174
+	No free Reservation Stations! Setting IFstall. Time: 174.00
+In FETCH  Stage at time 174
+	stallIF: TRUE  INSTRUCTION: 4401000
+	PC: 12 INSTRUCTION: 4401000
+In DISPLAY  Stage at time 174
+
+
+In WRITE Stage at time 175
+In EXECUTE Stage at time 175
+	FU  INTADD (id: 5) woken up at time 175
+In DISPATCH Stage at time 175
+	Could not find any instruction to dipatch. Time: 175.00
+In ISSUE  Stage at time 175
+	No free Reservation Stations! Setting IFstall. Time: 175.00
+In FETCH  Stage at time 175
+	stallIF: TRUE  INSTRUCTION: 4401000
+	PC: 12 INSTRUCTION: 4401000
+In DISPLAY  Stage at time 175
+
+		FU Unit INTADD completed execution at time 176.00-
+		RS[0]	FREE: FALSE  BUSY: TRUE FU: INTADD Destination Register: 8
+		op1RDY: TRUE tag1: -1  operand1: 4
+		op2RDY: TRUE, tag2: -1 operand2: -1
+
+In WRITE Stage at time 176
+Writing to Register 8 value 3
+	Completed CDB Broadcast of instruction in  RS[0]:  Result: 3  
+	Completed Instruction: INTADD. Result: 3 Num Instructions Completed: 32
+In EXECUTE Stage at time 176
+In DISPATCH Stage at time 176
+	Could not find any instruction to dipatch. Time: 176.00
+In ISSUE  Stage at time 176
+	OPCODE: ADDFP  Adding to RS index 0
+In FETCH  Stage at time 176
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 176
+
+
+In WRITE Stage at time 177
+In EXECUTE Stage at time 177
+In DISPATCH Stage at time 177
+	Activating FU ADDFP with instruction tag  0 at time 177.00
+	RS[0]	FREE: FALSE  BUSY: TRUE FU: ADDFP Destination Register: 2
+		op1RDY: TRUE tag1: -1  operand1: 3015
+		op2RDY: TRUE, tag2: -1 operand2: 506
+In ISSUE  Stage at time 177
+	No free Reservation Stations! Setting IFstall. Time: 177.00
+In FETCH  Stage at time 177
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 177
+
+
+In WRITE Stage at time 178
+In EXECUTE Stage at time 178
+	FU  ADDFP (id: 1) woken up at time 178
+In DISPATCH Stage at time 178
+	Could not find any instruction to dipatch. Time: 178.00
+In ISSUE  Stage at time 178
+	No free Reservation Stations! Setting IFstall. Time: 178.00
+In FETCH  Stage at time 178
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 178
+
+
+In WRITE Stage at time 179
+In EXECUTE Stage at time 179
+In DISPATCH Stage at time 179
+	Could not find any instruction to dipatch. Time: 179.00
+In ISSUE  Stage at time 179
+	No free Reservation Stations! Setting IFstall. Time: 179.00
+In FETCH  Stage at time 179
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 179
+
+
+In WRITE Stage at time 180
+In EXECUTE Stage at time 180
+In DISPATCH Stage at time 180
+	Could not find any instruction to dipatch. Time: 180.00
+In ISSUE  Stage at time 180
+	No free Reservation Stations! Setting IFstall. Time: 180.00
+In FETCH  Stage at time 180
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 180
+
+
+In WRITE Stage at time 181
+In EXECUTE Stage at time 181
+In DISPATCH Stage at time 181
+	Could not find any instruction to dipatch. Time: 181.00
+In ISSUE  Stage at time 181
+	No free Reservation Stations! Setting IFstall. Time: 181.00
+In FETCH  Stage at time 181
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 181
+
+
+In WRITE Stage at time 182
+In EXECUTE Stage at time 182
+In DISPATCH Stage at time 182
+	Could not find any instruction to dipatch. Time: 182.00
+In ISSUE  Stage at time 182
+	No free Reservation Stations! Setting IFstall. Time: 182.00
+In FETCH  Stage at time 182
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 182
+
+
+In WRITE Stage at time 183
+In EXECUTE Stage at time 183
+In DISPATCH Stage at time 183
+	Could not find any instruction to dipatch. Time: 183.00
+In ISSUE  Stage at time 183
+	No free Reservation Stations! Setting IFstall. Time: 183.00
+In FETCH  Stage at time 183
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 183
+
+
+In WRITE Stage at time 184
+In EXECUTE Stage at time 184
+In DISPATCH Stage at time 184
+	Could not find any instruction to dipatch. Time: 184.00
+In ISSUE  Stage at time 184
+	No free Reservation Stations! Setting IFstall. Time: 184.00
+In FETCH  Stage at time 184
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 184
+
+
+In WRITE Stage at time 185
+In EXECUTE Stage at time 185
+In DISPATCH Stage at time 185
+	Could not find any instruction to dipatch. Time: 185.00
+In ISSUE  Stage at time 185
+	No free Reservation Stations! Setting IFstall. Time: 185.00
+In FETCH  Stage at time 185
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 185
+
+
+In WRITE Stage at time 186
+In EXECUTE Stage at time 186
+In DISPATCH Stage at time 186
+	Could not find any instruction to dipatch. Time: 186.00
+In ISSUE  Stage at time 186
+	No free Reservation Stations! Setting IFstall. Time: 186.00
+In FETCH  Stage at time 186
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 186
+
+
+In WRITE Stage at time 187
+In EXECUTE Stage at time 187
+In DISPATCH Stage at time 187
+	Could not find any instruction to dipatch. Time: 187.00
+In ISSUE  Stage at time 187
+	No free Reservation Stations! Setting IFstall. Time: 187.00
+In FETCH  Stage at time 187
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 187
+
+
+In WRITE Stage at time 188
+In EXECUTE Stage at time 188
+In DISPATCH Stage at time 188
+	Could not find any instruction to dipatch. Time: 188.00
+In ISSUE  Stage at time 188
+	No free Reservation Stations! Setting IFstall. Time: 188.00
+In FETCH  Stage at time 188
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 188
+
+
+In WRITE Stage at time 189
+In EXECUTE Stage at time 189
+In DISPATCH Stage at time 189
+	Could not find any instruction to dipatch. Time: 189.00
+In ISSUE  Stage at time 189
+	No free Reservation Stations! Setting IFstall. Time: 189.00
+In FETCH  Stage at time 189
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 189
+
+
+In WRITE Stage at time 190
+In EXECUTE Stage at time 190
+In DISPATCH Stage at time 190
+	Could not find any instruction to dipatch. Time: 190.00
+In ISSUE  Stage at time 190
+	No free Reservation Stations! Setting IFstall. Time: 190.00
+In FETCH  Stage at time 190
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 190
+
+
+In WRITE Stage at time 191
+In EXECUTE Stage at time 191
+In DISPATCH Stage at time 191
+	Could not find any instruction to dipatch. Time: 191.00
+In ISSUE  Stage at time 191
+	No free Reservation Stations! Setting IFstall. Time: 191.00
+In FETCH  Stage at time 191
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 191
+
+
+In WRITE Stage at time 192
+In EXECUTE Stage at time 192
+In DISPATCH Stage at time 192
+	Could not find any instruction to dipatch. Time: 192.00
+In ISSUE  Stage at time 192
+	No free Reservation Stations! Setting IFstall. Time: 192.00
+In FETCH  Stage at time 192
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 192
+
+
+In WRITE Stage at time 193
+In EXECUTE Stage at time 193
+In DISPATCH Stage at time 193
+	Could not find any instruction to dipatch. Time: 193.00
+In ISSUE  Stage at time 193
+	No free Reservation Stations! Setting IFstall. Time: 193.00
+In FETCH  Stage at time 193
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 193
+
+		FU Unit ADDFP completed execution at time 194.00-
+		RS[0]	FREE: FALSE  BUSY: TRUE FU: ADDFP Destination Register: 2
+		op1RDY: TRUE tag1: -1  operand1: 3015
+		op2RDY: TRUE, tag2: -1 operand2: 506
+
+In WRITE Stage at time 194
+Writing to Register 2 value 3521
+	Completed CDB Broadcast of instruction in  RS[0]:  Result: 3521  
+	Completed Instruction: ADDFP. Result: 3521 Num Instructions Completed: 33
+In EXECUTE Stage at time 194
+In DISPATCH Stage at time 194
+	Could not find any instruction to dipatch. Time: 194.00
+In ISSUE  Stage at time 194
+	OPCODE: INTADD  Adding to RS index 0
+In FETCH  Stage at time 194
+	PC: 20 INSTRUCTION: 2500ffec
+In DISPLAY  Stage at time 194
+
+
+In WRITE Stage at time 195
+In EXECUTE Stage at time 195
+In DISPATCH Stage at time 195
+	Activating FU INTADD with instruction tag  0 at time 195.00
+	RS[0]	FREE: FALSE  BUSY: TRUE FU: INTADD Destination Register: 1
+		op1RDY: TRUE tag1: -1  operand1: 6
+		op2RDY: TRUE, tag2: -1 operand2: 1
+In ISSUE  Stage at time 195
+	Completed Instruction: BNEZ.  Time: 195.00 Number Instructions Completed: 34
+In FETCH  Stage at time 195
+	PC: 0 INSTRUCTION: 0
+In DISPLAY  Stage at time 195
+
+
+In WRITE Stage at time 196
+In EXECUTE Stage at time 196
+	FU  INTADD (id: 5) woken up at time 196
+In DISPATCH Stage at time 196
+	Could not find any instruction to dipatch. Time: 196.00
+In ISSUE  Stage at time 196
+	Instruction is NOP. Will not issue into RS. Time: 196.00
+In FETCH  Stage at time 196
+	PC: 4 INSTRUCTION: 10200000
+In DISPLAY  Stage at time 196
+
+		FU Unit INTADD completed execution at time 197.00-
+		RS[0]	FREE: FALSE  BUSY: TRUE FU: INTADD Destination Register: 1
+		op1RDY: TRUE tag1: -1  operand1: 6
+		op2RDY: TRUE, tag2: -1 operand2: 1
+
+In WRITE Stage at time 197
+Writing to Register 1 value 7
+	Completed CDB Broadcast of instruction in  RS[0]:  Result: 7  
+	Completed Instruction: INTADD. Result: 7 Num Instructions Completed: 35
+In EXECUTE Stage at time 197
+In DISPATCH Stage at time 197
+	Could not find any instruction to dipatch. Time: 197.00
+In ISSUE  Stage at time 197
+	OPCODE: LOADFP  Adding to RS index 0
+In FETCH  Stage at time 197
+	PC: 8 INSTRUCTION: 15094000
+In DISPLAY  Stage at time 197
+
+
+In WRITE Stage at time 198
+In EXECUTE Stage at time 198
+In DISPATCH Stage at time 198
+	Activating FU LOADFP with instruction tag  0 at time 198.00
+	RS[0]	FREE: FALSE  BUSY: TRUE FU: LOADFP Destination Register: 0
+		op1RDY: TRUE tag1: -1  operand1: 7
+		op2RDY: TRUE, tag2: -1 operand2: 1
+In ISSUE  Stage at time 198
+	No free Reservation Stations! Setting IFstall. Time: 198.00
+In FETCH  Stage at time 198
+	stallIF: TRUE  INSTRUCTION: 15094000
+	PC: 8 INSTRUCTION: 15094000
+In DISPLAY  Stage at time 198
+
+
+In WRITE Stage at time 199
+In EXECUTE Stage at time 199
+	FU  LOADFP (id: 4) woken up at time 199
+In DISPATCH Stage at time 199
+	Could not find any instruction to dipatch. Time: 199.00
+In ISSUE  Stage at time 199
+	No free Reservation Stations! Setting IFstall. Time: 199.00
+In FETCH  Stage at time 199
+	stallIF: TRUE  INSTRUCTION: 15094000
+	PC: 8 INSTRUCTION: 15094000
+In DISPLAY  Stage at time 199
+
+
+In WRITE Stage at time 200
+In EXECUTE Stage at time 200
+In DISPATCH Stage at time 200
+	Could not find any instruction to dipatch. Time: 200.00
+In ISSUE  Stage at time 200
+	No free Reservation Stations! Setting IFstall. Time: 200.00
+In FETCH  Stage at time 200
+	stallIF: TRUE  INSTRUCTION: 15094000
+	PC: 8 INSTRUCTION: 15094000
+In DISPLAY  Stage at time 200
+
+		FU Unit LOADFP completed execution at time 201.00-
+		RS[0]	FREE: FALSE  BUSY: TRUE FU: LOADFP Destination Register: 0
+		op1RDY: TRUE tag1: -1  operand1: 7
+		op2RDY: TRUE, tag2: -1 operand2: 1
+
+In WRITE Stage at time 201
+Writing to Register 0 value 507
+	Completed CDB Broadcast of instruction in  RS[0]:  Result: 507  
+	Completed Instruction: LOADFP. Result: 507 Num Instructions Completed: 36
+In EXECUTE Stage at time 201
+In DISPATCH Stage at time 201
+	Could not find any instruction to dipatch. Time: 201.00
+In ISSUE  Stage at time 201
+	OPCODE: INTADD  Adding to RS index 0
+In FETCH  Stage at time 201
+	PC: 12 INSTRUCTION: 4401000
+In DISPLAY  Stage at time 201
+
+
+In WRITE Stage at time 202
+In EXECUTE Stage at time 202
+In DISPATCH Stage at time 202
+	Activating FU INTADD with instruction tag  0 at time 202.00
+	RS[0]	FREE: FALSE  BUSY: TRUE FU: INTADD Destination Register: 8
+		op1RDY: TRUE tag1: -1  operand1: 3
+		op2RDY: TRUE, tag2: -1 operand2: -1
+In ISSUE  Stage at time 202
+	No free Reservation Stations! Setting IFstall. Time: 202.00
+In FETCH  Stage at time 202
+	stallIF: TRUE  INSTRUCTION: 4401000
+	PC: 12 INSTRUCTION: 4401000
+In DISPLAY  Stage at time 202
+
+
+In WRITE Stage at time 203
+In EXECUTE Stage at time 203
+	FU  INTADD (id: 5) woken up at time 203
+In DISPATCH Stage at time 203
+	Could not find any instruction to dipatch. Time: 203.00
+In ISSUE  Stage at time 203
+	No free Reservation Stations! Setting IFstall. Time: 203.00
+In FETCH  Stage at time 203
+	stallIF: TRUE  INSTRUCTION: 4401000
+	PC: 12 INSTRUCTION: 4401000
+In DISPLAY  Stage at time 203
+
+		FU Unit INTADD completed execution at time 204.00-
+		RS[0]	FREE: FALSE  BUSY: TRUE FU: INTADD Destination Register: 8
+		op1RDY: TRUE tag1: -1  operand1: 3
+		op2RDY: TRUE, tag2: -1 operand2: -1
+
+In WRITE Stage at time 204
+Writing to Register 8 value 2
+	Completed CDB Broadcast of instruction in  RS[0]:  Result: 2  
+	Completed Instruction: INTADD. Result: 2 Num Instructions Completed: 37
+In EXECUTE Stage at time 204
+In DISPATCH Stage at time 204
+	Could not find any instruction to dipatch. Time: 204.00
+In ISSUE  Stage at time 204
+	OPCODE: ADDFP  Adding to RS index 0
+In FETCH  Stage at time 204
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 204
+
+
+In WRITE Stage at time 205
+In EXECUTE Stage at time 205
+In DISPATCH Stage at time 205
+	Activating FU ADDFP with instruction tag  0 at time 205.00
+	RS[0]	FREE: FALSE  BUSY: TRUE FU: ADDFP Destination Register: 2
+		op1RDY: TRUE tag1: -1  operand1: 3521
+		op2RDY: TRUE, tag2: -1 operand2: 507
+In ISSUE  Stage at time 205
+	No free Reservation Stations! Setting IFstall. Time: 205.00
+In FETCH  Stage at time 205
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 205
+
+
+In WRITE Stage at time 206
+In EXECUTE Stage at time 206
+	FU  ADDFP (id: 1) woken up at time 206
+In DISPATCH Stage at time 206
+	Could not find any instruction to dipatch. Time: 206.00
+In ISSUE  Stage at time 206
+	No free Reservation Stations! Setting IFstall. Time: 206.00
+In FETCH  Stage at time 206
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 206
+
+
+In WRITE Stage at time 207
+In EXECUTE Stage at time 207
+In DISPATCH Stage at time 207
+	Could not find any instruction to dipatch. Time: 207.00
+In ISSUE  Stage at time 207
+	No free Reservation Stations! Setting IFstall. Time: 207.00
+In FETCH  Stage at time 207
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 207
+
+
+In WRITE Stage at time 208
+In EXECUTE Stage at time 208
+In DISPATCH Stage at time 208
+	Could not find any instruction to dipatch. Time: 208.00
+In ISSUE  Stage at time 208
+	No free Reservation Stations! Setting IFstall. Time: 208.00
+In FETCH  Stage at time 208
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 208
+
+
+In WRITE Stage at time 209
+In EXECUTE Stage at time 209
+In DISPATCH Stage at time 209
+	Could not find any instruction to dipatch. Time: 209.00
+In ISSUE  Stage at time 209
+	No free Reservation Stations! Setting IFstall. Time: 209.00
+In FETCH  Stage at time 209
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 209
+
+
+In WRITE Stage at time 210
+In EXECUTE Stage at time 210
+In DISPATCH Stage at time 210
+	Could not find any instruction to dipatch. Time: 210.00
+In ISSUE  Stage at time 210
+	No free Reservation Stations! Setting IFstall. Time: 210.00
+In FETCH  Stage at time 210
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 210
+
+
+In WRITE Stage at time 211
+In EXECUTE Stage at time 211
+In DISPATCH Stage at time 211
+	Could not find any instruction to dipatch. Time: 211.00
+In ISSUE  Stage at time 211
+	No free Reservation Stations! Setting IFstall. Time: 211.00
+In FETCH  Stage at time 211
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 211
+
+
+In WRITE Stage at time 212
+In EXECUTE Stage at time 212
+In DISPATCH Stage at time 212
+	Could not find any instruction to dipatch. Time: 212.00
+In ISSUE  Stage at time 212
+	No free Reservation Stations! Setting IFstall. Time: 212.00
+In FETCH  Stage at time 212
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 212
+
+
+In WRITE Stage at time 213
+In EXECUTE Stage at time 213
+In DISPATCH Stage at time 213
+	Could not find any instruction to dipatch. Time: 213.00
+In ISSUE  Stage at time 213
+	No free Reservation Stations! Setting IFstall. Time: 213.00
+In FETCH  Stage at time 213
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 213
+
+
+In WRITE Stage at time 214
+In EXECUTE Stage at time 214
+In DISPATCH Stage at time 214
+	Could not find any instruction to dipatch. Time: 214.00
+In ISSUE  Stage at time 214
+	No free Reservation Stations! Setting IFstall. Time: 214.00
+In FETCH  Stage at time 214
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 214
+
+
+In WRITE Stage at time 215
+In EXECUTE Stage at time 215
+In DISPATCH Stage at time 215
+	Could not find any instruction to dipatch. Time: 215.00
+In ISSUE  Stage at time 215
+	No free Reservation Stations! Setting IFstall. Time: 215.00
+In FETCH  Stage at time 215
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 215
+
+
+In WRITE Stage at time 216
+In EXECUTE Stage at time 216
+In DISPATCH Stage at time 216
+	Could not find any instruction to dipatch. Time: 216.00
+In ISSUE  Stage at time 216
+	No free Reservation Stations! Setting IFstall. Time: 216.00
+In FETCH  Stage at time 216
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 216
+
+
+In WRITE Stage at time 217
+In EXECUTE Stage at time 217
+In DISPATCH Stage at time 217
+	Could not find any instruction to dipatch. Time: 217.00
+In ISSUE  Stage at time 217
+	No free Reservation Stations! Setting IFstall. Time: 217.00
+In FETCH  Stage at time 217
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 217
+
+
+In WRITE Stage at time 218
+In EXECUTE Stage at time 218
+In DISPATCH Stage at time 218
+	Could not find any instruction to dipatch. Time: 218.00
+In ISSUE  Stage at time 218
+	No free Reservation Stations! Setting IFstall. Time: 218.00
+In FETCH  Stage at time 218
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 218
+
+
+In WRITE Stage at time 219
+In EXECUTE Stage at time 219
+In DISPATCH Stage at time 219
+	Could not find any instruction to dipatch. Time: 219.00
+In ISSUE  Stage at time 219
+	No free Reservation Stations! Setting IFstall. Time: 219.00
+In FETCH  Stage at time 219
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 219
+
+
+In WRITE Stage at time 220
+In EXECUTE Stage at time 220
+In DISPATCH Stage at time 220
+	Could not find any instruction to dipatch. Time: 220.00
+In ISSUE  Stage at time 220
+	No free Reservation Stations! Setting IFstall. Time: 220.00
+In FETCH  Stage at time 220
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 220
+
+
+In WRITE Stage at time 221
+In EXECUTE Stage at time 221
+In DISPATCH Stage at time 221
+	Could not find any instruction to dipatch. Time: 221.00
+In ISSUE  Stage at time 221
+	No free Reservation Stations! Setting IFstall. Time: 221.00
+In FETCH  Stage at time 221
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 221
+
+		FU Unit ADDFP completed execution at time 222.00-
+		RS[0]	FREE: FALSE  BUSY: TRUE FU: ADDFP Destination Register: 2
+		op1RDY: TRUE tag1: -1  operand1: 3521
+		op2RDY: TRUE, tag2: -1 operand2: 507
+
+In WRITE Stage at time 222
+Writing to Register 2 value 4028
+	Completed CDB Broadcast of instruction in  RS[0]:  Result: 4028  
+	Completed Instruction: ADDFP. Result: 4028 Num Instructions Completed: 38
+In EXECUTE Stage at time 222
+In DISPATCH Stage at time 222
+	Could not find any instruction to dipatch. Time: 222.00
+In ISSUE  Stage at time 222
+	OPCODE: INTADD  Adding to RS index 0
+In FETCH  Stage at time 222
+	PC: 20 INSTRUCTION: 2500ffec
+In DISPLAY  Stage at time 222
+
+
+In WRITE Stage at time 223
+In EXECUTE Stage at time 223
+In DISPATCH Stage at time 223
+	Activating FU INTADD with instruction tag  0 at time 223.00
+	RS[0]	FREE: FALSE  BUSY: TRUE FU: INTADD Destination Register: 1
+		op1RDY: TRUE tag1: -1  operand1: 7
+		op2RDY: TRUE, tag2: -1 operand2: 1
+In ISSUE  Stage at time 223
+	Completed Instruction: BNEZ.  Time: 223.00 Number Instructions Completed: 39
+In FETCH  Stage at time 223
+	PC: 0 INSTRUCTION: 0
+In DISPLAY  Stage at time 223
+
+
+In WRITE Stage at time 224
+In EXECUTE Stage at time 224
+	FU  INTADD (id: 5) woken up at time 224
+In DISPATCH Stage at time 224
+	Could not find any instruction to dipatch. Time: 224.00
+In ISSUE  Stage at time 224
+	Instruction is NOP. Will not issue into RS. Time: 224.00
+In FETCH  Stage at time 224
+	PC: 4 INSTRUCTION: 10200000
+In DISPLAY  Stage at time 224
+
+		FU Unit INTADD completed execution at time 225.00-
+		RS[0]	FREE: FALSE  BUSY: TRUE FU: INTADD Destination Register: 1
+		op1RDY: TRUE tag1: -1  operand1: 7
+		op2RDY: TRUE, tag2: -1 operand2: 1
+
+In WRITE Stage at time 225
+Writing to Register 1 value 8
+	Completed CDB Broadcast of instruction in  RS[0]:  Result: 8  
+	Completed Instruction: INTADD. Result: 8 Num Instructions Completed: 40
+In EXECUTE Stage at time 225
+In DISPATCH Stage at time 225
+	Could not find any instruction to dipatch. Time: 225.00
+In ISSUE  Stage at time 225
+	OPCODE: LOADFP  Adding to RS index 0
+In FETCH  Stage at time 225
+	PC: 8 INSTRUCTION: 15094000
+In DISPLAY  Stage at time 225
+
+
+In WRITE Stage at time 226
+In EXECUTE Stage at time 226
+In DISPATCH Stage at time 226
+	Activating FU LOADFP with instruction tag  0 at time 226.00
+	RS[0]	FREE: FALSE  BUSY: TRUE FU: LOADFP Destination Register: 0
+		op1RDY: TRUE tag1: -1  operand1: 8
+		op2RDY: TRUE, tag2: -1 operand2: 1
+In ISSUE  Stage at time 226
+	No free Reservation Stations! Setting IFstall. Time: 226.00
+In FETCH  Stage at time 226
+	stallIF: TRUE  INSTRUCTION: 15094000
+	PC: 8 INSTRUCTION: 15094000
+In DISPLAY  Stage at time 226
+
+
+In WRITE Stage at time 227
+In EXECUTE Stage at time 227
+	FU  LOADFP (id: 4) woken up at time 227
+In DISPATCH Stage at time 227
+	Could not find any instruction to dipatch. Time: 227.00
+In ISSUE  Stage at time 227
+	No free Reservation Stations! Setting IFstall. Time: 227.00
+In FETCH  Stage at time 227
+	stallIF: TRUE  INSTRUCTION: 15094000
+	PC: 8 INSTRUCTION: 15094000
+In DISPLAY  Stage at time 227
+
+
+In WRITE Stage at time 228
+In EXECUTE Stage at time 228
+In DISPATCH Stage at time 228
+	Could not find any instruction to dipatch. Time: 228.00
+In ISSUE  Stage at time 228
+	No free Reservation Stations! Setting IFstall. Time: 228.00
+In FETCH  Stage at time 228
+	stallIF: TRUE  INSTRUCTION: 15094000
+	PC: 8 INSTRUCTION: 15094000
+In DISPLAY  Stage at time 228
+
+		FU Unit LOADFP completed execution at time 229.00-
+		RS[0]	FREE: FALSE  BUSY: TRUE FU: LOADFP Destination Register: 0
+		op1RDY: TRUE tag1: -1  operand1: 8
+		op2RDY: TRUE, tag2: -1 operand2: 1
+
+In WRITE Stage at time 229
+Writing to Register 0 value 508
+	Completed CDB Broadcast of instruction in  RS[0]:  Result: 508  
+	Completed Instruction: LOADFP. Result: 508 Num Instructions Completed: 41
+In EXECUTE Stage at time 229
+In DISPATCH Stage at time 229
+	Could not find any instruction to dipatch. Time: 229.00
+In ISSUE  Stage at time 229
+	OPCODE: INTADD  Adding to RS index 0
+In FETCH  Stage at time 229
+	PC: 12 INSTRUCTION: 4401000
+In DISPLAY  Stage at time 229
+
+
+In WRITE Stage at time 230
+In EXECUTE Stage at time 230
+In DISPATCH Stage at time 230
+	Activating FU INTADD with instruction tag  0 at time 230.00
+	RS[0]	FREE: FALSE  BUSY: TRUE FU: INTADD Destination Register: 8
+		op1RDY: TRUE tag1: -1  operand1: 2
+		op2RDY: TRUE, tag2: -1 operand2: -1
+In ISSUE  Stage at time 230
+	No free Reservation Stations! Setting IFstall. Time: 230.00
+In FETCH  Stage at time 230
+	stallIF: TRUE  INSTRUCTION: 4401000
+	PC: 12 INSTRUCTION: 4401000
+In DISPLAY  Stage at time 230
+
+
+In WRITE Stage at time 231
+In EXECUTE Stage at time 231
+	FU  INTADD (id: 5) woken up at time 231
+In DISPATCH Stage at time 231
+	Could not find any instruction to dipatch. Time: 231.00
+In ISSUE  Stage at time 231
+	No free Reservation Stations! Setting IFstall. Time: 231.00
+In FETCH  Stage at time 231
+	stallIF: TRUE  INSTRUCTION: 4401000
+	PC: 12 INSTRUCTION: 4401000
+In DISPLAY  Stage at time 231
+
+		FU Unit INTADD completed execution at time 232.00-
+		RS[0]	FREE: FALSE  BUSY: TRUE FU: INTADD Destination Register: 8
+		op1RDY: TRUE tag1: -1  operand1: 2
+		op2RDY: TRUE, tag2: -1 operand2: -1
+
+In WRITE Stage at time 232
+Writing to Register 8 value 1
+	Completed CDB Broadcast of instruction in  RS[0]:  Result: 1  
+	Completed Instruction: INTADD. Result: 1 Num Instructions Completed: 42
+In EXECUTE Stage at time 232
+In DISPATCH Stage at time 232
+	Could not find any instruction to dipatch. Time: 232.00
+In ISSUE  Stage at time 232
+	OPCODE: ADDFP  Adding to RS index 0
+In FETCH  Stage at time 232
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 232
+
+
+In WRITE Stage at time 233
+In EXECUTE Stage at time 233
+In DISPATCH Stage at time 233
+	Activating FU ADDFP with instruction tag  0 at time 233.00
+	RS[0]	FREE: FALSE  BUSY: TRUE FU: ADDFP Destination Register: 2
+		op1RDY: TRUE tag1: -1  operand1: 4028
+		op2RDY: TRUE, tag2: -1 operand2: 508
+In ISSUE  Stage at time 233
+	No free Reservation Stations! Setting IFstall. Time: 233.00
+In FETCH  Stage at time 233
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 233
+
+
+In WRITE Stage at time 234
+In EXECUTE Stage at time 234
+	FU  ADDFP (id: 1) woken up at time 234
+In DISPATCH Stage at time 234
+	Could not find any instruction to dipatch. Time: 234.00
+In ISSUE  Stage at time 234
+	No free Reservation Stations! Setting IFstall. Time: 234.00
+In FETCH  Stage at time 234
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 234
+
+
+In WRITE Stage at time 235
+In EXECUTE Stage at time 235
+In DISPATCH Stage at time 235
+	Could not find any instruction to dipatch. Time: 235.00
+In ISSUE  Stage at time 235
+	No free Reservation Stations! Setting IFstall. Time: 235.00
+In FETCH  Stage at time 235
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 235
+
+
+In WRITE Stage at time 236
+In EXECUTE Stage at time 236
+In DISPATCH Stage at time 236
+	Could not find any instruction to dipatch. Time: 236.00
+In ISSUE  Stage at time 236
+	No free Reservation Stations! Setting IFstall. Time: 236.00
+In FETCH  Stage at time 236
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 236
+
+
+In WRITE Stage at time 237
+In EXECUTE Stage at time 237
+In DISPATCH Stage at time 237
+	Could not find any instruction to dipatch. Time: 237.00
+In ISSUE  Stage at time 237
+	No free Reservation Stations! Setting IFstall. Time: 237.00
+In FETCH  Stage at time 237
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 237
+
+
+In WRITE Stage at time 238
+In EXECUTE Stage at time 238
+In DISPATCH Stage at time 238
+	Could not find any instruction to dipatch. Time: 238.00
+In ISSUE  Stage at time 238
+	No free Reservation Stations! Setting IFstall. Time: 238.00
+In FETCH  Stage at time 238
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 238
+
+
+In WRITE Stage at time 239
+In EXECUTE Stage at time 239
+In DISPATCH Stage at time 239
+	Could not find any instruction to dipatch. Time: 239.00
+In ISSUE  Stage at time 239
+	No free Reservation Stations! Setting IFstall. Time: 239.00
+In FETCH  Stage at time 239
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 239
+
+
+In WRITE Stage at time 240
+In EXECUTE Stage at time 240
+In DISPATCH Stage at time 240
+	Could not find any instruction to dipatch. Time: 240.00
+In ISSUE  Stage at time 240
+	No free Reservation Stations! Setting IFstall. Time: 240.00
+In FETCH  Stage at time 240
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 240
+
+
+In WRITE Stage at time 241
+In EXECUTE Stage at time 241
+In DISPATCH Stage at time 241
+	Could not find any instruction to dipatch. Time: 241.00
+In ISSUE  Stage at time 241
+	No free Reservation Stations! Setting IFstall. Time: 241.00
+In FETCH  Stage at time 241
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 241
+
+
+In WRITE Stage at time 242
+In EXECUTE Stage at time 242
+In DISPATCH Stage at time 242
+	Could not find any instruction to dipatch. Time: 242.00
+In ISSUE  Stage at time 242
+	No free Reservation Stations! Setting IFstall. Time: 242.00
+In FETCH  Stage at time 242
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 242
+
+
+In WRITE Stage at time 243
+In EXECUTE Stage at time 243
+In DISPATCH Stage at time 243
+	Could not find any instruction to dipatch. Time: 243.00
+In ISSUE  Stage at time 243
+	No free Reservation Stations! Setting IFstall. Time: 243.00
+In FETCH  Stage at time 243
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 243
+
+
+In WRITE Stage at time 244
+In EXECUTE Stage at time 244
+In DISPATCH Stage at time 244
+	Could not find any instruction to dipatch. Time: 244.00
+In ISSUE  Stage at time 244
+	No free Reservation Stations! Setting IFstall. Time: 244.00
+In FETCH  Stage at time 244
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 244
+
+
+In WRITE Stage at time 245
+In EXECUTE Stage at time 245
+In DISPATCH Stage at time 245
+	Could not find any instruction to dipatch. Time: 245.00
+In ISSUE  Stage at time 245
+	No free Reservation Stations! Setting IFstall. Time: 245.00
+In FETCH  Stage at time 245
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 245
+
+
+In WRITE Stage at time 246
+In EXECUTE Stage at time 246
+In DISPATCH Stage at time 246
+	Could not find any instruction to dipatch. Time: 246.00
+In ISSUE  Stage at time 246
+	No free Reservation Stations! Setting IFstall. Time: 246.00
+In FETCH  Stage at time 246
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 246
+
+
+In WRITE Stage at time 247
+In EXECUTE Stage at time 247
+In DISPATCH Stage at time 247
+	Could not find any instruction to dipatch. Time: 247.00
+In ISSUE  Stage at time 247
+	No free Reservation Stations! Setting IFstall. Time: 247.00
+In FETCH  Stage at time 247
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 247
+
+
+In WRITE Stage at time 248
+In EXECUTE Stage at time 248
+In DISPATCH Stage at time 248
+	Could not find any instruction to dipatch. Time: 248.00
+In ISSUE  Stage at time 248
+	No free Reservation Stations! Setting IFstall. Time: 248.00
+In FETCH  Stage at time 248
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 248
+
+
+In WRITE Stage at time 249
+In EXECUTE Stage at time 249
+In DISPATCH Stage at time 249
+	Could not find any instruction to dipatch. Time: 249.00
+In ISSUE  Stage at time 249
+	No free Reservation Stations! Setting IFstall. Time: 249.00
+In FETCH  Stage at time 249
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 249
+
+		FU Unit ADDFP completed execution at time 250.00-
+		RS[0]	FREE: FALSE  BUSY: TRUE FU: ADDFP Destination Register: 2
+		op1RDY: TRUE tag1: -1  operand1: 4028
+		op2RDY: TRUE, tag2: -1 operand2: 508
+
+In WRITE Stage at time 250
+Writing to Register 2 value 4536
+	Completed CDB Broadcast of instruction in  RS[0]:  Result: 4536  
+	Completed Instruction: ADDFP. Result: 4536 Num Instructions Completed: 43
+In EXECUTE Stage at time 250
+In DISPATCH Stage at time 250
+	Could not find any instruction to dipatch. Time: 250.00
+In ISSUE  Stage at time 250
+	OPCODE: INTADD  Adding to RS index 0
+In FETCH  Stage at time 250
+	PC: 20 INSTRUCTION: 2500ffec
+In DISPLAY  Stage at time 250
+
+
+In WRITE Stage at time 251
+In EXECUTE Stage at time 251
+In DISPATCH Stage at time 251
+	Activating FU INTADD with instruction tag  0 at time 251.00
+	RS[0]	FREE: FALSE  BUSY: TRUE FU: INTADD Destination Register: 1
+		op1RDY: TRUE tag1: -1  operand1: 8
+		op2RDY: TRUE, tag2: -1 operand2: 1
+In ISSUE  Stage at time 251
+	Completed Instruction: BNEZ.  Time: 251.00 Number Instructions Completed: 44
+In FETCH  Stage at time 251
+	PC: 0 INSTRUCTION: 0
+In DISPLAY  Stage at time 251
+
+
+In WRITE Stage at time 252
+In EXECUTE Stage at time 252
+	FU  INTADD (id: 5) woken up at time 252
+In DISPATCH Stage at time 252
+	Could not find any instruction to dipatch. Time: 252.00
+In ISSUE  Stage at time 252
+	Instruction is NOP. Will not issue into RS. Time: 252.00
+In FETCH  Stage at time 252
+	PC: 4 INSTRUCTION: 10200000
+In DISPLAY  Stage at time 252
+
+		FU Unit INTADD completed execution at time 253.00-
+		RS[0]	FREE: FALSE  BUSY: TRUE FU: INTADD Destination Register: 1
+		op1RDY: TRUE tag1: -1  operand1: 8
+		op2RDY: TRUE, tag2: -1 operand2: 1
+
+In WRITE Stage at time 253
+Writing to Register 1 value 9
+	Completed CDB Broadcast of instruction in  RS[0]:  Result: 9  
+	Completed Instruction: INTADD. Result: 9 Num Instructions Completed: 45
+In EXECUTE Stage at time 253
+In DISPATCH Stage at time 253
+	Could not find any instruction to dipatch. Time: 253.00
+In ISSUE  Stage at time 253
+	OPCODE: LOADFP  Adding to RS index 0
+In FETCH  Stage at time 253
+	PC: 8 INSTRUCTION: 15094000
+In DISPLAY  Stage at time 253
+
+
+In WRITE Stage at time 254
+In EXECUTE Stage at time 254
+In DISPATCH Stage at time 254
+	Activating FU LOADFP with instruction tag  0 at time 254.00
+	RS[0]	FREE: FALSE  BUSY: TRUE FU: LOADFP Destination Register: 0
+		op1RDY: TRUE tag1: -1  operand1: 9
+		op2RDY: TRUE, tag2: -1 operand2: 1
+In ISSUE  Stage at time 254
+	No free Reservation Stations! Setting IFstall. Time: 254.00
+In FETCH  Stage at time 254
+	stallIF: TRUE  INSTRUCTION: 15094000
+	PC: 8 INSTRUCTION: 15094000
+In DISPLAY  Stage at time 254
+
+
+In WRITE Stage at time 255
+In EXECUTE Stage at time 255
+	FU  LOADFP (id: 4) woken up at time 255
+In DISPATCH Stage at time 255
+	Could not find any instruction to dipatch. Time: 255.00
+In ISSUE  Stage at time 255
+	No free Reservation Stations! Setting IFstall. Time: 255.00
+In FETCH  Stage at time 255
+	stallIF: TRUE  INSTRUCTION: 15094000
+	PC: 8 INSTRUCTION: 15094000
+In DISPLAY  Stage at time 255
+
+
+In WRITE Stage at time 256
+In EXECUTE Stage at time 256
+In DISPATCH Stage at time 256
+	Could not find any instruction to dipatch. Time: 256.00
+In ISSUE  Stage at time 256
+	No free Reservation Stations! Setting IFstall. Time: 256.00
+In FETCH  Stage at time 256
+	stallIF: TRUE  INSTRUCTION: 15094000
+	PC: 8 INSTRUCTION: 15094000
+In DISPLAY  Stage at time 256
+
+		FU Unit LOADFP completed execution at time 257.00-
+		RS[0]	FREE: FALSE  BUSY: TRUE FU: LOADFP Destination Register: 0
+		op1RDY: TRUE tag1: -1  operand1: 9
+		op2RDY: TRUE, tag2: -1 operand2: 1
+
+In WRITE Stage at time 257
+Writing to Register 0 value 509
+	Completed CDB Broadcast of instruction in  RS[0]:  Result: 509  
+	Completed Instruction: LOADFP. Result: 509 Num Instructions Completed: 46
+In EXECUTE Stage at time 257
+In DISPATCH Stage at time 257
+	Could not find any instruction to dipatch. Time: 257.00
+In ISSUE  Stage at time 257
+	OPCODE: INTADD  Adding to RS index 0
+In FETCH  Stage at time 257
+	PC: 12 INSTRUCTION: 4401000
+In DISPLAY  Stage at time 257
+
+
+In WRITE Stage at time 258
+In EXECUTE Stage at time 258
+In DISPATCH Stage at time 258
+	Activating FU INTADD with instruction tag  0 at time 258.00
+	RS[0]	FREE: FALSE  BUSY: TRUE FU: INTADD Destination Register: 8
+		op1RDY: TRUE tag1: -1  operand1: 1
+		op2RDY: TRUE, tag2: -1 operand2: -1
+In ISSUE  Stage at time 258
+	No free Reservation Stations! Setting IFstall. Time: 258.00
+In FETCH  Stage at time 258
+	stallIF: TRUE  INSTRUCTION: 4401000
+	PC: 12 INSTRUCTION: 4401000
+In DISPLAY  Stage at time 258
+
+
+In WRITE Stage at time 259
+In EXECUTE Stage at time 259
+	FU  INTADD (id: 5) woken up at time 259
+In DISPATCH Stage at time 259
+	Could not find any instruction to dipatch. Time: 259.00
+In ISSUE  Stage at time 259
+	No free Reservation Stations! Setting IFstall. Time: 259.00
+In FETCH  Stage at time 259
+	stallIF: TRUE  INSTRUCTION: 4401000
+	PC: 12 INSTRUCTION: 4401000
+In DISPLAY  Stage at time 259
+
+		FU Unit INTADD completed execution at time 260.00-
+		RS[0]	FREE: FALSE  BUSY: TRUE FU: INTADD Destination Register: 8
+		op1RDY: TRUE tag1: -1  operand1: 1
+		op2RDY: TRUE, tag2: -1 operand2: -1
+
+In WRITE Stage at time 260
+Writing to Register 8 value 0
+	Completed CDB Broadcast of instruction in  RS[0]:  Result: 0  
+	Completed Instruction: INTADD. Result: 0 Num Instructions Completed: 47
+In EXECUTE Stage at time 260
+In DISPATCH Stage at time 260
+	Could not find any instruction to dipatch. Time: 260.00
+In ISSUE  Stage at time 260
+	OPCODE: ADDFP  Adding to RS index 0
+In FETCH  Stage at time 260
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 260
+
+
+In WRITE Stage at time 261
+In EXECUTE Stage at time 261
+In DISPATCH Stage at time 261
+	Activating FU ADDFP with instruction tag  0 at time 261.00
+	RS[0]	FREE: FALSE  BUSY: TRUE FU: ADDFP Destination Register: 2
+		op1RDY: TRUE tag1: -1  operand1: 4536
+		op2RDY: TRUE, tag2: -1 operand2: 509
+In ISSUE  Stage at time 261
+	No free Reservation Stations! Setting IFstall. Time: 261.00
+In FETCH  Stage at time 261
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 261
+
+
+In WRITE Stage at time 262
+In EXECUTE Stage at time 262
+	FU  ADDFP (id: 1) woken up at time 262
+In DISPATCH Stage at time 262
+	Could not find any instruction to dipatch. Time: 262.00
+In ISSUE  Stage at time 262
+	No free Reservation Stations! Setting IFstall. Time: 262.00
+In FETCH  Stage at time 262
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 262
+
+
+In WRITE Stage at time 263
+In EXECUTE Stage at time 263
+In DISPATCH Stage at time 263
+	Could not find any instruction to dipatch. Time: 263.00
+In ISSUE  Stage at time 263
+	No free Reservation Stations! Setting IFstall. Time: 263.00
+In FETCH  Stage at time 263
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 263
+
+
+In WRITE Stage at time 264
+In EXECUTE Stage at time 264
+In DISPATCH Stage at time 264
+	Could not find any instruction to dipatch. Time: 264.00
+In ISSUE  Stage at time 264
+	No free Reservation Stations! Setting IFstall. Time: 264.00
+In FETCH  Stage at time 264
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 264
+
+
+In WRITE Stage at time 265
+In EXECUTE Stage at time 265
+In DISPATCH Stage at time 265
+	Could not find any instruction to dipatch. Time: 265.00
+In ISSUE  Stage at time 265
+	No free Reservation Stations! Setting IFstall. Time: 265.00
+In FETCH  Stage at time 265
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 265
+
+
+In WRITE Stage at time 266
+In EXECUTE Stage at time 266
+In DISPATCH Stage at time 266
+	Could not find any instruction to dipatch. Time: 266.00
+In ISSUE  Stage at time 266
+	No free Reservation Stations! Setting IFstall. Time: 266.00
+In FETCH  Stage at time 266
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 266
+
+
+In WRITE Stage at time 267
+In EXECUTE Stage at time 267
+In DISPATCH Stage at time 267
+	Could not find any instruction to dipatch. Time: 267.00
+In ISSUE  Stage at time 267
+	No free Reservation Stations! Setting IFstall. Time: 267.00
+In FETCH  Stage at time 267
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 267
+
+
+In WRITE Stage at time 268
+In EXECUTE Stage at time 268
+In DISPATCH Stage at time 268
+	Could not find any instruction to dipatch. Time: 268.00
+In ISSUE  Stage at time 268
+	No free Reservation Stations! Setting IFstall. Time: 268.00
+In FETCH  Stage at time 268
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 268
+
+
+In WRITE Stage at time 269
+In EXECUTE Stage at time 269
+In DISPATCH Stage at time 269
+	Could not find any instruction to dipatch. Time: 269.00
+In ISSUE  Stage at time 269
+	No free Reservation Stations! Setting IFstall. Time: 269.00
+In FETCH  Stage at time 269
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 269
+
+
+In WRITE Stage at time 270
+In EXECUTE Stage at time 270
+In DISPATCH Stage at time 270
+	Could not find any instruction to dipatch. Time: 270.00
+In ISSUE  Stage at time 270
+	No free Reservation Stations! Setting IFstall. Time: 270.00
+In FETCH  Stage at time 270
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 270
+
+
+In WRITE Stage at time 271
+In EXECUTE Stage at time 271
+In DISPATCH Stage at time 271
+	Could not find any instruction to dipatch. Time: 271.00
+In ISSUE  Stage at time 271
+	No free Reservation Stations! Setting IFstall. Time: 271.00
+In FETCH  Stage at time 271
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 271
+
+
+In WRITE Stage at time 272
+In EXECUTE Stage at time 272
+In DISPATCH Stage at time 272
+	Could not find any instruction to dipatch. Time: 272.00
+In ISSUE  Stage at time 272
+	No free Reservation Stations! Setting IFstall. Time: 272.00
+In FETCH  Stage at time 272
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 272
+
+
+In WRITE Stage at time 273
+In EXECUTE Stage at time 273
+In DISPATCH Stage at time 273
+	Could not find any instruction to dipatch. Time: 273.00
+In ISSUE  Stage at time 273
+	No free Reservation Stations! Setting IFstall. Time: 273.00
+In FETCH  Stage at time 273
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 273
+
+
+In WRITE Stage at time 274
+In EXECUTE Stage at time 274
+In DISPATCH Stage at time 274
+	Could not find any instruction to dipatch. Time: 274.00
+In ISSUE  Stage at time 274
+	No free Reservation Stations! Setting IFstall. Time: 274.00
+In FETCH  Stage at time 274
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 274
+
+
+In WRITE Stage at time 275
+In EXECUTE Stage at time 275
+In DISPATCH Stage at time 275
+	Could not find any instruction to dipatch. Time: 275.00
+In ISSUE  Stage at time 275
+	No free Reservation Stations! Setting IFstall. Time: 275.00
+In FETCH  Stage at time 275
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 275
+
+
+In WRITE Stage at time 276
+In EXECUTE Stage at time 276
+In DISPATCH Stage at time 276
+	Could not find any instruction to dipatch. Time: 276.00
+In ISSUE  Stage at time 276
+	No free Reservation Stations! Setting IFstall. Time: 276.00
+In FETCH  Stage at time 276
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 276
+
+
+In WRITE Stage at time 277
+In EXECUTE Stage at time 277
+In DISPATCH Stage at time 277
+	Could not find any instruction to dipatch. Time: 277.00
+In ISSUE  Stage at time 277
+	No free Reservation Stations! Setting IFstall. Time: 277.00
+In FETCH  Stage at time 277
+	stallIF: TRUE  INSTRUCTION: 14230800
+	PC: 16 INSTRUCTION: 14230800
+In DISPLAY  Stage at time 277
+
+		FU Unit ADDFP completed execution at time 278.00-
+		RS[0]	FREE: FALSE  BUSY: TRUE FU: ADDFP Destination Register: 2
+		op1RDY: TRUE tag1: -1  operand1: 4536
+		op2RDY: TRUE, tag2: -1 operand2: 509
+
+In WRITE Stage at time 278
+Writing to Register 2 value 5045
+	Completed CDB Broadcast of instruction in  RS[0]:  Result: 5045  
+	Completed Instruction: ADDFP. Result: 5045 Num Instructions Completed: 48
+In EXECUTE Stage at time 278
+In DISPATCH Stage at time 278
+	Could not find any instruction to dipatch. Time: 278.00
+In ISSUE  Stage at time 278
+	OPCODE: INTADD  Adding to RS index 0
+In FETCH  Stage at time 278
+	PC: 20 INSTRUCTION: 2500ffec
+In DISPLAY  Stage at time 278
+
+
+In WRITE Stage at time 279
+In EXECUTE Stage at time 279
+In DISPATCH Stage at time 279
+	Activating FU INTADD with instruction tag  0 at time 279.00
+	RS[0]	FREE: FALSE  BUSY: TRUE FU: INTADD Destination Register: 1
+		op1RDY: TRUE tag1: -1  operand1: 9
+		op2RDY: TRUE, tag2: -1 operand2: 1
+In ISSUE  Stage at time 279
+	Completed Instruction: BNEZ.  Time: 279.00 Number Instructions Completed: 49
+In FETCH  Stage at time 279
+	PC: 24 INSTRUCTION: 28000000
+In DISPLAY  Stage at time 279
+
+
+In WRITE Stage at time 280
+In EXECUTE Stage at time 280
+	FU  INTADD (id: 5) woken up at time 280
+In DISPATCH Stage at time 280
+	Could not find any instruction to dipatch. Time: 280.00
+In ISSUE  Stage at time 280
+	Instruction is HALT. Will not issue into RS. Will assert stallIF. Time: 280.00
+In FETCH  Stage at time 280
+	stallIF: TRUE  INSTRUCTION: 28000000
+	PC: 24 INSTRUCTION: 28000000
+In DISPLAY  Stage at time 280
+
+		FU Unit INTADD completed execution at time 281.00-
+		RS[0]	FREE: FALSE  BUSY: TRUE FU: INTADD Destination Register: 1
+		op1RDY: TRUE tag1: -1  operand1: 9
+		op2RDY: TRUE, tag2: -1 operand2: 1
+
+In WRITE Stage at time 281
+Writing to Register 1 value 10
+	Completed CDB Broadcast of instruction in  RS[0]:  Result: 10  
+	Completed Instruction: INTADD. Result: 10 Num Instructions Completed: 50
+In EXECUTE Stage at time 281
+In DISPATCH Stage at time 281
+	Could not find any instruction to dipatch. Time: 281.00
+In ISSUE  Stage at time 281
+	Instruction is HALT. Will not issue into RS. Will assert stallIF. Time: 281.00
+In FETCH  Stage at time 281
+	stallIF: TRUE  INSTRUCTION: 28000000
+	PC: 24 INSTRUCTION: 28000000
+In DISPLAY  Stage at time 281
+
+
+In WRITE Stage at time 282
+In EXECUTE Stage at time 282
+In DISPATCH Stage at time 282
+	Could not find any instruction to dipatch. Time: 282.00
+In ISSUE  Stage at time 282
+	Instruction is HALT. Will not issue into RS. Will assert stallIF. Time: 282.00
+In FETCH  Stage at time 282
+	stallIF: TRUE  INSTRUCTION: 28000000
+	PC: 24 INSTRUCTION: 28000000
+In DISPLAY  Stage at time 282
+
+
+In WRITE Stage at time 283
+In EXECUTE Stage at time 283
+In DISPATCH Stage at time 283
+	Could not find any instruction to dipatch. Time: 283.00
+In ISSUE  Stage at time 283
+	Instruction is HALT. Will not issue into RS. Will assert stallIF. Time: 283.00
+In FETCH  Stage at time 283
+	stallIF: TRUE  INSTRUCTION: 28000000
+	PC: 24 INSTRUCTION: 28000000
+In DISPLAY  Stage at time 283
+
+
+In WRITE Stage at time 284
+In EXECUTE Stage at time 284
+In DISPATCH Stage at time 284
+	Could not find any instruction to dipatch. Time: 284.00
+In ISSUE  Stage at time 284
+	Instruction is HALT. Will not issue into RS. Will assert stallIF. Time: 284.00
+In FETCH  Stage at time 284
+	stallIF: TRUE  INSTRUCTION: 28000000
+	PC: 24 INSTRUCTION: 28000000
+In DISPLAY  Stage at time 284
+
+
+In WRITE Stage at time 285
+In EXECUTE Stage at time 285
+In DISPATCH Stage at time 285
+	Could not find any instruction to dipatch. Time: 285.00
+In ISSUE  Stage at time 285
+	Instruction is HALT. Will not issue into RS. Will assert stallIF. Time: 285.00
+In FETCH  Stage at time 285
+	stallIF: TRUE  INSTRUCTION: 28000000
+	PC: 24 INSTRUCTION: 28000000
+In DISPLAY  Stage at time 285
+
+
+In WRITE Stage at time 286
+In EXECUTE Stage at time 286
+In DISPATCH Stage at time 286
+	Could not find any instruction to dipatch. Time: 286.00
+In ISSUE  Stage at time 286
+	Instruction is HALT. Will not issue into RS. Will assert stallIF. Time: 286.00
+In FETCH  Stage at time 286
+	stallIF: TRUE  INSTRUCTION: 28000000
+	PC: 24 INSTRUCTION: 28000000
+In DISPLAY  Stage at time 286
+
+
+In WRITE Stage at time 287
+In EXECUTE Stage at time 287
+In DISPATCH Stage at time 287
+	Could not find any instruction to dipatch. Time: 287.00
+In ISSUE  Stage at time 287
+	Instruction is HALT. Will not issue into RS. Will assert stallIF. Time: 287.00
+In FETCH  Stage at time 287
+	stallIF: TRUE  INSTRUCTION: 28000000
+	PC: 24 INSTRUCTION: 28000000
+In DISPLAY  Stage at time 287
+
+
+In WRITE Stage at time 288
+In EXECUTE Stage at time 288
+In DISPATCH Stage at time 288
+	Could not find any instruction to dipatch. Time: 288.00
+In ISSUE  Stage at time 288
+	Instruction is HALT. Will not issue into RS. Will assert stallIF. Time: 288.00
+In FETCH  Stage at time 288
+	stallIF: TRUE  INSTRUCTION: 28000000
+	PC: 24 INSTRUCTION: 28000000
+In DISPLAY  Stage at time 288
+
+
+In WRITE Stage at time 289
+In EXECUTE Stage at time 289
+In DISPATCH Stage at time 289
+	Could not find any instruction to dipatch. Time: 289.00
+In ISSUE  Stage at time 289
+	Instruction is HALT. Will not issue into RS. Will assert stallIF. Time: 289.00
+In FETCH  Stage at time 289
+	stallIF: TRUE  INSTRUCTION: 28000000
+	PC: 24 INSTRUCTION: 28000000
+In DISPLAY  Stage at time 289
+
+
+In WRITE Stage at time 290
+In EXECUTE Stage at time 290
+In DISPATCH Stage at time 290
+	Could not find any instruction to dipatch. Time: 290.00
+In ISSUE  Stage at time 290
+	Instruction is HALT. Will not issue into RS. Will assert stallIF. Time: 290.00
+In FETCH  Stage at time 290
+	stallIF: TRUE  INSTRUCTION: 28000000
+	PC: 24 INSTRUCTION: 28000000
+In DISPLAY  Stage at time 290
+
+
+In WRITE Stage at time 291
+In EXECUTE Stage at time 291
+In DISPATCH Stage at time 291
+	Could not find any instruction to dipatch. Time: 291.00
+In ISSUE  Stage at time 291
+	Instruction is HALT. Will not issue into RS. Will assert stallIF. Time: 291.00
+In FETCH  Stage at time 291
+	stallIF: TRUE  INSTRUCTION: 28000000
+	PC: 24 INSTRUCTION: 28000000
+In DISPLAY  Stage at time 291
+
+
+In WRITE Stage at time 292
+In EXECUTE Stage at time 292
+In DISPATCH Stage at time 292
+	Could not find any instruction to dipatch. Time: 292.00
+In ISSUE  Stage at time 292
+	Instruction is HALT. Will not issue into RS. Will assert stallIF. Time: 292.00
+In FETCH  Stage at time 292
+	stallIF: TRUE  INSTRUCTION: 28000000
+	PC: 24 INSTRUCTION: 28000000
+In DISPLAY  Stage at time 292
+
+
+In WRITE Stage at time 293
+In EXECUTE Stage at time 293
+In DISPATCH Stage at time 293
+	Could not find any instruction to dipatch. Time: 293.00
+In ISSUE  Stage at time 293
+	Instruction is HALT. Will not issue into RS. Will assert stallIF. Time: 293.00
+In FETCH  Stage at time 293
+	stallIF: TRUE  INSTRUCTION: 28000000
+	PC: 24 INSTRUCTION: 28000000
+In DISPLAY  Stage at time 293
+
+
+In WRITE Stage at time 294
+In EXECUTE Stage at time 294
+In DISPATCH Stage at time 294
+	Could not find any instruction to dipatch. Time: 294.00
+In ISSUE  Stage at time 294
+	Instruction is HALT. Will not issue into RS. Will assert stallIF. Time: 294.00
+In FETCH  Stage at time 294
+	stallIF: TRUE  INSTRUCTION: 28000000
+	PC: 24 INSTRUCTION: 28000000
+In DISPLAY  Stage at time 294
+
+
+In WRITE Stage at time 295
+In EXECUTE Stage at time 295
+In DISPATCH Stage at time 295
+	Could not find any instruction to dipatch. Time: 295.00
+In ISSUE  Stage at time 295
+	Instruction is HALT. Will not issue into RS. Will assert stallIF. Time: 295.00
+In FETCH  Stage at time 295
+	stallIF: TRUE  INSTRUCTION: 28000000
+	PC: 24 INSTRUCTION: 28000000
+In DISPLAY  Stage at time 295
+
+
+In WRITE Stage at time 296
+In EXECUTE Stage at time 296
+In DISPATCH Stage at time 296
+	Could not find any instruction to dipatch. Time: 296.00
+In ISSUE  Stage at time 296
+	Instruction is HALT. Will not issue into RS. Will assert stallIF. Time: 296.00
+In FETCH  Stage at time 296
+	stallIF: TRUE  INSTRUCTION: 28000000
+	PC: 24 INSTRUCTION: 28000000
+In DISPLAY  Stage at time 296
+
+
+In WRITE Stage at time 297
+In EXECUTE Stage at time 297
+In DISPATCH Stage at time 297
+	Could not find any instruction to dipatch. Time: 297.00
+In ISSUE  Stage at time 297
+	Instruction is HALT. Will not issue into RS. Will assert stallIF. Time: 297.00
+In FETCH  Stage at time 297
+	stallIF: TRUE  INSTRUCTION: 28000000
+	PC: 24 INSTRUCTION: 28000000
+In DISPLAY  Stage at time 297
+
+
+In WRITE Stage at time 298
+In EXECUTE Stage at time 298
+In DISPATCH Stage at time 298
+	Could not find any instruction to dipatch. Time: 298.00
+In ISSUE  Stage at time 298
+	Instruction is HALT. Will not issue into RS. Will assert stallIF. Time: 298.00
+In FETCH  Stage at time 298
+	stallIF: TRUE  INSTRUCTION: 28000000
+	PC: 24 INSTRUCTION: 28000000
+In DISPLAY  Stage at time 298
+
+
+In WRITE Stage at time 299
+In EXECUTE Stage at time 299
+In DISPATCH Stage at time 299
+	Could not find any instruction to dipatch. Time: 299.00
+In ISSUE  Stage at time 299
+	Instruction is HALT. Will not issue into RS. Will assert stallIF. Time: 299.00
+In FETCH  Stage at time 299
+	stallIF: TRUE  INSTRUCTION: 28000000
+	PC: 24 INSTRUCTION: 28000000
+In DISPLAY  Stage at time 299
+
+
+In WRITE Stage at time 300
+
+
+*********************************************************
+
+NUM_RESERVATION_STATIONS: 1 NUM_COPIES: 1  LOAD_CYCLES: 2
+Simulation ended  at 300
+Execution completed at time  280
+Retirement completed  at time  281
+Number Instructions Retired: 50
+Number Stall Cycles: 240
+Number Stall Cycles: HALT : 20 RSFull : 220 BranchControl: 0  Branch Data: 0
+REG[0]: 509	REG[1]: 10	REG[2]: 5045	REG[3]: 1	REG[4]: 256	REG[5]: 0	REG[6]: 512	REG[7]: 0	REG[8]: 0	REG[9]: -1	REG[10]: 0	REG[11]: 0	REG[12]: 0	REG[13]: 0	REG[14]: 0	REG[15]: 0	
+
+********************************************************************************
+************************* YACSIM - Normal Termination **************************
+********************************************************************************

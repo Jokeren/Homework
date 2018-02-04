@@ -1,0 +1,41 @@
+Source Files
+------------
+sim.c -- main driver of the simulation
+fetch.c -- FETCH stage implementation (no changes needed or allowed)
+issue.c -- ISSUE stage. Template needs to be completed with implementation
+dispatch.c -- DISPATCH stage implementation (no changes needed or allowed)
+exec.c --  EXEC stage implementation (no changes needed or allowed)
+write.c -- WRITEBACK stage. Template needs to be completed with implementation
+display.c -- An additional stage invoked every cycle to collect statistics and display state information
+utils.c -- Code for initialization and helper functions
+
+Header Files
+------------
+global.h  --- Constants and struct definitions 
+sim.h -- Yacsim-specific header file (do not change)
+
+Simulator Object File
+---------------------
+yacsim.o 
+
+Text Files
+----------
+demo1 -- Trace of program 1 with 1 Reservation Station and default parameters
+demo2 -- Trace of program 1 with 2 Reservation Stations (remaining parameters same as demo1)
+README --- This file
+
+
+To compile and run your program:
+--------------------------------
+gcc *.c ./yacsim.o -lm -o runme
+
+Execute the program using:
+----------------------------
+./runme
+
+or
+
+./runme > out   if you want the output in a file called "out".
+
+You must edit "global.h" to change simulation parameters and the TRACE and DEBUG flags.
+
