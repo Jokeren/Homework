@@ -16,15 +16,15 @@ extern unsigned  INSTRUCTION, PC4;
 extern unsigned  PC;  
 
 void fetchstage() {
-        int job_num;
-	job_num = ActivityArgSize(ME) - 1;
-	
-	while(1){
-	  if (TRACE)
-	    printf("In FETCH  Stage at time %2.0f\n", GetSimTime());
-	do_fetch();
-	ProcessDelay(1.0);
-	}
+  int job_num;
+  job_num = ActivityArgSize(ME) - 1;
+
+  while(1){
+    if (TRACE)
+      printf("In FETCH  Stage at time %2.0f\n", GetSimTime());
+    do_fetch();
+    ProcessDelay(1.0);
+  }
 }
 
 
@@ -36,7 +36,7 @@ do_fetch() {
     if (branchFlag) {
       INSTRUCTION = NOP;
       PC = nextPC;
-       }
+    }
     else {
       INSTRUCTION  = insMEM[PC/4];
       PC = PC + 4;
@@ -49,7 +49,7 @@ do_fetch() {
       printf("\tstallIF: %s  INSTRUCTION: %x\n", bool(stallIF), INSTRUCTION);
   }
 
- if (TRACE) 
+  if (TRACE) 
     printf("\tPC: %d INSTRUCTION: %x\n", GetSimTime(), PC, INSTRUCTION);
 }
 

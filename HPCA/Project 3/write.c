@@ -81,7 +81,7 @@ do_write() {
       break;
     }
   }
-  if (fu == -1)
+  if (fu == NUM_FU * NUM_COPIES)
     return;
 
   // Update isFree and resultReady flags of chosen FU

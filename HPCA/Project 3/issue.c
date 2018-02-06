@@ -88,23 +88,24 @@ do_issue() {
   decode(&opCode, &srcReg1, &srcReg2, &destReg, &offset); // Decode instruction
 
 
+  branchFlag = FALSE;
+  stallIF = FALSE;
   // Handle NOP, HALT, BRANCH and BNEZ
 
   /********************  Handle NOP  ********************/
-  if (DEBUG) 
-    printf("\tInstruction is NOP. Will not issue into RS. Time: %5.2f\n", GetSimTime());
-
-  if (opCode == NOP)
+  if (opCode == NOP) {
+    if (DEBUG) 
+      printf("\tInstruction is NOP. Will not issue into RS. Time: %5.2f\n", GetSimTime());
     return;
+  }
 
   /********************  Handle HALT  ********************/
-  numHaltStallCycles++;
-  if (DEBUG) 
-    printf("\tInstruction is HALT. Will not issue into RS. Will assert stallIF. Time: %5.2f\n", GetSimTime());
-
   if (opCode == HALT) {
     isHALT = TRUE;
     stallIF = TRUE;
+    numHaltStallCycles++;
+    if (DEBUG) 
+      printf("\tInstruction is HALT. Will not issue into RS. Will assert stallIF. Time: %5.2f\n", GetSimTime());
     return;
   }
 
@@ -126,19 +127,16 @@ do_issue() {
   if (opCode == BNEZ) {
     if (REG_TAG[srcReg1] != -1) {
       numBranchDataStallCycles++;  // Increment if  BNEZ  register is not available
-      stallIF = TRUE;
       if (DEBUG)
         printf("\tBNEZ source register %d not READY ! Setting IFstall. Time: %5.2f\n", srcReg1,  bool(stallIF), GetSimTime());
-      // if Branch is NOT TAKEN execution should continue normally
-      branchFlag = FALSE;
+      stallIF = TRUE;
     } else {
       //  BENZ operand is avaliable
       numInstrComplete++;   // Taken BNEZ completes in the ISSUE stage
       if (DEBUG)
         printf("\tCompleted Instruction: %s.  Time: %5.2f Number Instructions Completed: %d\n", "BNEZ", GetSimTime(), numInstrComplete);
-
       // If Branch is TAKEN, IF stage needs to be notified
-      branchFlag = TRUE;
+      branchFlag = REG_FILE[srcReg1];
     }
     return;
   }
@@ -159,7 +157,6 @@ do_issue() {
   // Get id of Functional Unit that will execute this instruction
   fu = getFU(opCode);  
 
-
   /********************  FIll up fields of RS entry and REGister File of the issuing instruction  ********************/
 
   // Update all fields of RS Entry "rsindex"
@@ -169,12 +166,16 @@ do_issue() {
     RS[rsindex].tag2 = REG_TAG[srcReg2];
     if (RS[rsindex].tag1 != -1) {  // not available
       RS[rsindex].op1RDY = FALSE;
+      RS[rsindex].operand1 = -1;
     } else {
+      RS[rsindex].op1RDY = TRUE;
       RS[rsindex].operand1 = REG_FILE[srcReg1];
     }
     if (RS[rsindex].tag2 != -1) {  // not available
       RS[rsindex].op2RDY = FALSE;
+      RS[rsindex].operand2 = -1;
     } else {
+      RS[rsindex].op2RDY = TRUE;
       RS[rsindex].operand2 = REG_FILE[srcReg2];
     }
     RS[rsindex].free = FALSE;
@@ -182,11 +183,15 @@ do_issue() {
   } else if (opCode == LOADFP) {  // LOAD
     RS[rsindex].fu = fu;
     RS[rsindex].tag1 = REG_TAG[srcReg1];
+    RS[rsindex].tag2 = -1;
     if (RS[rsindex].tag1 != -1) {  // not available
       RS[rsindex].op1RDY = FALSE;
+      RS[rsindex].operand1 = -1;
     } else {
+      RS[rsindex].op1RDY = TRUE;
       RS[rsindex].operand1 = REG_FILE[srcReg1];
     }
+    RS[rsindex].op2RDY = TRUE;
     RS[rsindex].free = FALSE;
     RS[rsindex].busy = FALSE;
     RS[rsindex].destReg = destReg;
@@ -198,12 +203,16 @@ do_issue() {
     RS[rsindex].tag2 = REG_TAG[srcReg2];
     if (RS[rsindex].tag1 != -1) {  // not available
       RS[rsindex].op1RDY = FALSE;
+      RS[rsindex].operand1 = -1;
     } else {
+      RS[rsindex].op1RDY = TRUE;
       RS[rsindex].operand1 = REG_FILE[srcReg1];
     }
     if (RS[rsindex].tag2 != -1) {  // not available
       RS[rsindex].op2RDY = FALSE;
+      RS[rsindex].operand2 = -1;
     } else {
+      RS[rsindex].op2RDY = TRUE;
       RS[rsindex].operand2 = REG_FILE[srcReg2];
     }
     RS[rsindex].free = FALSE;
@@ -212,7 +221,6 @@ do_issue() {
     // Update Register File Tag
     REG_TAG[destReg] = rsindex;
   }
-
 
   if (TRACE)
     printf("\tOPCODE: %s  Adding to RS index %d\n", map(fu),rsindex);  
