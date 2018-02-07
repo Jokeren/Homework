@@ -7,7 +7,7 @@ rsfull_cycle=()
 
 for((i=1;i<=128;i=i*2))
 do
-  gcc *.c ./yacsim.o -lm -o runme -DLOADFP_CYCBLES=2 -DNUM_RESERVATION_STATIONS=$i
+  gcc *.c ./yacsim.o -lm -o runme -DLOADFP_CYCLES=2 -DNUM_RESERVATION_STATIONS=$i
   ./runme > tmp
   exec_time+=(`grep "Execution completed at time" ./tmp | cut -d " " -f 6`)
   retire_ins+=(`grep "Number Instructions Retired" ./tmp | cut -d " " -f 4`)
@@ -32,7 +32,7 @@ rsfull_cycle=()
 
 for((i=1;i<=128;i=i*2))
 do
-  gcc *.c ./yacsim.o -lm -o runme -DLOADFP_CYCBLES=16 -DNUM_RESERVATION_STATIONS=$i
+  gcc *.c ./yacsim.o -lm -o runme -DLOADFP_CYCLES=16 -DNUM_RESERVATION_STATIONS=$i
   ./runme > tmp
   exec_time+=(`grep "Execution completed at time" ./tmp | cut -d " " -f 6`)
   retire_ins+=(`grep "Number Instructions Retired" ./tmp | cut -d " " -f 4`)
@@ -57,7 +57,7 @@ rsfull_cycle=()
 
 for((i=1;i<=5;i=i+1))
 do
-  gcc *.c ./yacsim.o -lm -o runme -DLOADFP_CYCBLES=2 -DNUM_RESERVATION_STATIONS=4 -DNUM_COPIES=$i
+  gcc *.c ./yacsim.o -lm -o runme -DLOADFP_CYCLES=2 -DNUM_RESERVATION_STATIONS=4 -DNUM_COPIES=$i
   ./runme > tmp
   exec_time+=(`grep "Execution completed at time" ./tmp | cut -d " " -f 6`)
   retire_ins+=(`grep "Number Instructions Retired" ./tmp | cut -d " " -f 4`)
@@ -82,7 +82,7 @@ rsfull_cycle=()
 
 for((i=1;i<=5;i=i+1))
 do
-  gcc *.c ./yacsim.o -lm -o runme -DLOADFP_CYCBLES=2 -DNUM_RESERVATION_STATIONS=64 -DNUM_COPIES=$i
+  gcc *.c ./yacsim.o -lm -o runme -DLOADFP_CYCLES=2 -DNUM_RESERVATION_STATIONS=64 -DNUM_COPIES=$i
   ./runme > tmp
   exec_time+=(`grep "Execution completed at time" ./tmp | cut -d " " -f 6`)
   retire_ins+=(`grep "Number Instructions Retired" ./tmp | cut -d " " -f 4`)
@@ -107,7 +107,7 @@ rsfull_cycle=()
 
 for((i=1;i<=5;i=i+1))
 do
-  gcc *.c ./yacsim.o -lm -o runme -DLOADFP_CYCBLES=16 -DNUM_RESERVATION_STATIONS=4 -DNUM_COPIES=$i
+  gcc *.c ./yacsim.o -lm -o runme -DLOADFP_CYCLES=16 -DNUM_RESERVATION_STATIONS=4 -DNUM_COPIES=$i
   ./runme > tmp
   exec_time+=(`grep "Execution completed at time" ./tmp | cut -d " " -f 6`)
   retire_ins+=(`grep "Number Instructions Retired" ./tmp | cut -d " " -f 4`)
@@ -132,7 +132,7 @@ rsfull_cycle=()
 
 for((i=1;i<=5;i=i+1))
 do
-  gcc *.c ./yacsim.o -lm -o runme -DLOADFP_CYCBLES=16 -DNUM_RESERVATION_STATIONS=64 -DNUM_COPIES=$i
+  gcc *.c ./yacsim.o -lm -o runme -DLOADFP_CYCLES=16 -DNUM_RESERVATION_STATIONS=64 -DNUM_COPIES=$i
   ./runme > tmp
   exec_time+=(`grep "Execution completed at time" ./tmp | cut -d " " -f 6`)
   retire_ins+=(`grep "Number Instructions Retired" ./tmp | cut -d " " -f 4`)
