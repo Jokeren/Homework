@@ -4,25 +4,23 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-float *get_matrix(char *file_name, size_t *n) {
+static void get_matrix(const char *file_name, size_t *n, float **m) {
   FILE *fp;
   size_t size;
-  float *m;
 
   fp = fopen(file_name, "r");
   fscanf(fp, "%zu", n);
   size = *n;
-  m = (float *)malloc(sizeof(float) * size * size);
+  *m = (float *)malloc(sizeof(float) * size * size);
 
   size_t i, j;
   for (i = 0; i < size; ++i) {
     for (j = 0; j < size; ++j) {
-      fscanf(fp, "%f", m + i * size + j);
+      fscanf(fp, "%f", *m + i * size + j);
     }
   }
 
   fclose(fp);
-  return m;
 }
 
 int main(int argc, char *argv[]) {
@@ -38,7 +36,7 @@ int main(int argc, char *argv[]) {
   char *file_name = argv[1];
   char *kernel_name = argv[2];
   determinant_s_fn_t determinant_s_fn = lookup_determinant_s(kernel_name);
-  m = get_matrix(file_name, &n);
+  get_matrix(file_name, &n, &m);
 
   float result = determinant_s_fn(n, m);
   printf("%f\n", result);
