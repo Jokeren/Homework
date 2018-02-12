@@ -8,12 +8,12 @@
 #include <utils/log.h>
 
 // Forward declaration
-static float determinant_s_plain(size_t N, float *M);
+static float determinant_s_plain(size_t N, const float *M);
 
 #define FOREACH_FUNC_NAME(macro) \
   macro("plain", determinant_s_plain)
 
-determinant_s_fn_t lookup_determinant_s(char *kernel_name) {
+determinant_s_fn_t lookup_determinant_s(const char *kernel_name) {
 #define find_determinant_func(name, func) \
   if (strcmp(kernel_name, name) == 0) {   \
     return func;                          \
@@ -23,7 +23,7 @@ determinant_s_fn_t lookup_determinant_s(char *kernel_name) {
 }
 
 
-float determinant_s_plain(size_t N, float *M) {
+float determinant_s_plain(size_t N, const float *M) {
 #ifdef PERFORMANCE
   float start = 0.0f;
   float end = 0.0f;
