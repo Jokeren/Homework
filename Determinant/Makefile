@@ -12,15 +12,15 @@ BUILD_DIR := build/
 
 LIB := $(LIB_DIR)libdeterminant.so
 
-ifdef $(DEBUG)
-OFLAGS := -g
+ifdef DEBUG
+OFLAGS += -g
 endif
 
-ifdef $(PERFORMANCE)
+ifdef PERFORMANCE
 OFLAGS += -O3
 endif
 
-ifdef $(OPENMP)
+ifdef OPENMP
 OFLAGS += -fopenmp
 endif
 

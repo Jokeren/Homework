@@ -30,6 +30,9 @@ float determinant_s_plain(size_t N, float *M) {
   float elapsed = 0.0f;
   CPU_TIMER_START(elapsed, start);
 #endif
+  if (N == 0) {
+    LOG_ERROR("determinant_s_plain", "N: %zu", N);
+  }
   float result = determinant_s_plain_kernel(N, M);
 #ifdef PERFORMANCE
   CPU_TIMER_END(elapsed, start, end);

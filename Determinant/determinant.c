@@ -37,11 +37,12 @@ int main(int argc, char *argv[]) {
   char *kernel_name = argv[2];
   determinant_s_fn_t determinant_s_fn = lookup_determinant_s(kernel_name);
 
-  float *m;
+  float *m = (float *)malloc(sizeof(float) * n * n);
   init(n, m);
   printf("Init matrix:\n");
   display(n, m);
   float result = determinant_s_fn(n, m);
   printf("Determinant result: %f\n", result);
+  free(m);
   return 0;
 }
