@@ -64,10 +64,12 @@ clean:
 
 ifdef PREFIX
 install:
-	mkdir -p $(PREFIX)
-	mv $(LIB_DIR) $(PREFIX)/$(BUILD_DIR)
-	mv $(INC_DIR)$(PROJECT).h $(PREFIX)/$(INC_DIR)
-	mv $(BIN_DIR) $(PREFIX)/$(BIN_DIR)
+	mkdir -p $(PREFIX)/$(BUILD_DIR)
+	mkdir -p $(PREFIX)/$(INC_DIR)
+	mkdir -p $(PREFIX)/$(BIN_DIR)
+	cp -rf $(LIB_DIR) $(PREFIX)
+	cp -rf $(INC_DIR)$(PROJECT).h $(PREFIX)/$(INC_DIR)
+	cp -rf $(BIN_DIR) $(PREFIX)
 endif
 
 #utils
