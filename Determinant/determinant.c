@@ -1,48 +1,47 @@
+// Local include
+#include <determinant.h>
 // System include
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
-// Local include
-#include <determinant.h>
 
+float *get_matrix(char *file_name, size_t *n) {
+  FILE *fp;
+  size_t size;
+  float *m;
 
-void init(size_t n, float *m) {
-  srand((unsigned int)time(NULL));
+  fp = fopen(file_name, "r");
+  fscanf(fp, "%zu", n);
+  size = *n;
+  m = (float *)malloc(sizeof(float) * size * size);
+
   size_t i, j;
-  for (i = 0; i < n; ++i) {
-    for (j = 0; j < n; ++j) {
-      *(m + i * n + j) = ((float)rand()/(float)(RAND_MAX));
+  for (i = 0; i < size; ++i) {
+    for (j = 0; j < size; ++j) {
+      fscanf(fp, "%f", m + i * size + j);
     }
   }
+
+  fclose(fp);
+  return m;
 }
-
-
-void display(size_t n, float *m) {
-  size_t i, j;
-  for (i = 0; i < n; ++i) {
-    for (j = 0; j < n; ++j) {
-      printf("%f ", *(m + i * n + j));
-    }
-    printf("\n");
-  }
-}
-
 
 int main(int argc, char *argv[]) {
   if (argc != 3) {
     fprintf(stderr, "Arguments error!\n");
-    exit(-1);
+    fprintf(stderr, "arg[1]: file_name!\n");
+    fprintf(stderr, "arg[2]: kernel_name!\n");
+    exit(1);
   }
-  size_t n = atoi(argv[1]);
+
+  size_t n;
+  float *m;
+  char *file_name = argv[1];
   char *kernel_name = argv[2];
   determinant_s_fn_t determinant_s_fn = lookup_determinant_s(kernel_name);
+  m = get_matrix(file_name, &n);
 
-  float *m = (float *)malloc(sizeof(float) * n * n);
-  init(n, m);
-  printf("Init matrix:\n");
-  display(n, m);
   float result = determinant_s_fn(n, m);
-  printf("Determinant result: %f\n", result);
+  printf("%f\n", result);
   free(m);
   return 0;
 }
