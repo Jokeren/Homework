@@ -24,6 +24,12 @@ ifdef OPENMP
 OFLAGS += -fopenmp
 endif
 
+ifdef BLAS
+ifeq BLAS openblas
+OFLGAS += -lopenblas
+endif
+endif
+
 CFLAGS := -fPIC $(OFLAGS)
 LDFLAGS := 
 SRCS := $(shell find . -maxdepth 3 -name "*.c")

@@ -12,8 +12,13 @@ static float determinant_s_plain(size_t N, const float *M);
 
 static double determinant_d_plain(size_t N, const double *M);
 
-#define FOREACH_FUNC_NAME(macro) \
-  macro("plain", determinant_s_plain)
+static float determinant_s_blas(size_t N, const float *M);
+
+static double determinant_d_blas(size_t N, const double *M);
+
+#define FOREACH_FUNC_NAME(macro)      \
+  macro("plain", determinant_s_plain) \
+  macro("blas", determinant_s_blas)
 
 determinant_s_fn_t lookup_determinant_s(const char *kernel_name) {
 #define find_determinant_func(name, func) \
@@ -27,8 +32,9 @@ determinant_s_fn_t lookup_determinant_s(const char *kernel_name) {
 #undef FOREACH_FUNC_NAME
 
 
-#define FOREACH_FUNC_NAME(macro) \
-  macro("plain", determinant_d_plain)
+#define FOREACH_FUNC_NAME(macro)      \
+  macro("plain", determinant_d_plain) \
+  macro("blas", determinant_d_blas)
 
 determinant_d_fn_t lookup_determinant_d(const char *kernel_name) {
 #define find_determinant_func(name, func) \
@@ -68,12 +74,50 @@ double determinant_d_plain(size_t N, const double *M) {
   CPU_TIMER_START(elapsed, start);
 #endif
   if (N == 0) {
-    LOG_ERROR("determinant_s_plain", "N: %zu", N);
+    LOG_ERROR("determinant_d_plain", "N: %zu", N);
   }
   double result = determinant_d_plain_kernel(N, M);
 #ifdef PERFORMANCE
   CPU_TIMER_END(elapsed, start, end);
-  LOG_INFO("determinant_s_plain", "elapsed time: %f", elapsed);
+  LOG_INFO("determinant_d_plain", "elapsed time: %f", elapsed);
+#endif
+  return result;
+}
+
+
+float determinant_s_blas(size_t N, const float *M) {
+#ifdef PERFORMANCE
+  float start = 0.0f;
+  float end = 0.0f;
+  float elapsed = 0.0f;
+  CPU_TIMER_START(elapsed, start);
+#endif
+  if (N == 0) {
+    LOG_ERROR("determinant_s_blas", "N: %zu", N);
+  }
+  float result = determinant_s_blas_kernel(N, M);
+#ifdef PERFORMANCE
+  CPU_TIMER_END(elapsed, start, end);
+  LOG_INFO("determinant_s_blas", "elapsed time: %f", elapsed);
+#endif
+  return result;
+}
+
+
+double determinant_d_blas(size_t N, const double *M) {
+#ifdef PERFORMANCE
+  float start = 0.0f;
+  float end = 0.0f;
+  float elapsed = 0.0f;
+  CPU_TIMER_START(elapsed, start);
+#endif
+  if (N == 0) {
+    LOG_ERROR("determinant_d_blas", "N: %zu", N);
+  }
+  double result = determinant_d_blas_kernel(N, M);
+#ifdef PERFORMANCE
+  CPU_TIMER_END(elapsed, start, end);
+  LOG_INFO("determinant_d_blas", "elapsed time: %f", elapsed);
 #endif
   return result;
 }
