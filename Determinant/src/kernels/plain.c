@@ -4,7 +4,7 @@
 
 #define ACCESS(N, M, i, j) (*((M) + (i) * (N) + (j)))
 
-float determinant_s_plain_kernel(size_t N, const float *M) {
+float determinant_s_plain_kernel(size_t N, float *M) {
   if (N == 1) {
     return *M;
   } else if (N == 2) {
@@ -34,7 +34,7 @@ float determinant_s_plain_kernel(size_t N, const float *M) {
 }
 
 
-double determinant_d_plain_kernel(size_t N, const double *M) {
+double determinant_d_plain_kernel(size_t N, double *M) {
   if (N == 1) {
     return *M;
   } else if (N == 2) {

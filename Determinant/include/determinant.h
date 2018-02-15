@@ -3,9 +3,9 @@
 
 #include <stddef.h>
 
-typedef float (*determinant_s_fn_t)(size_t N, const float *M);
+typedef float (*determinant_s_fn_t)(size_t N, float *M);
 
-typedef double (*determinant_d_fn_t)(size_t N, const double *M);
+typedef double (*determinant_d_fn_t)(size_t N, double *M);
 
 extern determinant_s_fn_t lookup_determinant_s(const char *kernel_name);
 

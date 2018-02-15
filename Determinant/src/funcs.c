@@ -4,17 +4,18 @@
 #include <string.h>
 // Local include
 #include <kernels/plain.h>
+#include <kernels/blas.h>
 #include <utils/timer.h>
 #include <utils/log.h>
 
 // Forward declaration
-static float determinant_s_plain(size_t N, const float *M);
+static float determinant_s_plain(size_t N, float *M);
 
-static double determinant_d_plain(size_t N, const double *M);
+static double determinant_d_plain(size_t N, double *M);
 
-static float determinant_s_blas(size_t N, const float *M);
+static float determinant_s_blas(size_t N, float *M);
 
-static double determinant_d_blas(size_t N, const double *M);
+static double determinant_d_blas(size_t N, double *M);
 
 #define FOREACH_FUNC_NAME(macro)      \
   macro("plain", determinant_s_plain) \
@@ -47,7 +48,7 @@ determinant_d_fn_t lookup_determinant_d(const char *kernel_name) {
 #undef FOREACH_FUNC_NAME
 
 
-float determinant_s_plain(size_t N, const float *M) {
+float determinant_s_plain(size_t N, float *M) {
 #ifdef PERFORMANCE
   float start = 0.0f;
   float end = 0.0f;
@@ -56,6 +57,8 @@ float determinant_s_plain(size_t N, const float *M) {
 #endif
   if (N == 0) {
     LOG_ERROR("determinant_s_plain", "N: %zu", N);
+  } else {
+    LOG_INFO("determinant_s_plain", "N: %zu", N);
   }
   float result = determinant_s_plain_kernel(N, M);
 #ifdef PERFORMANCE
@@ -66,7 +69,7 @@ float determinant_s_plain(size_t N, const float *M) {
 }
 
 
-double determinant_d_plain(size_t N, const double *M) {
+double determinant_d_plain(size_t N, double *M) {
 #ifdef PERFORMANCE
   float start = 0.0f;
   float end = 0.0f;
@@ -75,6 +78,8 @@ double determinant_d_plain(size_t N, const double *M) {
 #endif
   if (N == 0) {
     LOG_ERROR("determinant_d_plain", "N: %zu", N);
+  } else {
+    LOG_INFO("determinant_d_plain", "N: %zu", N);
   }
   double result = determinant_d_plain_kernel(N, M);
 #ifdef PERFORMANCE
@@ -85,7 +90,7 @@ double determinant_d_plain(size_t N, const double *M) {
 }
 
 
-float determinant_s_blas(size_t N, const float *M) {
+float determinant_s_blas(size_t N, float *M) {
 #ifdef PERFORMANCE
   float start = 0.0f;
   float end = 0.0f;
@@ -94,6 +99,8 @@ float determinant_s_blas(size_t N, const float *M) {
 #endif
   if (N == 0) {
     LOG_ERROR("determinant_s_blas", "N: %zu", N);
+  } else {
+    LOG_INFO("determinant_s_blas", "N: %zu", N);
   }
   float result = determinant_s_blas_kernel(N, M);
 #ifdef PERFORMANCE
@@ -104,7 +111,7 @@ float determinant_s_blas(size_t N, const float *M) {
 }
 
 
-double determinant_d_blas(size_t N, const double *M) {
+double determinant_d_blas(size_t N, double *M) {
 #ifdef PERFORMANCE
   float start = 0.0f;
   float end = 0.0f;
@@ -113,6 +120,8 @@ double determinant_d_blas(size_t N, const double *M) {
 #endif
   if (N == 0) {
     LOG_ERROR("determinant_d_blas", "N: %zu", N);
+  } else {
+    LOG_INFO("determinant_d_blas", "N: %zu", N);
   }
   double result = determinant_d_blas_kernel(N, M);
 #ifdef PERFORMANCE

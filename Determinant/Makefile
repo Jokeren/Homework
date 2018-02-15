@@ -25,8 +25,8 @@ OFLAGS += -fopenmp
 endif
 
 ifdef BLAS
-ifeq BLAS openblas
-OFLGAS += -lopenblas
+ifeq ($(BLAS), openblas)
+OFLAGS += -lopenblas -DUSE_OPENBLAS
 endif
 endif
 
