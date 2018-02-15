@@ -46,6 +46,26 @@ static void get_matrix_d(const char *file_name, size_t *n, double **m) {
 }
 
 
+static void get_matrix_ll(const char *file_name, size_t *n, long long **m) {
+  FILE *fp;
+  size_t size;
+
+  fp = fopen(file_name, "r");
+  fscanf(fp, "%zu", n);
+  size = *n;
+  *m = (long long *)malloc(sizeof(long long) * size * size);
+
+  size_t i, j;
+  for (i = 0; i < size; ++i) {
+    for (j = 0; j < size; ++j) {
+      fscanf(fp, "%lld", *m + i * size + j);
+    }
+  }
+
+  fclose(fp);
+}
+
+
 int main(int argc, char *argv[]) {
   if (argc != 4) {
     fprintf(stderr, "Arguments error!\n");
@@ -73,6 +93,13 @@ int main(int argc, char *argv[]) {
     get_matrix_d(file_name, &n, &m);
     double result = determinant_d_fn(n, m);
     printf("%lf\n", result);
+    free(m);
+  } else if (strcmp(data_type, "ll") == 0) {
+    long long *m;
+    determinant_ll_fn_t determinant_ll_fn = lookup_determinant_ll(kernel_name);
+    get_matrix_ll(file_name, &n, &m);
+    long long result = determinant_ll_fn(n, m);
+    printf("%lld\n", result);
     free(m);
   }
 
