@@ -11,4 +11,6 @@ long long determinant_ll_plain1_kernel(size_t N, long long *M);
 
 long long determinant_ll_plain2_kernel(size_t N, long long *M, size_t offset);
 
+long long determinant_ll_plain3_kernel(size_t N, long long *M, size_t offset);
+
 #endif  // _INCLUDE_KERNELS_PLAIN_H_
