@@ -17,7 +17,7 @@ OFLAGS += -g
 endif
 
 ifdef PERFORMANCE
-OFLAGS += -O3
+OFLAGS += -O3 -DPERFORMANCE
 endif
 
 ifdef OPENMP

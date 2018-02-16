@@ -1,4 +1,5 @@
 #ifndef _INCLUDE_UTILS_TIMER_H_
+#define _INCLUDE_UTILS_TIMER_H_
 
 #include <sys/time.h>
 
