@@ -16,6 +16,22 @@
   } while (0)
 
 float determinant_s_blas_kernel(size_t N, float *M) {
+#ifdef USE_OPENBLAS
+  int *ipiv = (int *)malloc((N + 1) * sizeof(int));
+  LAPACKE_CALL("determinant_d_blas_kernel",
+               LAPACKE_sgetrf(LAPACK_ROW_MAJOR, N, N, M, N, ipiv));
+  int sum = 0;
+  float det = 1.0;
+  size_t i;
+  for (i = 0; i < N; ++i) {
+    sum += (ipiv[i] - 1) ^ i;
+    det *= ACCESS(N, M, i, i);
+  }
+  det = sum % 2 ? -det : det;
+  return det;
+#else
+  return 0.0;
+#endif
 }
 
 

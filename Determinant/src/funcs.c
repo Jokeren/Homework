@@ -6,6 +6,7 @@
 // Local include
 #include <kernels/plain.h>
 #include <kernels/blas.h>
+#include <kernels/simd.h>
 #include <utils/timer.h>
 #include <utils/log.h>
 
@@ -26,9 +27,14 @@ static float determinant_s_blas(size_t N, float *M);
 
 static double determinant_d_blas(size_t N, double *M);
 
+static float determinant_s_simd(size_t N, float *M);
+
+static double determinant_d_simd(size_t N, double *M);
+
 #define FOREACH_FUNC_NAME(macro)      \
   macro("plain", determinant_s_plain) \
-  macro("blas", determinant_s_blas)
+  macro("blas", determinant_s_blas)   \
+  macro("simd", determinant_s_simd)
 
 determinant_s_fn_t lookup_determinant_s(const char *kernel_name) {
 #define find_determinant_func(name, func) \
@@ -44,7 +50,8 @@ determinant_s_fn_t lookup_determinant_s(const char *kernel_name) {
 
 #define FOREACH_FUNC_NAME(macro)      \
   macro("plain", determinant_d_plain) \
-  macro("blas", determinant_d_blas)
+  macro("blas", determinant_d_blas)   \
+  macro("simd", determinant_d_simd)
 
 determinant_d_fn_t lookup_determinant_d(const char *kernel_name) {
 #define find_determinant_func(name, func) \
@@ -246,6 +253,48 @@ double determinant_d_blas(size_t N, double *M) {
 #ifdef PERFORMANCE
   CPU_TIMER_END(elapsed, start, end);
   LOG_INFO("determinant_d_blas", "elapsed time: %f", elapsed);
+#endif
+  return result;
+}
+
+
+float determinant_s_simd(size_t N, float *M) {
+#ifdef PERFORMANCE
+  struct timeval start;
+  struct timeval end;
+  float elapsed = 0.0f;
+  CPU_TIMER_START(elapsed, start);
+#endif
+  if (N == 0) {
+    LOG_ERROR("determinant_s_simd", "N: %zu", N);
+  } else {
+    LOG_INFO("determinant_s_simd", "N: %zu", N);
+  }
+  float result = determinant_s_simd_kernel(N, M);
+#ifdef PERFORMANCE
+  CPU_TIMER_END(elapsed, start, end);
+  LOG_INFO("determinant_s_simd", "elapsed time: %f", elapsed);
+#endif
+  return result;
+}
+
+
+double determinant_d_simd(size_t N, double *M) {
+#ifdef PERFORMANCE
+  struct timeval start;
+  struct timeval end;
+  float elapsed = 0.0f;
+  CPU_TIMER_START(elapsed, start);
+#endif
+  if (N == 0) {
+    LOG_ERROR("determinant_d_simd", "N: %zu", N);
+  } else {
+    LOG_INFO("determinant_d_simd", "N: %zu", N);
+  }
+  double result = determinant_d_simd_kernel(N, M);
+#ifdef PERFORMANCE
+  CPU_TIMER_END(elapsed, start, end);
+  LOG_INFO("determinant_s_simd", "elapsed time: %f", elapsed);
 #endif
   return result;
 }
