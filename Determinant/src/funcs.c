@@ -32,7 +32,6 @@
 
 
 #ifdef PERFORMANCE
-
 #define DETERMINANT_FUNC(type, name, func)          \
 type func(size_t N, type *M) {                      \
   struct timeval start;                             \
@@ -49,13 +48,9 @@ type func(size_t N, type *M) {                      \
   LOG_INFO(STR(func), "elapsed time: %f", elapsed); \
   return result;                                    \
 }
-
 FOREACH_FUNC_NAME(DETERMINANT_FUNC)
-
 #undef DETERMINANT_FUNC
-
 #else
-
 #define DETERMINANT_FUNC(type, name, func)  \
 type func(size_t N, type *M) {              \
   if (N == 0) {                             \
@@ -66,11 +61,8 @@ type func(size_t N, type *M) {              \
   type result = func##_kernel(N, M);        \
   return result;                            \
 }
-
 FOREACH_FUNC_NAME(DETERMINANT_FUNC)
-
 #undef DETERMINANT_FUNC
-
 #endif
 
 
