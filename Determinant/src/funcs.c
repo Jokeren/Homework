@@ -10,291 +10,78 @@
 #include <utils/timer.h>
 #include <utils/log.h>
 
-// Forward declaration
-static float determinant_s_plain(size_t N, float *M);
+#define STR(x) #x
 
-static double determinant_d_plain(size_t N, double *M);
+#ifdef USE_OPENBLAS
+#define FOREACH_FUNC_NAME(macro)             \
+  macro(float,  plain, determinant_s_plain)  \
+  macro(double, plain, determinant_d_plain)  \
+  macro(long long, plain, determinant_ll_plain) \
+  macro(float,  simd,  determinant_s_simd)   \
+  macro(double, simd,  determinant_d_simd)   \
+  macro(float,  blas,  determinant_s_blas)   \
+  macro(double, blas,  determinant_d_blas)   
+#else
+#define FOREACH_FUNC_NAME(macro)             \
+  macro(float,  plain, determinant_s_plain)  \
+  macro(double, plain, determinant_d_plain)  \
+  macro(long long, plain, determinant_ll_plain) \
+  macro(float,  simd,  determinant_s_simd)   \
+  macro(double, simd,  determinant_d_simd)
+#endif
 
-static long long determinant_ll_plain(size_t N, long long *M);
 
-static long long determinant_ll_plain1(size_t N, long long *M);
+#ifdef PERFORMANCE
 
-static long long determinant_ll_plain2(size_t N, long long *M);
+#define DETERMINANT_FUNC(type, name, func)          \
+type func(size_t N, type *M) {                      \
+  struct timeval start;                             \
+  struct timeval end;                               \
+  float elapsed = 0.0f;                             \
+  CPU_TIMER_START(elapsed, start);                  \
+  if (N == 0) {                                     \
+    LOG_ERROR(STR(func), "N: %zu", N);              \
+  } else {                                          \
+    LOG_INFO(STR(func), "N: %zu", N);               \
+  }                                                 \
+  type result = func##_kernel(N, M);                \
+  CPU_TIMER_END(elapsed, start, end);               \
+  LOG_INFO(STR(func), "elapsed time: %f", elapsed); \
+  return result;                                    \
+}
 
-static long long determinant_ll_plain3(size_t N, long long *M);
+FOREACH_FUNC_NAME(DETERMINANT_FUNC)
 
-static float determinant_s_blas(size_t N, float *M);
+#undef DETERMINANT_FUNC
 
-static double determinant_d_blas(size_t N, double *M);
+#else
 
-static float determinant_s_simd(size_t N, float *M);
+#define DETERMINANT_FUNC(type, name, func)  \
+type func(size_t N, type *M) {              \
+  if (N == 0) {                             \
+    LOG_ERROR(STR(func), "N: %zu", N);      \
+  } else {                                  \
+    LOG_INFO(STR(func), "N: %zu", N);       \
+  }                                         \
+  type result = func##_kernel(N, M);        \
+  return result;                            \
+}
 
-static double determinant_d_simd(size_t N, double *M);
+FOREACH_FUNC_NAME(DETERMINANT_FUNC)
 
-#define FOREACH_FUNC_NAME(macro)      \
-  macro("plain", determinant_s_plain) \
-  macro("blas", determinant_s_blas)   \
-  macro("simd", determinant_s_simd)
+#undef DETERMINANT_FUNC
 
-determinant_s_fn_t lookup_determinant_s(const char *kernel_name) {
-#define find_determinant_func(name, func) \
-  if (strcmp(kernel_name, name) == 0) {   \
-    return func;                          \
+#endif
+
+
+void *lookup_determinant_func(const char *data_type, const char *kernel_name) {
+#define find_determinant_func(type, name, func)                                   \
+  if (strcmp(kernel_name, STR(name)) == 0 && strcmp(data_type, STR(type)) == 0) { \
+    return (void *)func;                                                          \
   }
   FOREACH_FUNC_NAME(find_determinant_func)
 #undef find_determinant_func
+  return NULL;
 }
 
 #undef FOREACH_FUNC_NAME
-
-
-#define FOREACH_FUNC_NAME(macro)      \
-  macro("plain", determinant_d_plain) \
-  macro("blas", determinant_d_blas)   \
-  macro("simd", determinant_d_simd)
-
-determinant_d_fn_t lookup_determinant_d(const char *kernel_name) {
-#define find_determinant_func(name, func) \
-  if (strcmp(kernel_name, name) == 0) {   \
-    return func;                          \
-  }
-  FOREACH_FUNC_NAME(find_determinant_func)
-#undef find_determinant_func
-}
-#undef FOREACH_FUNC_NAME
-
-
-#define FOREACH_FUNC_NAME(macro)         \
-  macro("plain", determinant_ll_plain)   \
-  macro("plain1", determinant_ll_plain1) \
-  macro("plain2", determinant_ll_plain2) \
-  macro("plain3", determinant_ll_plain3)
-
-determinant_ll_fn_t lookup_determinant_ll(const char *kernel_name) {
-#define find_determinant_func(name, func) \
-  if (strcmp(kernel_name, name) == 0) {   \
-    return func;                          \
-  }
-  FOREACH_FUNC_NAME(find_determinant_func)
-#undef find_determinant_func
-}
-#undef FOREACH_FUNC_NAME
-
-
-
-float determinant_s_plain(size_t N, float *M) {
-#ifdef PERFORMANCE
-  struct timeval start;
-  struct timeval end;
-  float elapsed = 0.0f;
-  CPU_TIMER_START(elapsed, start);
-#endif
-  if (N == 0) {
-    LOG_ERROR("determinant_s_plain", "N: %zu", N);
-  } else {
-    LOG_INFO("determinant_s_plain", "N: %zu", N);
-  }
-  float result = determinant_s_plain_kernel(N, M);
-#ifdef PERFORMANCE
-  CPU_TIMER_END(elapsed, start, end);
-  LOG_INFO("determinant_s_plain", "elapsed time: %f", elapsed);
-#endif
-  return result;
-}
-
-
-double determinant_d_plain(size_t N, double *M) {
-#ifdef PERFORMANCE
-  struct timeval start;
-  struct timeval end;
-  float elapsed = 0.0f;
-  CPU_TIMER_START(elapsed, start);
-#endif
-  if (N == 0) {
-    LOG_ERROR("determinant_d_plain", "N: %zu", N);
-  } else {
-    LOG_INFO("determinant_d_plain", "N: %zu", N);
-  }
-  double result = determinant_d_plain_kernel(N, M);
-#ifdef PERFORMANCE
-  CPU_TIMER_END(elapsed, start, end);
-  LOG_INFO("determinant_d_plain", "elapsed time: %f", elapsed);
-#endif
-  return result;
-}
-
-
-long long determinant_ll_plain(size_t N, long long *M) {
-#ifdef PERFORMANCE
-  struct timeval start;
-  struct timeval end;
-  float elapsed = 0.0f;
-  CPU_TIMER_START(elapsed, start);
-#endif
-  if (N == 0) {
-    LOG_ERROR("determinant_ll_plain", "N: %zu", N);
-  } else {
-    LOG_INFO("determinant_ll_plain", "N: %zu", N);
-  }
-  long long result = determinant_ll_plain_kernel(N, M);
-#ifdef PERFORMANCE
-  CPU_TIMER_END(elapsed, start, end);
-  LOG_INFO("determinant_d_plain", "elapsed time: %f", elapsed);
-#endif
-  return result;
-}
-
-
-long long determinant_ll_plain1(size_t N, long long *M) {
-#ifdef PERFORMANCE
-  struct timeval start;
-  struct timeval end;
-  float elapsed = 0.0f;
-  CPU_TIMER_START(elapsed, start);
-#endif
-  if (N == 0) {
-    LOG_ERROR("determinant_ll_plain1", "N: %zu", N);
-  } else {
-    LOG_INFO("determinant_ll_plain1", "N: %zu", N);
-  }
-  long long result = determinant_ll_plain1_kernel(N, M);
-#ifdef PERFORMANCE
-  CPU_TIMER_END(elapsed, start, end);
-  LOG_INFO("determinant_d_plain1", "elapsed time: %f", elapsed);
-#endif
-  return result;
-}
-
-
-long long determinant_ll_plain2(size_t N, long long *M) {
-#ifdef PERFORMANCE
-  struct timeval start;
-  struct timeval end;
-  float elapsed = 0.0f;
-  CPU_TIMER_START(elapsed, start);
-#endif
-  if (N == 0) {
-    LOG_ERROR("determinant_ll_plain2", "N: %zu", N);
-  } else {
-    LOG_INFO("determinant_ll_plain2", "N: %zu", N);
-  }
-  size_t offset = 0;
-  long long *m = (long long *)malloc(sizeof(long long) * (N * (N + 1) * (2 * N + 1)) / 6);
-  memcpy(m, M, sizeof(long long) * N * N);
-  long long result = determinant_ll_plain2_kernel(N, m, offset + N * N);
-  free(m);
-#ifdef PERFORMANCE
-  CPU_TIMER_END(elapsed, start, end);
-  LOG_INFO("determinant_d_plain2", "elapsed time: %f", elapsed);
-#endif
-  return result;
-}
-
-
-long long determinant_ll_plain3(size_t N, long long *M) {
-#ifdef PERFORMANCE
-  struct timeval start;
-  struct timeval end;
-  float elapsed = 0.0f;
-  CPU_TIMER_START(elapsed, start);
-#endif
-  if (N == 0) {
-    LOG_ERROR("determinant_ll_plain3", "N: %zu", N);
-  } else {
-    LOG_INFO("determinant_ll_plain3", "N: %zu", N);
-  }
-  size_t offset = 0;
-  long long *m = (long long *)malloc(sizeof(long long) * (N * (N + 1) * (2 * N + 1)) / 6);
-  memcpy(m, M, sizeof(long long) * N * N);
-  long long result = determinant_ll_plain3_kernel(N, m, offset + N * N);
-  free(m);
-#ifdef PERFORMANCE
-  CPU_TIMER_END(elapsed, start, end);
-  LOG_INFO("determinant_d_plain3", "elapsed time: %f", elapsed);
-#endif
-  return result;
-}
-
-
-float determinant_s_blas(size_t N, float *M) {
-#ifdef PERFORMANCE
-  struct timeval start;
-  struct timeval end;
-  float elapsed = 0.0f;
-  CPU_TIMER_START(elapsed, start);
-#endif
-  if (N == 0) {
-    LOG_ERROR("determinant_s_blas", "N: %zu", N);
-  } else {
-    LOG_INFO("determinant_s_blas", "N: %zu", N);
-  }
-  float result = determinant_s_blas_kernel(N, M);
-#ifdef PERFORMANCE
-  CPU_TIMER_END(elapsed, start, end);
-  LOG_INFO("determinant_s_blas", "elapsed time: %f", elapsed);
-#endif
-  return result;
-}
-
-
-double determinant_d_blas(size_t N, double *M) {
-#ifdef PERFORMANCE
-  struct timeval start;
-  struct timeval end;
-  float elapsed = 0.0f;
-  CPU_TIMER_START(elapsed, start);
-#endif
-  if (N == 0) {
-    LOG_ERROR("determinant_d_blas", "N: %zu", N);
-  } else {
-    LOG_INFO("determinant_d_blas", "N: %zu", N);
-  }
-  double result = determinant_d_blas_kernel(N, M);
-#ifdef PERFORMANCE
-  CPU_TIMER_END(elapsed, start, end);
-  LOG_INFO("determinant_d_blas", "elapsed time: %f", elapsed);
-#endif
-  return result;
-}
-
-
-float determinant_s_simd(size_t N, float *M) {
-#ifdef PERFORMANCE
-  struct timeval start;
-  struct timeval end;
-  float elapsed = 0.0f;
-  CPU_TIMER_START(elapsed, start);
-#endif
-  if (N == 0) {
-    LOG_ERROR("determinant_s_simd", "N: %zu", N);
-  } else {
-    LOG_INFO("determinant_s_simd", "N: %zu", N);
-  }
-  float result = determinant_s_simd_kernel(N, M);
-#ifdef PERFORMANCE
-  CPU_TIMER_END(elapsed, start, end);
-  LOG_INFO("determinant_s_simd", "elapsed time: %f", elapsed);
-#endif
-  return result;
-}
-
-
-double determinant_d_simd(size_t N, double *M) {
-#ifdef PERFORMANCE
-  struct timeval start;
-  struct timeval end;
-  float elapsed = 0.0f;
-  CPU_TIMER_START(elapsed, start);
-#endif
-  if (N == 0) {
-    LOG_ERROR("determinant_d_simd", "N: %zu", N);
-  } else {
-    LOG_INFO("determinant_d_simd", "N: %zu", N);
-  }
-  double result = determinant_d_simd_kernel(N, M);
-#ifdef PERFORMANCE
-  CPU_TIMER_END(elapsed, start, end);
-  LOG_INFO("determinant_d_simd", "elapsed time: %f", elapsed);
-#endif
-  return result;
-}

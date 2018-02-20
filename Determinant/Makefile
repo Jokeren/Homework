@@ -30,6 +30,10 @@ OFLAGS += -lopenblas -DUSE_OPENBLAS
 endif
 endif
 
+ifdef ARCH
+OFLAGS += -m$(ARCH)
+endif
+
 CFLAGS := -fPIC $(OFLAGS)
 LDFLAGS := 
 SRCS := $(shell find . -maxdepth 3 -name "*.c")

@@ -82,24 +82,30 @@ int main(int argc, char *argv[]) {
 
   if (strcmp(data_type, "float") == 0) {
     float *m;
-    determinant_s_fn_t determinant_s_fn = lookup_determinant_s(kernel_name);
-    get_matrix_s(file_name, &n, &m);
-    float result = determinant_s_fn(n, m);
-    printf("%f\n", result);
+    determinant_s_fn_t determinant_s_fn = lookup_determinant_func(data_type, kernel_name);
+    if (determinant_s_fn != NULL) {
+      get_matrix_s(file_name, &n, &m);
+      float result = determinant_s_fn(n, m);
+      printf("%f\n", result);
+    }
     free(m);
   } else if (strcmp(data_type, "double") == 0) {
     double *m;
-    determinant_d_fn_t determinant_d_fn = lookup_determinant_d(kernel_name);
-    get_matrix_d(file_name, &n, &m);
-    double result = determinant_d_fn(n, m);
-    printf("%lf\n", result);
+    determinant_d_fn_t determinant_d_fn = lookup_determinant_func(data_type, kernel_name);
+    if (determinant_d_fn != NULL) {
+      get_matrix_d(file_name, &n, &m);
+      double result = determinant_d_fn(n, m);
+      printf("%lf\n", result);
+    }
     free(m);
   } else if (strcmp(data_type, "ll") == 0) {
     long long *m;
-    determinant_ll_fn_t determinant_ll_fn = lookup_determinant_ll(kernel_name);
-    get_matrix_ll(file_name, &n, &m);
-    long long result = determinant_ll_fn(n, m);
-    printf("%lld\n", result);
+    determinant_ll_fn_t determinant_ll_fn = lookup_determinant_func("long long", kernel_name);
+    if (determinant_ll_fn != NULL) {
+      get_matrix_ll(file_name, &n, &m);
+      long long result = determinant_ll_fn(n, m);
+      printf("%lld\n", result);
+    }
     free(m);
   }
 
