@@ -294,7 +294,7 @@ double determinant_d_simd(size_t N, double *M) {
   double result = determinant_d_simd_kernel(N, M);
 #ifdef PERFORMANCE
   CPU_TIMER_END(elapsed, start, end);
-  LOG_INFO("determinant_s_simd", "elapsed time: %f", elapsed);
+  LOG_INFO("determinant_d_simd", "elapsed time: %f", elapsed);
 #endif
   return result;
 }
