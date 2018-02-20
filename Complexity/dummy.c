@@ -301,7 +301,6 @@ static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, lof
 			return -1;
 		}
 
-
 		return (size_of_message);  
 	}
 	else {
