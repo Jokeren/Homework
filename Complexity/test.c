@@ -56,12 +56,13 @@ void *measurement(void *v) {
     printf("Write out buffer\n");
     /*Reading number of determinant calculations*/
     fd3 = open("/sys/module/dummy/parameters/no_of_det_cals", O_RDONLY);
-    for (i = 0; d[i] != '\n'; i++) {
-      read(fd3, &d[i], 1);
-      if (d[i] == '\n')
+    size_t j;
+    for (j = 0; d[j] != '\n'; j++) {
+      read(fd3, &d[j], 1);
+      if (d[j] == '\n')
         break;
     }
-    d[i] = '\0';
+    d[j] = '\0';
     int num = atoi(d);
     fprintf(fp, "%d\n", num);
   }
@@ -146,6 +147,10 @@ int main()
 
   close(fd);
 
+  printf("End of the program\n");
+  CPU_TIMER_END(elapsed_time, t1, t2);
+  printf("Running time %f\n", elapsed_time);
+
   /*Join measurement thread*/
   void *status;
   pthread_attr_destroy(&attr);
@@ -156,8 +161,5 @@ int main()
     exit(-1);
   }
 
-  printf("End of the program\n");
-  CPU_TIMER_END(elapsed_time, t1, t2);
-  printf("Running time %f\n", elapsed_time);
   return 0;
 }
