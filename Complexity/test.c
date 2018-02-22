@@ -71,6 +71,54 @@ void write_back(int fd) {
 }
 
 
+void reader(int fd) {
+  printf("Reading from the device...\n");
+  size_t order = 0;
+  size_t head = 0;
+  while (terminate == false) {
+    size_t i;
+    for (i = 0; i < NUM_BULKS; ++i) {
+      int ret = read(fd, receive + i * D_ARRAY_SIZE * D_ARRAY_SIZE, BUFFER_LENGTH);
+      if (ret < 0) {
+        perror("Failed to read the message from the device.");
+      }
+    }
+    compute_queue_lock(head);
+    while (compute_queue_try_push(head, order,
+      NUM_BULKS, D_ARRAY_SIZE * D_ARRAY_SIZE, receive) == false) {
+      head = (head + 1) % NUM_COMP_THREADS;
+    }
+    compute_queue_unlock(head);
+    head = (head + 1) % NUM_COMP_THREADS;
+    order = (order + NUM_BULKS) % WRITE_QUEUE_LENGTH;
+  }
+}
+
+
+void compute(int fd, size_t tid) {
+  printf("%zu: Start computing...\n", tid);
+  long long results[NUM_BULKS];
+  size_t tags[NUM_BULKS];
+  while (true) {
+    bool update = false;
+    if (compute_queue_try_lock(tid)) {
+      compute_queue_compute(tid, NUM_BULKS, D_ARRAY_SIZE, results, tags);
+      update = compute_queue_try_pop(tid, NUM_BULKS);
+      compute_queue_unlock(tid);
+      if (update) {
+        size_t i;
+        for (i = 0; i < NUM_BULKS; ++i) {
+          write_back_queue_lock(tags[i]);
+          write_back_queue_set_val(tags[i], results[i]); 
+          write_back_queue_set_avail(tags[i]);
+          write_back_queue_unlock(tags[i]);
+        }
+      }
+    }
+  }
+}
+
+
 void init() {
   write_back_queue_init();
   compute_queue_init();
@@ -106,60 +154,21 @@ int main() {
   #pragma omp parallel num_threads(NUM_COMP_THREADS + 3)
   {
     size_t tid = omp_get_thread_num();
+    /*Start computing threads*/
+    if (tid < NUM_COMP_THREADS) {
+      compute(fd, tid);
+    }
     /*Create measurement thread*/
-    if (tid == 0) {
+    else if (tid == NUM_COMP_THREADS) {
       measurement();
     }
     /*Create writeback thread*/ 
-    else if (tid == 1) {
+    else if (tid == NUM_COMP_THREADS + 1) {
       write_back(fd);
     }
     /* Read matrices from the device*/
-    else if (tid == 2) {
-      printf("Reading from the device...\n");
-      size_t order = 0;
-      size_t head = 0;
-      while (terminate == false) {
-        size_t i;
-        for (i = 0; i < NUM_BULKS; ++i) {
-          int ret = read(fd, receive + i * D_ARRAY_SIZE * D_ARRAY_SIZE, BUFFER_LENGTH);
-          if (ret < 0) {
-            perror("Failed to read the message from the device.");
-          }
-        }
-        compute_queue_lock(head);
-        while (compute_queue_try_push(head, order,
-          NUM_BULKS, D_ARRAY_SIZE * D_ARRAY_SIZE, receive) == false) {
-          head = (head + 1) % NUM_COMP_THREADS;
-        }
-        compute_queue_unlock(head);
-        head = (head + 1) % NUM_COMP_THREADS;
-        order = (order + NUM_BULKS) % WRITE_QUEUE_LENGTH;
-      }
-    }
-    /*Start computing threads*/
     else {
-      size_t tid = omp_get_thread_num();
-      printf("%zu: Start computing...\n", tid);
-      long long results[NUM_BULKS];
-      size_t tags[NUM_BULKS];
-      while (true) {
-        bool update = false;
-        if (compute_queue_try_lock(tid)) {
-          compute_queue_compute(tid, NUM_BULKS, D_ARRAY_SIZE, results, tags);
-          update = compute_queue_try_pop(tid, NUM_BULKS);
-          compute_queue_unlock(tid);
-          if (update) {
-            size_t i;
-            for (i = 0; i < NUM_BULKS; ++i) {
-              write_back_queue_lock(tags[i]);
-              write_back_queue_set_val(tags[i], results[i]); 
-              write_back_queue_set_avail(tags[i]);
-              write_back_queue_unlock(tags[i]);
-            }
-          }
-        }
-      }
+      reader(fd);
     }
   }
 
