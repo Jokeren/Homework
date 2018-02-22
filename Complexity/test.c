@@ -95,7 +95,7 @@ void reader(int fd) {
 }
 
 
-void compute(int fd, size_t tid) {
+void compute(size_t tid) {
   printf("%zu: Start computing...\n", tid);
   long long results[NUM_BULKS];
   size_t tags[NUM_BULKS];
@@ -156,7 +156,7 @@ int main() {
     size_t tid = omp_get_thread_num();
     /*Start computing threads*/
     if (tid < NUM_COMP_THREADS) {
-      compute(fd, tid);
+      compute(tid);
     }
     /*Create measurement thread*/
     else if (tid == NUM_COMP_THREADS) {
