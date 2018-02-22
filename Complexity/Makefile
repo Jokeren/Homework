@@ -1,6 +1,31 @@
-obj-m = dummy.o
-KVERSION = $(shell uname -r)
-all:
-	make -C /lib/modules/$(KVERSION)/build M=$(PWD) modules
+.PHONY : all bin objs clean
+
+PROJECT := test
+
+SOURCES := write_back_queue.c compute_queue.c
+
+CC := gcc
+
+OBJS := $(SOURCES:.c=.o)
+
+CFLAGS := -O3 -fopenmp -mavx2 -std=c99
+
+LDFLAGS := -ldeterminant
+
+all: bin objs
+
+bin: $(PROJECT)
+
+objs: $(OBJS)
+
+$(PROJECT): $(OBJS) $(PROJECT).c
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
+
+$(OBJS): %.o : %.c
+	$(CC) $(CFLAGS) $(LDFLAGS) -c $<
+
 clean:
-	make -C /lib/modules/$(KVERSION)/build M=$(PWD) clean
+	rm $(OBJS) $(PROJECT)
+
+#utils
+print-% : ; $(info $* is $(flavor $*) variable set to [$($*)]) @true
