@@ -59,7 +59,7 @@ void compute_queue_compute(size_t queue_id,
 
   size_t i;
   for (i = 0; i < bulk_size; ++i) {
-    size_t idx = cq_tail[queue_id] - bulk_size + i;
+    size_t idx = cq_tail[queue_id] + i;
     results[i] = compute_fn(data_size, cq[queue_id][idx].data);
     tags[i] = cq[queue_id][idx].tag;
   }
@@ -79,15 +79,17 @@ bool compute_queue_try_push(size_t queue_id,
                             size_t tag_start,
                             size_t bulk_size,
                             size_t data_size,
-                            int *buffer) {
-  if (cq_tail[queue_id] == (cq_head[queue_id] + bulk_size) % READ_QUEUE_LENGTH)
+                            int *receive) {
+  if (cq_tail[queue_id] == (cq_head[queue_id] + 1) % READ_QUEUE_LENGTH) {
     return false;
+  }
 
   size_t i;
   size_t head_idx = cq_head[queue_id];
   for (i = 0; i < bulk_size; ++i) {
     cq[queue_id][head_idx + i].tag = tag_start + i;
     double *data = cq[queue_id][head_idx + i].data;
+    int *buffer = receive + i * data_size;
     size_t j;
     for (j = 0; j < data_size; ++j) {
       data[j] = buffer[j];

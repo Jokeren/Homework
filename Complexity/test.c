@@ -8,6 +8,7 @@
 #include <time.h>
 #include <omp.h>
 
+#include "common.h"
 #include "compute_queue.h"
 #include "write_back_queue.h"
 
@@ -15,9 +16,9 @@ static volatile bool terminate = false;
 static int receive[NUM_BULKS * BUFFER_LENGTH];
 static double comp[WRITE_QUEUE_LENGTH * D_ARRAY_SIZE * D_ARRAY_SIZE];
 
-void measurement() {
+void measurement(size_t tid) {
+  printf("[tid:%zu]->Start measurement...\n", tid);
   FILE *fp = fopen("result.output", "w");
-  printf("Open output buffer\n");
   if (!fp) {
     perror("Failed to open the output file...");
     return;
@@ -29,7 +30,7 @@ void measurement() {
   for (i = 0; i < LIFE; ++i) {
     sleep(10);
     /*Reading number of determinant calculations*/
-    printf("Write out buffer\n");
+    printf("[tid:%zu]->Write out buffer\n", tid);
     fd = open("/sys/module/dummy/parameters/no_of_det_cals", O_RDONLY);
     size_t j = 0;
     while (true) {
@@ -47,32 +48,35 @@ void measurement() {
 
   close(fd);
   fclose(fp);
+  printf("[tid:%zu]->End measurement...\n", tid);
 }
 
 
 /*Write determinant value to the dummy*/
-void write_back(int fd) {
-  printf("Writing to the device...\n");
+void write_back(int fd, size_t tid) {
+  printf("[tid:%zu]->Writing to the device...\n", tid);
   size_t head = 0;
   while (terminate == false) {
     /*Unavail is only set in the write back thread*/
     if (write_back_queue_avail(head)) {
       write_back_queue_lock(head);
       long long result = write_back_queue_get_val(head);
+      //printf("write back %lld\n", result);
       int ret = write(fd, &result, sizeof(long long)); 
       if (ret < 0) {
-        printf("incorrect answer\n");
+        printf("incorrect answer %lld\n", result);
       }
       write_back_queue_set_unavail(head);
       write_back_queue_unlock(head);
       head = (head + 1) % WRITE_QUEUE_LENGTH;
     }
   }
+  printf("[tid:%zu]->End writing...\n", tid);
 }
 
 
-void reader(int fd) {
-  printf("Reading from the device...\n");
+void reader(int fd, size_t tid) {
+  printf("[tid:%zu]->Reading from the device...\n", tid);
   size_t order = 0;
   size_t head = 0;
   while (terminate == false) {
@@ -84,38 +88,45 @@ void reader(int fd) {
       }
     }
     compute_queue_lock(head);
-    while (compute_queue_try_push(head, order,
-      NUM_BULKS, D_ARRAY_SIZE * D_ARRAY_SIZE, receive) == false) {
+    while (compute_queue_try_push(head, order, NUM_BULKS, D_ARRAY_SIZE * D_ARRAY_SIZE, receive) == false &&
+           terminate == false) {
       head = (head + 1) % NUM_COMP_THREADS;
     }
     compute_queue_unlock(head);
     head = (head + 1) % NUM_COMP_THREADS;
     order = (order + NUM_BULKS) % WRITE_QUEUE_LENGTH;
   }
+  printf("[tid:%zu]->End reading...\n", tid);
 }
 
 
 void compute(size_t tid) {
-  printf("%zu: Start computing...\n", tid);
+  printf("[tid:%zu]->Start computing...\n", tid);
   long long results[NUM_BULKS];
   size_t tags[NUM_BULKS];
-  while (true) {
+  while (terminate == false) {
     bool update = false;
     if (compute_queue_try_lock(tid)) {
       compute_queue_compute(tid, NUM_BULKS, D_ARRAY_SIZE, results, tags);
       update = compute_queue_try_pop(tid, NUM_BULKS);
       compute_queue_unlock(tid);
       if (update) {
-        size_t i;
-        for (i = 0; i < NUM_BULKS; ++i) {
+        size_t i = 0;
+        while (i < NUM_BULKS && terminate == false) {
           write_back_queue_lock(tags[i]);
+          if (write_back_queue_avail(tags[i])) {
+            write_back_queue_unlock(tags[i]);
+            continue;
+          }
           write_back_queue_set_val(tags[i], results[i]); 
           write_back_queue_set_avail(tags[i]);
           write_back_queue_unlock(tags[i]);
+          ++i;
         }
       }
     }
   }
+  printf("[tid:%zu]->End computing...\n", tid);
 }
 
 
@@ -160,15 +171,15 @@ int main() {
     }
     /*Create measurement thread*/
     else if (tid == NUM_COMP_THREADS) {
-      measurement();
+      measurement(tid);
     }
     /*Create writeback thread*/ 
     else if (tid == NUM_COMP_THREADS + 1) {
-      write_back(fd);
+      write_back(fd, tid);
     }
     /* Read matrices from the device*/
     else {
-      reader(fd);
+      reader(fd, tid);
     }
   }
 

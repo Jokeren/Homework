@@ -12,9 +12,14 @@
 #define READ_QUEUE_LENGTH 100
 #endif
 
-#define LIFE 18
+#define LIFE 1
 
-#define NUM_COMP_THREADS 4
-#define NUM_BULKS 4
+#ifndef NUM_COMP_THREADS
+#define NUM_COMP_THREADS 1
+#endif
+
+#ifndef NUM_BULKS
+#define NUM_BULKS 1
+#endif
 
 #endif
