@@ -15,7 +15,7 @@
 #define LIFE 1
 
 #ifndef NUM_COMP_THREADS
-#define NUM_COMP_THREADS 1
+#define NUM_COMP_THREADS 2
 #endif
 
 #ifndef NUM_BULKS

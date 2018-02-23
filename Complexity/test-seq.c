@@ -55,10 +55,11 @@ void measurement(size_t tid) {
 
 /*Write determinant value to the dummy*/
 void write_back(int fd, size_t tid) {
-  printf("[tid:%zu]->Writing to the device...\n", tid);
+  //printf("[tid:%zu]->Writing to the device...\n", tid);
   size_t head = 0;
-  while (terminate == false) {
-    /*Unavail is only set in the write back thread*/
+  /*Unavail is only set in the write back thread*/
+  size_t i;
+  for (i = 0; i < NUM_BULKS; ++i) {
     if (write_back_queue_avail(head)) {
       write_back_queue_lock(head);
       long long result = write_back_queue_get_val(head);
@@ -72,64 +73,60 @@ void write_back(int fd, size_t tid) {
       head = (head + 1) % WRITE_QUEUE_LENGTH;
     }
   }
-  printf("[tid:%zu]->End writing...\n", tid);
+  //printf("[tid:%zu]->End writing...\n", tid);
 }
 
 
 void reader(int fd, size_t tid) {
-  printf("[tid:%zu]->Reading from the device...\n", tid);
+  //printf("[tid:%zu]->Reading from the device...\n", tid);
   size_t order = 0;
   size_t head = 0;
-  while (terminate == false) {
-    size_t i;
-    for (i = 0; i < NUM_BULKS; ++i) {
-      int ret = read(fd, receive + i * D_ARRAY_SIZE * D_ARRAY_SIZE, BUFFER_LENGTH);
-      if (ret < 0) {
-        perror("Failed to read the message from the device.");
-      }
+  size_t i;
+  for (i = 0; i < NUM_BULKS; ++i) {
+    int ret = read(fd, receive + i * D_ARRAY_SIZE * D_ARRAY_SIZE, BUFFER_LENGTH);
+    if (ret < 0) {
+      perror("Failed to read the message from the device.");
     }
-    compute_queue_lock(head);
-    while (compute_queue_try_push(head, order, NUM_BULKS, D_ARRAY_SIZE * D_ARRAY_SIZE, receive) == false &&
-           terminate == false) {
-      compute_queue_unlock(head);
-      head = (head + 1) % NUM_COMP_THREADS;
-      compute_queue_lock(head);
-    }
+  }
+  compute_queue_lock(head);
+  while (compute_queue_try_push(head, order, NUM_BULKS, D_ARRAY_SIZE * D_ARRAY_SIZE, receive) == false &&
+         terminate == false) {
     compute_queue_unlock(head);
     head = (head + 1) % NUM_COMP_THREADS;
-    order = (order + NUM_BULKS) % WRITE_QUEUE_LENGTH;
+    compute_queue_lock(head);
   }
-  printf("[tid:%zu]->End reading...\n", tid);
+  compute_queue_unlock(head);
+  head = (head + 1) % NUM_COMP_THREADS;
+  order = (order + NUM_BULKS) % WRITE_QUEUE_LENGTH;
+  //printf("[tid:%zu]->End reading...\n", tid);
 }
 
 
 void compute(size_t tid) {
-  printf("[tid:%zu]->Start computing...\n", tid);
+  //printf("[tid:%zu]->Start computing...\n", tid);
   long long results[NUM_BULKS];
   size_t tags[NUM_BULKS];
-  while (terminate == false) {
-    bool update = false;
-    if (compute_queue_try_lock(tid)) {
-      compute_queue_compute(tid, NUM_BULKS, D_ARRAY_SIZE, results, tags);
-      update = compute_queue_try_pop(tid, NUM_BULKS);
-      compute_queue_unlock(tid);
-      if (update) {
-        size_t i = 0;
-        while (i < NUM_BULKS && terminate == false) {
-          write_back_queue_lock(tags[i]);
-          if (write_back_queue_avail(tags[i])) {
-            write_back_queue_unlock(tags[i]);
-            continue;
-          }
-          write_back_queue_set_val(tags[i], results[i]); 
-          write_back_queue_set_avail(tags[i]);
+  bool update = false;
+  if (compute_queue_try_lock(tid)) {
+    compute_queue_compute(tid, NUM_BULKS, D_ARRAY_SIZE, results, tags);
+    update = compute_queue_try_pop(tid, NUM_BULKS);
+    compute_queue_unlock(tid);
+    if (update) {
+      size_t i = 0;
+      while (i < NUM_BULKS && terminate == false) {
+        write_back_queue_lock(tags[i]);
+        if (write_back_queue_avail(tags[i])) {
           write_back_queue_unlock(tags[i]);
-          ++i;
+          continue;
         }
+        write_back_queue_set_val(tags[i], results[i]); 
+        write_back_queue_set_avail(tags[i]);
+        write_back_queue_unlock(tags[i]);
+        ++i;
       }
     }
   }
-  printf("[tid:%zu]->End computing...\n", tid);
+  //printf("[tid:%zu]->End computing...\n", tid);
 }
 
 
@@ -165,24 +162,22 @@ int main() {
     return errno;
   }
 
-  #pragma omp parallel num_threads(NUM_COMP_THREADS + 3)
+  #pragma omp parallel num_threads(2)
   {
     size_t tid = omp_get_thread_num();
     /*Start computing threads*/
+    /*Create writeback thread*/ 
+    /* Read matrices from the device*/
     if (tid < NUM_COMP_THREADS) {
-      compute(tid);
+      while (terminate == false) {
+        reader(fd, tid);
+        compute(tid);
+        write_back(fd, tid);
+      }
     }
     /*Create measurement thread*/
-    else if (tid == NUM_COMP_THREADS) {
-      measurement(tid);
-    }
-    /*Create writeback thread*/ 
-    else if (tid == NUM_COMP_THREADS + 1) {
-      write_back(fd, tid);
-    }
-    /* Read matrices from the device*/
     else {
-      reader(fd, tid);
+      measurement(tid);
     }
   }
 
