@@ -60,18 +60,13 @@ void write_back(int fd, size_t tid) {
   /*Unavail is only set in the write back thread*/
   size_t i;
   for (i = 0; i < NUM_BULKS; ++i) {
-    if (write_back_queue_avail(head)) {
-      write_back_queue_lock(head);
-      long long result = write_back_queue_get_val(head);
-      //printf("write back %lld\n", result);
-      int ret = write(fd, &result, sizeof(long long)); 
-      if (ret < 0) {
-        printf("incorrect answer %lld\n", result);
-      }
-      write_back_queue_set_unavail(head);
-      write_back_queue_unlock(head);
-      head = (head + 1) % WRITE_QUEUE_LENGTH;
+    long long result = write_back_queue_get_val(head);
+    //printf("write back %lld\n", result);
+    int ret = write(fd, &result, sizeof(long long)); 
+    if (ret < 0) {
+      printf("incorrect answer %lld\n", result);
     }
+    head = (head + 1) % WRITE_QUEUE_LENGTH;
   }
   //printf("[tid:%zu]->End writing...\n", tid);
 }
@@ -88,14 +83,7 @@ void reader(int fd, size_t tid) {
       perror("Failed to read the message from the device.");
     }
   }
-  compute_queue_lock(head);
-  while (compute_queue_try_push(head, order, NUM_BULKS, D_ARRAY_SIZE * D_ARRAY_SIZE, receive) == false &&
-         terminate == false) {
-    compute_queue_unlock(head);
-    head = (head + 1) % NUM_COMP_THREADS;
-    compute_queue_lock(head);
-  }
-  compute_queue_unlock(head);
+  compute_queue_try_push(head, order, NUM_BULKS, D_ARRAY_SIZE * D_ARRAY_SIZE, receive);
   head = (head + 1) % NUM_COMP_THREADS;
   order = (order + NUM_BULKS) % WRITE_QUEUE_LENGTH;
   //printf("[tid:%zu]->End reading...\n", tid);
@@ -107,24 +95,12 @@ void compute(size_t tid) {
   long long results[NUM_BULKS];
   size_t tags[NUM_BULKS];
   bool update = false;
-  if (compute_queue_try_lock(tid)) {
-    compute_queue_compute(tid, NUM_BULKS, D_ARRAY_SIZE, results, tags);
-    update = compute_queue_try_pop(tid, NUM_BULKS);
-    compute_queue_unlock(tid);
-    if (update) {
-      size_t i = 0;
-      while (i < NUM_BULKS && terminate == false) {
-        write_back_queue_lock(tags[i]);
-        if (write_back_queue_avail(tags[i])) {
-          write_back_queue_unlock(tags[i]);
-          continue;
-        }
-        write_back_queue_set_val(tags[i], results[i]); 
-        write_back_queue_set_avail(tags[i]);
-        write_back_queue_unlock(tags[i]);
-        ++i;
-      }
-    }
+  compute_queue_compute(tid, NUM_BULKS, D_ARRAY_SIZE, results, tags);
+  compute_queue_try_pop(tid, NUM_BULKS);
+  size_t i = 0;
+  while (i < NUM_BULKS) {
+    write_back_queue_set_val(tags[i], results[i]); 
+    ++i;
   }
   //printf("[tid:%zu]->End computing...\n", tid);
 }

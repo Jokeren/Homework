@@ -1,1 +1,1 @@
-single-thread: 1000000
+single-thread: 1090000
