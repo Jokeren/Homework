@@ -36,6 +36,10 @@
 #define SEC_SLEEP 10
 #endif
 
+#ifndef NUM_POOL_SIZE
+#define NUM_POOL_SIZE 8000
+#endif
+
 #define READ_QUEUE_SIZE READ_QUEUE_LENGTH + NUM_BULKS
 
 #endif

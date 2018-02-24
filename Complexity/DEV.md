@@ -1,3 +1,5 @@
+02/23
+
 single-thread: 1100000
 multi-thread:  5100000
 
@@ -16,3 +18,13 @@ multi-thread:  5100000
 4. Search for the best parameter
 5. Adjust execution patterns
 6. Adjust data structures
+
+02/24
+
+1. reduce lock regions
+
+single-thread: 1150000
+multi-thread:  5100000
+
+2. malloc improvement
+

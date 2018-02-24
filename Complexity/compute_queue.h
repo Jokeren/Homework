@@ -20,10 +20,12 @@ void compute_queue_unlock(size_t queue_id);
 void compute_queue_push(size_t queue_id,
                         size_t tag_start,
                         size_t bulk_size,
-                        double *data[NUM_BULKS]);
+                        int *receive[NUM_BULKS],
+                        size_t mem_index[NUM_BULKS]);
 
 bool compute_queue_try_pop(size_t queue_id,
                            size_t bulk_size,
-                           double *data[NUM_BULKS],
-                           size_t tags[NUM_BULKS]);
+                           int *data[NUM_BULKS],
+                           size_t tags[NUM_BULKS],
+                           size_t mem_index[NUM_BULKS]);
 #endif

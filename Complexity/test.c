@@ -15,6 +15,46 @@
 
 static volatile bool terminate = false;
 static determinant_d_fn_t compute_fn;
+static int *memory_pool[NUM_POOL_SIZE];
+static volatile bool memory_in_use[NUM_POOL_SIZE];
+
+
+void memory_init() {
+  size_t i;
+  for (i = 0; i < NUM_POOL_SIZE; ++i) {
+    if (memory_in_use[i] == false) {
+      memory_pool[i] = (int *)malloc(sizeof(int) * D_ARRAY_SIZE * D_ARRAY_SIZE);
+    }
+  }
+}
+
+
+void memory_free() {
+  size_t i;
+  for (i = 0; i < NUM_POOL_SIZE; ++i) {
+    if (memory_in_use[i] == false) {
+      free(memory_pool[i]);
+    }
+  }
+}
+
+
+bool memory_fetch(size_t *pool_index) {
+  while (true) {
+    if (terminate == true) {
+      return false;
+    }
+    if (*pool_index == NUM_POOL_SIZE) {
+      *pool_index = 0;
+    }
+    if (memory_in_use[*pool_index] == false) {
+      memory_in_use[*pool_index] = true;
+      return true;
+    }
+    ++(*pool_index);
+  }
+}
+
 
 void measurement(size_t tid) {
   printf("[tid:%zu]->Start measurement...\n", tid);
@@ -82,23 +122,25 @@ void reader(int fd, size_t tid) {
   printf("[tid:%zu]->Reading from the device...\n", tid);
   size_t order = 1;
   size_t head = 0;
-  int int_buffer[D_ARRAY_SIZE * D_ARRAY_SIZE];
+  size_t pool_index = 0;
+  typedef int *buffer_t[NUM_BULKS];
+  buffer_t receive[NUM_READ_ITERS];
+  size_t receive_index[NUM_READ_ITERS][NUM_BULKS];
   while (terminate == false) {
     size_t i = 0;
-    typedef double *buffer_t[NUM_BULKS];
-    buffer_t receive[NUM_READ_ITERS];
     for (i = 0; i < NUM_READ_ITERS; ++i) {
       size_t j;
       for (j = 0; j < NUM_BULKS; ++j) {
-        int ret = read(fd, int_buffer, BUFFER_LENGTH);
+        if (memory_fetch(&pool_index) == false) {
+          return; 
+        };
+        int *buffer = memory_pool[pool_index];
+        int ret = read(fd, buffer, BUFFER_LENGTH);
         if (ret < 0) {
           perror("Failed to read the message from the device.");
         }
-        receive[i][j] = (double *)malloc(sizeof(double) * D_ARRAY_SIZE * D_ARRAY_SIZE);
-        size_t k;
-        for (k = 0; k < D_ARRAY_SIZE * D_ARRAY_SIZE; ++k) {
-          receive[i][j][k] = int_buffer[k];
-        }
+        receive[i][j] = buffer;
+        receive_index[i][j] = pool_index;
       }
     }
     //bool lock = false;
@@ -112,7 +154,7 @@ void reader(int fd, size_t tid) {
     //}
     compute_queue_lock(head);
     for (i = 0; i < NUM_READ_ITERS; ++i) {
-      compute_queue_push(head, order, NUM_BULKS, receive[i]);
+      compute_queue_push(head, order, NUM_BULKS, receive[i], receive_index[i]);
       order = order + NUM_BULKS;
     }
     compute_queue_unlock(head);
@@ -126,27 +168,29 @@ void compute(size_t tid) {
   printf("[tid:%zu]->Start computing...\n", tid);
   long long results[NUM_BULKS];
   size_t tags[NUM_BULKS];
-  double *data[NUM_BULKS];
+  size_t mem_index[NUM_BULKS];
+  int *data[NUM_BULKS];
+  double compute_buffer[D_ARRAY_SIZE * D_ARRAY_SIZE];
   while (terminate == false) {
     bool update = false;
     compute_queue_lock(tid);
-    update = compute_queue_try_pop(tid, NUM_BULKS, data, tags);
+    update = compute_queue_try_pop(tid, NUM_BULKS, data, tags, mem_index);
     compute_queue_unlock(tid);
 
     if (update) {
       size_t i;
       for (i = 0; i < NUM_BULKS; ++i) {
-        results[i] = compute_fn(D_ARRAY_SIZE, data[i]);
-      }
-      for (i = 0; i < NUM_BULKS; ++i) {
+        size_t j;
+        for (j = 0; j < D_ARRAY_SIZE * D_ARRAY_SIZE; ++j) {
+          compute_buffer[j] = data[i][j];
+        }
+        memory_in_use[mem_index[i]] = false;
+        results[i] = compute_fn(D_ARRAY_SIZE, compute_buffer);
         write_back_queue_lock(tags[i]);
         //printf("write tag %zu\n", tags[i]);
         //printf("tags %zu\n", tags[i]);
         write_back_queue_set_val(tags[i], results[i]); 
         write_back_queue_unlock(tags[i]);
-      }
-      for (i = 0; i < NUM_BULKS; ++i) {
-        free(data[i]);
       }
     }
   }
@@ -158,12 +202,14 @@ void init() {
   compute_fn = lookup_determinant_func("double", "simd");
   write_back_queue_init();
   compute_queue_init();
+  memory_init();
 }
 
 
 void destory() {
   write_back_queue_destory();
   compute_queue_destory();
+  memory_free();
 }
 
 

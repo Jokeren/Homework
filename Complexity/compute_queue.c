@@ -5,7 +5,8 @@
 
 struct compute_queue_entry {
   size_t tag;
-  double *data;
+  size_t mem_index;
+  int *data;
 };
 
 __thread long long msize = 0;
@@ -60,8 +61,9 @@ void compute_queue_unlock(size_t queue_id) {
 
 bool compute_queue_try_pop(size_t queue_id,
                            size_t bulk_size,
-                           double *data[NUM_BULKS],
-                           size_t tags[NUM_BULKS]) {
+                           int *data[NUM_BULKS],
+                           size_t tags[NUM_BULKS],
+                           size_t mem_index[NUM_BULKS]) {
   if (cq_tail[queue_id] == cq_head[queue_id]) {
     return false;
   }
@@ -74,6 +76,7 @@ bool compute_queue_try_pop(size_t queue_id,
     }
     data[i] = cq[queue_id][idx].data;
     tags[i] = cq[queue_id][idx].tag;
+    mem_index[i] = cq[queue_id][idx].mem_index;
     cq[queue_id][idx].data = NULL;
     cq[queue_id][idx].tag = 0;
     idx = idx + 1;
@@ -97,6 +100,7 @@ static void compute_queue_resize(size_t queue_id,
     }
     new_queue[i].tag = cq[queue_id][tail].tag;
     new_queue[i].data = cq[queue_id][tail].data;
+    new_queue[i].mem_index = cq[queue_id][tail].mem_index;
     tail = tail + 1;
   }
   tail = cq_tail[queue_id];
@@ -112,7 +116,8 @@ static void compute_queue_resize(size_t queue_id,
 void compute_queue_push(size_t queue_id,
                         size_t tag_start,
                         size_t bulk_size,
-                        double *receive[NUM_BULKS]) {
+                        int *receive[NUM_BULKS],
+                        size_t receive_index[NUM_BULKS]) {
   //size_t tail = cq_tail[queue_id];
   //printf("before\n");
   //printf("tail %zu head %zu tag_start %zu\n", tail, cq_head[queue_id], tag_start);
@@ -138,6 +143,7 @@ void compute_queue_push(size_t queue_id,
     cq[queue_id][head_idx].tag = tag_start + i;
     //printf("push %zu\n", cq[queue_id][head_idx].tag);
     cq[queue_id][head_idx].data = receive[i];
+    cq[queue_id][head_idx].mem_index = receive_index[i];
     head_idx = head_idx + 1;
   }
 
