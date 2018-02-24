@@ -1,8 +1,8 @@
 .PHONY : all bin objs clean
 
-PROJECT := test
+PROJECT := test-compute
 
-SOURCES := write_back_queue.c compute_queue.c
+SOURCES := compute_queue.c
 
 CC := gcc
 
@@ -12,7 +12,7 @@ CFLAGS := -O3 -g -fopenmp -mavx2 -std=c99
 
 NUM_COMP_THREADS   ?= 1
 NUM_COMP_BULKS     ?= 4
-NUM_READ_BULKS     ?= 4
+NUM_READ_BULKS     ?= 8
 READ_QUEUE_LENGTH  ?= 64
 WRITE_QUEUE_LENGTH ?= 16
 

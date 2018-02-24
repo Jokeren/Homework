@@ -10,7 +10,7 @@ OBJS := $(SOURCES:.c=.o)
 
 CFLAGS := -O3 -g -fopenmp -mavx2 -std=c99
 
-DFLAGS := -DNUM_COMP_THREADS=1 -DNUM_BULKS=1
+DFLAGS := -DNUM_COMP_THREADS=1 -DNUM_READ_BULKS=1 -DNUM_COMP_BULKS=1
 
 LDFLAGS := -ldeterminant
 

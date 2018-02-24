@@ -23,11 +23,11 @@ void compute_queue_compute(size_t queue_id,
                            long long *results,
                            size_t *tags);
 
-bool compute_queue_try_push(size_t queue_id,
-                            size_t tag_start,
-                            size_t bulk_size,
-                            size_t data_size,
-                            int *buffer);
+void compute_queue_push(size_t queue_id,
+                        size_t tag_start,
+                        size_t bulk_size,
+                        size_t data_size,
+                        int *buffer);
 
 bool compute_queue_try_pop(size_t queue_id, size_t bulk_size);
 

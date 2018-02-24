@@ -13,8 +13,7 @@
 #include "write_back_queue.h"
 
 static volatile bool terminate = false;
-static int receive[NUM_BULKS * BUFFER_LENGTH];
-static double comp[WRITE_QUEUE_LENGTH * D_ARRAY_SIZE * D_ARRAY_SIZE];
+static int receive[NUM_READ_BULKS * BUFFER_LENGTH];
 
 void measurement(size_t tid) {
   printf("[tid:%zu]->Start measurement...\n", tid);
@@ -59,7 +58,7 @@ void write_back(int fd, size_t tid) {
   size_t head = 0;
   /*Unavail is only set in the write back thread*/
   size_t i;
-  for (i = 0; i < NUM_BULKS; ++i) {
+  for (i = 0; i < NUM_COMP_BULKS; ++i) {
     long long result = write_back_queue_get_val(head);
     //printf("write back %lld\n", result);
     int ret = write(fd, &result, sizeof(long long)); 
@@ -77,28 +76,28 @@ void reader(int fd, size_t tid) {
   size_t order = 0;
   size_t head = 0;
   size_t i;
-  for (i = 0; i < NUM_BULKS; ++i) {
+  for (i = 0; i < NUM_READ_BULKS; ++i) {
     int ret = read(fd, receive + i * D_ARRAY_SIZE * D_ARRAY_SIZE, BUFFER_LENGTH);
     if (ret < 0) {
       perror("Failed to read the message from the device.");
     }
   }
-  compute_queue_try_push(head, order, NUM_BULKS, D_ARRAY_SIZE * D_ARRAY_SIZE, receive);
+  compute_queue_try_push(head, order, NUM_READ_BULKS, D_ARRAY_SIZE * D_ARRAY_SIZE, receive);
   head = (head + 1) % NUM_COMP_THREADS;
-  order = (order + NUM_BULKS) % WRITE_QUEUE_LENGTH;
+  order = (order + NUM_READ_BULKS) % WRITE_QUEUE_LENGTH;
   //printf("[tid:%zu]->End reading...\n", tid);
 }
 
 
 void compute(size_t tid) {
   //printf("[tid:%zu]->Start computing...\n", tid);
-  long long results[NUM_BULKS];
-  size_t tags[NUM_BULKS];
+  long long results[NUM_COMP_BULKS];
+  size_t tags[NUM_COMP_BULKS];
   bool update = false;
-  compute_queue_compute(tid, NUM_BULKS, D_ARRAY_SIZE, results, tags);
-  compute_queue_try_pop(tid, NUM_BULKS);
+  compute_queue_compute(tid, NUM_COMP_BULKS, D_ARRAY_SIZE, results, tags);
+  compute_queue_try_pop(tid, NUM_COMP_BULKS);
   size_t i = 0;
-  while (i < NUM_BULKS) {
+  while (i < NUM_COMP_BULKS) {
     write_back_queue_set_val(tags[i], results[i]); 
     ++i;
   }
