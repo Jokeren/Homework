@@ -64,7 +64,7 @@ void write_back(int fd, size_t tid) {
       //printf("write back %lld\n", result);
       int ret = write(fd, &result, sizeof(long long)); 
       if (ret < 0) {
-        //printf("incorrect answer %lld\n", result);
+        printf("incorrect answer %lld\n", result);
       } else {
         //printf("correct answer %lld\n", result);
       }
@@ -103,7 +103,7 @@ void reader(int fd, size_t tid) {
     }
     //bool lock = false;
     //i = 0;
-    //while ((lock = compute_queue_try_lock(head)) == false && i < NUM_READ_ITERS) {
+    //while ((lock = compute_queue_try_lock(head)) == false && i < NUM_COMP_THREADS) {
     //  head = (head + 1) % NUM_COMP_THREADS;
     //  ++i;
     //}
