@@ -88,7 +88,13 @@ void reader(int fd, size_t tid) {
         perror("Failed to read the message from the device.");
       }
     }
-    compute_queue_lock(head);
+    bool lock = false;
+    while ((lock = compute_queue_try_lock(head)) == false && i < NUM_READ_ITERS) {
+      ++i;
+    }
+    if (lock == false) {
+      compute_queue_lock(head);
+    }
     for (i = 0; i < NUM_READ_ITERS; ++i) {
       compute_queue_push(head, order, NUM_BULKS, D_ARRAY_SIZE * D_ARRAY_SIZE,
                          receive + i * D_ARRAY_SIZE * D_ARRAY_SIZE * NUM_BULKS);
