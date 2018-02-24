@@ -66,10 +66,14 @@ void compute_queue_compute(size_t queue_id,
     return;
 
   size_t i;
+  size_t idx = cq_tail[queue_id];
   for (i = 0; i < bulk_size; ++i) {
-    size_t idx = (cq_tail[queue_id] + i) % cq_size[queue_id];
+    if (idx == cq_size[queue_id]) {
+      idx = 0;
+    }
     results[i] = compute_fn(data_size, cq[queue_id][idx].data);
     tags[i] = cq[queue_id][idx].tag;
+    idx = idx + 1;
     //printf("pop tag %zu\n", tags[i]);
   }
 }
@@ -93,9 +97,13 @@ bool compute_queue_try_pop(size_t queue_id, size_t bulk_size) {
   //printf("\n");
 
   size_t i;
+  size_t idx = cq_tail[queue_id];
   for (i = 0; i < bulk_size; ++i) {
-    size_t idx = (cq_tail[queue_id] + i) % cq_size[queue_id];
+    if (idx == cq_size[queue_id]) {
+      idx = 0;
+    }
     cq[queue_id][idx].tag = 0;
+    idx = idx + 1;
   }
   //tail = cq_tail[queue_id];
   //printf("tags-before-after:\n");
@@ -115,6 +123,44 @@ bool compute_queue_try_pop(size_t queue_id, size_t bulk_size) {
 }
 
 
+static void compute_queue_resize(size_t queue_id,
+                                 size_t bulk_size,
+                                 size_t data_size) {
+  compute_queue_entry_t *new_queue = (compute_queue_entry_t *)calloc(
+    (cq_size[queue_id] + READ_QUEUE_LENGTH), sizeof(compute_queue_entry_t));
+  size_t tail = cq_tail[queue_id];
+  size_t i;
+  //printf("tags-before:\n");
+  //for (i = 0; i < cq_length[queue_id]; ++i) {
+  //  if (tail == cq_size[queue_id]) {
+  //    tail = 0;
+  //  }
+  //  printf("%zu ", cq[queue_id][tail].tag);
+  //  ++tail;
+  //}
+  //printf("\n");
+  //tail = cq_tail[queue_id];
+  for (i = 0; i < cq_length[queue_id]; ++i) {
+    if (tail == cq_size[queue_id]) {
+      tail = 0;
+    }
+    new_queue[i].tag = cq[queue_id][tail].tag;
+    size_t j;
+    for (j = 0; j < data_size; ++j) {
+      new_queue[i].data[j] = cq[queue_id][tail].data[j];
+    }
+    tail = tail + 1;
+  }
+  tail = cq_tail[queue_id];
+  free(cq[queue_id]);
+  cq[queue_id] = new_queue;
+  cq_tail[queue_id] = 0;
+  cq_head[queue_id] = cq_length[queue_id];
+  cq_size[queue_id] = cq_size[queue_id] + READ_QUEUE_LENGTH;
+  cq_length[queue_id] = cq_length[queue_id] + READ_QUEUE_LENGTH;
+}
+
+
 void compute_queue_push(size_t queue_id,
                         size_t tag_start,
                         size_t bulk_size,
@@ -123,64 +169,44 @@ void compute_queue_push(size_t queue_id,
    //size_t tail = cq_tail[queue_id];
    //printf("tail %zu cq_tail[queue_id] %zu cq_head[queue_id] %zu bulk_size %zu cq_size[queue_id] %zu cq_length[queue_id] %zu\n", tail, cq_tail[queue_id], cq_head[queue_id], bulk_size, cq_size[queue_id], cq_length[queue_id]);
   if (cq_tail[queue_id] == (cq_head[queue_id] + bulk_size) % cq_size[queue_id]) {
-    compute_queue_entry_t *new_queue = (compute_queue_entry_t *)calloc(
-      (cq_size[queue_id] + READ_QUEUE_LENGTH), sizeof(compute_queue_entry_t));
-    size_t tail = cq_tail[queue_id];
-    size_t i;
-    if (tail == cq_length[queue_id]) {
-      tail = 0;
-    }
-    //printf("tags-before:\n");
-    //for (i = 0; i < cq_length[queue_id]; ++i) {
-    //  if (tail == cq_length[queue_id]) {
-    //    tail = 0;
-    //  }
-    //  printf("%zu ", cq[queue_id][tail].tag);
-    //  ++tail;
-    //}
-    //printf("\n");
-    //tail = cq_tail[queue_id];
-    for (i = 0; i < cq_length[queue_id]; ++i) {
-      if (tail == cq_length[queue_id]) {
-        tail = 0;
-      }
-      new_queue[i].tag = cq[queue_id][tail].tag;
-      size_t j;
-      for (j = 0; j < data_size; ++j) {
-        new_queue[i].data[j] = cq[queue_id][tail].data[j];
-      }
-      tail = tail + 1;
-    }
-    tail = cq_tail[queue_id];
-    free(cq[queue_id]);
-    cq[queue_id] = new_queue;
-    cq_tail[queue_id] = 0;
-    cq_head[queue_id] = cq_length[queue_id];
-    cq_size[queue_id] = cq_size[queue_id] + READ_QUEUE_LENGTH;
-    cq_length[queue_id] = cq_length[queue_id] + READ_QUEUE_LENGTH;
+    compute_queue_resize(queue_id, bulk_size, data_size);
   }
 
-  size_t i;
-  size_t head_idx = cq_head[queue_id];
   //tail = cq_tail[queue_id];
   //printf("tags-after:\n");
   //for (i = 0; i < cq_length[queue_id]; ++i) {
-  //  if (tail == cq_length[queue_id]) {
+  //  if (tail == cq_size[queue_id]) {
   //    tail = 0;
   //  }
   //  printf("%zu ", cq[queue_id][tail].tag);
   //  ++tail;
   //}
   //printf("\n");
+  size_t i;
+  size_t head_idx = cq_head[queue_id];
   for (i = 0; i < bulk_size; ++i) {
-    cq[queue_id][(head_idx + i) % cq_size[queue_id]].tag = tag_start + i;
-    double *data = cq[queue_id][(head_idx + i) % cq_size[queue_id]].data;
+    if (head_idx == cq_size[queue_id]) {
+       head_idx = 0;
+    }
+    cq[queue_id][head_idx].tag = tag_start + i;
+    double *data = cq[queue_id][head_idx].data;
     int *buffer = receive + i * data_size;
     size_t j;
     for (j = 0; j < data_size; ++j) {
       data[j] = buffer[j];
     }
+    head_idx = head_idx + 1;
   }
   
   cq_head[queue_id] = (cq_head[queue_id] + bulk_size) % cq_size[queue_id];
+  //tail = cq_tail[queue_id];
+  //printf("tags-after-after:\n");
+  //for (i = 0; i < cq_length[queue_id]; ++i) {
+  //  if (tail == cq_size[queue_id]) {
+  //    tail = 0;
+  //  }
+  //  printf("%zu ", cq[queue_id][tail].tag);
+  //  ++tail;
+  //}
+  //printf("\n");
 }
