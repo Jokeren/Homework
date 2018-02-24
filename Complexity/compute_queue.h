@@ -17,18 +17,13 @@ void compute_queue_lock(size_t queue_id);
 
 void compute_queue_unlock(size_t queue_id);
 
-void compute_queue_compute(size_t queue_id,
-                           size_t bulk_size,
-                           size_t data_size,
-                           long long *results,
-                           size_t *tags);
-
 void compute_queue_push(size_t queue_id,
                         size_t tag_start,
                         size_t bulk_size,
-                        size_t data_size,
-                        int *buffer);
+                        double *data[NUM_BULKS]);
 
-bool compute_queue_try_pop(size_t queue_id, size_t bulk_size);
-
+bool compute_queue_try_pop(size_t queue_id,
+                           size_t bulk_size,
+                           double *data[NUM_BULKS],
+                           size_t tags[NUM_BULKS]);
 #endif

@@ -7,13 +7,15 @@
 #include <unistd.h>
 #include <time.h>
 #include <omp.h>
+#include <determinant.h>
 
 #include "common.h"
 #include "compute_queue.h"
 #include "write_back_queue.h"
 
 static volatile bool terminate = false;
-static int receive[NUM_BULKS * BUFFER_LENGTH];
+static determinant_d_fn_t compute_fn;
+static int int_buffer[D_ARRAY_SIZE * D_ARRAY_SIZE];
 
 void measurement(size_t tid) {
   printf("[tid:%zu]->Start measurement...\n", tid);
@@ -60,7 +62,8 @@ void write_back(int fd, size_t tid) {
   size_t i;
   bool get_val = false;
   for (i = 0; i < NUM_BULKS; ++i) {
-    long long result = write_back_queue_get_val(order, &get_val);
+    long long result;
+    write_back_queue_try_get_val(order, &result);
     int ret = write(fd, &result, sizeof(long long)); 
     if (ret < 0) {
       printf("incorrect answer %lld\n", result);
@@ -75,14 +78,20 @@ void reader(int fd, size_t tid) {
   //printf("[tid:%zu]->Reading from the device...\n", tid);
   size_t order = 1;
   size_t head = 0;
+  double *buffer[NUM_BULKS];
   size_t i;
   for (i = 0; i < NUM_BULKS; ++i) {
-    int ret = read(fd, receive + i * D_ARRAY_SIZE * D_ARRAY_SIZE, BUFFER_LENGTH);
+    buffer[i] = (double *)malloc(sizeof(double) * D_ARRAY_SIZE * D_ARRAY_SIZE);
+    int ret = read(fd, int_buffer, BUFFER_LENGTH);
     if (ret < 0) {
       perror("Failed to read the message from the device.");
     }
+    size_t k;
+    for (k = 0; k < D_ARRAY_SIZE * D_ARRAY_SIZE; ++k) {
+      buffer[i][k] = int_buffer[k];
+    }
   }
-  compute_queue_push(head, order, NUM_BULKS, D_ARRAY_SIZE * D_ARRAY_SIZE, receive);
+  compute_queue_push(head, order, NUM_BULKS, buffer);
   head = (head + 1) % NUM_COMP_THREADS;
   order = order + NUM_BULKS;
   //printf("[tid:%zu]->End reading...\n", tid);
@@ -93,19 +102,22 @@ void compute(size_t tid) {
   //printf("[tid:%zu]->Start computing...\n", tid);
   long long results[NUM_BULKS];
   size_t tags[NUM_BULKS];
-  bool update = false;
-  compute_queue_compute(tid, NUM_BULKS, D_ARRAY_SIZE, results, tags);
-  compute_queue_try_pop(tid, NUM_BULKS);
+  double *data[NUM_BULKS];
+  compute_queue_try_pop(tid, NUM_BULKS, data, tags);
   size_t i = 0;
-  while (i < NUM_BULKS) {
+  for (i = 0; i < NUM_BULKS; ++i) {
+    results[i] = compute_fn(D_ARRAY_SIZE, data[i]);
     write_back_queue_set_val(tags[i], results[i]); 
-    ++i;
+  }
+  for (i = 0; i < NUM_BULKS; ++i) {
+    free(data[i]);
   }
   //printf("[tid:%zu]->End computing...\n", tid);
 }
 
 
 void init() {
+  compute_fn = lookup_determinant_func("double", "simd");
   write_back_queue_init();
   compute_queue_init();
 }
