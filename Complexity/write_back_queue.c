@@ -17,8 +17,8 @@ void write_back_queue_init() {
   size_t i;
   for (i = 0; i < WRITE_QUEUE_LENGTH; ++i) {
     omp_init_lock(&wq_locks[i]);
-    wq[i] = (write_back_entry_t *)calloc(WRITE_QUEUE_ENTRIES, sizeof(write_back_entry_t));
-    wq_size[i] = WRITE_QUEUE_ENTRIES;
+    wq[i] = (write_back_entry_t *)calloc(NUM_WRITE_ENTRIES, sizeof(write_back_entry_t));
+    wq_size[i] = NUM_WRITE_ENTRIES;
   }
 }
 
@@ -56,13 +56,13 @@ void write_back_queue_set_val(size_t index, long long val) {
   }
   if (i == wq_size[queue_id]) {
     write_back_entry_t *new_queue = (write_back_entry_t *)calloc(
-      (wq_size[queue_id] + WRITE_QUEUE_ENTRIES), sizeof(write_back_entry_t));
+      (wq_size[queue_id] + NUM_WRITE_ENTRIES), sizeof(write_back_entry_t));
     memcpy(new_queue, wq[queue_id], wq_size[queue_id] * sizeof(write_back_entry_t));
     free(wq[queue_id]);
     wq[queue_id] = new_queue;
     wq[queue_id][wq_size[queue_id]].val = val;
     wq[queue_id][wq_size[queue_id]].tag = index;
-    wq_size[queue_id] = wq_size[queue_id] + WRITE_QUEUE_ENTRIES;
+    wq_size[queue_id] = wq_size[queue_id] + NUM_WRITE_ENTRIES;
   }
 }
 

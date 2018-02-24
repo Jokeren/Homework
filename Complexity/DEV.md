@@ -1,14 +1,8 @@
-single-thread: 1090000
-pipeline: 790000
-  -DNUM_COMP_THREADS=2
-  -DNUM_READ_BULKS=10
-  -DNUM_COMP_BULKS=10
-  -DWRITE_QUEUE_LENGTH=100
-  -DREAD_QUEUE_LENGTH=100
-multi-thread: 1150000
-  DFLAGS ?= -DNUM_COMP_THREADS=2       \
-            -DNUM_READ_BULKS=200       \
-            -DNUM_COMP_BULKS=50        \
-            -DWRITE_QUEUE_LENGTH=200   \   
-            -DREAD_QUEUE_LENGTH=1000
+single-thread: 1100000
 
+1. Get single-thread performance
+2. Set up all configurable parameters
+3. RM comments
+4. Search for the best parameter
+5. Adjust execution patterns
+6. Adjust data structures

@@ -10,8 +10,8 @@
 #define WRITE_QUEUE_LENGTH 100
 #endif
 
-#ifndef WRITE_QUEUE_ENTRIES
-#define WRITE_QUEUE_ENTRIES 10
+#ifndef NUM_WRITE_ENTRIES
+#define NUM_WRITE_ENTRIES 10
 #endif
 
 #ifndef READ_QUEUE_LENGTH
@@ -24,14 +24,18 @@
 #define NUM_COMP_THREADS 2
 #endif
 
-#ifndef NUM_READ_BULKS
-#define NUM_READ_BULKS 1
+#ifndef NUM_BULKS
+#define NUM_BULKS 1
 #endif
 
-#ifndef NUM_COMP_BULKS
-#define NUM_COMP_BULKS 1
+#ifndef NUM_READ_ITERS
+#define NUM_READ_ITERS 2
 #endif
 
-#define READ_QUEUE_SIZE READ_QUEUE_LENGTH + NUM_READ_BULKS
+#ifndef SEC_SLEEP
+#define SEC_SLEEP 10
+#endif
+
+#define READ_QUEUE_SIZE READ_QUEUE_LENGTH + NUM_BULKS
 
 #endif

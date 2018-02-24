@@ -13,7 +13,7 @@
 #include "write_back_queue.h"
 
 static volatile bool terminate = false;
-static int receive[NUM_READ_BULKS * BUFFER_LENGTH];
+static int receive[NUM_READ_ITERS * NUM_BULKS * BUFFER_LENGTH];
 
 void measurement(size_t tid) {
   printf("[tid:%zu]->Start measurement...\n", tid);
@@ -27,7 +27,7 @@ void measurement(size_t tid) {
   int fd;
   char d[64];
   for (i = 0; i < LIFE; ++i) {
-    sleep(10);
+    sleep(SEC_SLEEP);
     /*Reading number of determinant calculations*/
     printf("[tid:%zu]->Write out buffer\n", tid);
     fd = open("/sys/module/dummy/parameters/no_of_det_cals", O_RDONLY);
@@ -81,18 +81,21 @@ void reader(int fd, size_t tid) {
   size_t order = 1;
   size_t head = 0;
   while (terminate == false) {
-    size_t i;
-    for (i = 0; i < NUM_READ_BULKS; ++i) {
+    size_t i = 0;
+    for (i = 0; i < NUM_BULKS * NUM_READ_ITERS; ++i) {
       int ret = read(fd, receive + i * D_ARRAY_SIZE * D_ARRAY_SIZE, BUFFER_LENGTH);
       if (ret < 0) {
         perror("Failed to read the message from the device.");
       }
     }
     compute_queue_lock(head);
-    compute_queue_push(head, order, NUM_READ_BULKS, D_ARRAY_SIZE * D_ARRAY_SIZE, receive);
+    for (i = 0; i < NUM_READ_ITERS; ++i) {
+      compute_queue_push(head, order, NUM_BULKS, D_ARRAY_SIZE * D_ARRAY_SIZE,
+                         receive + i * D_ARRAY_SIZE * D_ARRAY_SIZE * NUM_BULKS);
+      order = order + NUM_BULKS;
+    }
     compute_queue_unlock(head);
     head = (head + 1) % NUM_COMP_THREADS;
-    order = order + NUM_READ_BULKS;
   }
   printf("[tid:%zu]->End reading...\n", tid);
 }
@@ -100,17 +103,17 @@ void reader(int fd, size_t tid) {
 
 void compute(size_t tid) {
   printf("[tid:%zu]->Start computing...\n", tid);
-  long long results[NUM_COMP_BULKS];
-  size_t tags[NUM_COMP_BULKS];
+  long long results[NUM_BULKS];
+  size_t tags[NUM_BULKS];
   while (terminate == false) {
     bool update = false;
     compute_queue_lock(tid);
-    compute_queue_compute(tid, NUM_COMP_BULKS, D_ARRAY_SIZE, results, tags);
-    update = compute_queue_try_pop(tid, NUM_COMP_BULKS);
+    compute_queue_compute(tid, NUM_BULKS, D_ARRAY_SIZE, results, tags);
+    update = compute_queue_try_pop(tid, NUM_BULKS);
     compute_queue_unlock(tid);
     if (update) {
       size_t i;
-      for (i = 0; i < NUM_COMP_BULKS; ++i) {
+      for (i = 0; i < NUM_BULKS; ++i) {
         write_back_queue_lock(tags[i]);
         //printf("write tag %zu\n", tags[i]);
         write_back_queue_set_val(tags[i], results[i]); 
@@ -169,7 +172,7 @@ int main() {
     else if (tid == NUM_COMP_THREADS + 1) {
       write_back(fd, tid);
     }
-    /* Read matrices from the device*/
+    /*Read matrices from the device*/
     else {
       reader(fd, tid);
     }
