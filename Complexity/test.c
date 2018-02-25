@@ -67,6 +67,7 @@ void measurement(size_t tid) {
   size_t i;
   int fd;
   char d[64];
+  int prev_num = 0;
   for (i = 0; i < LIFE; ++i) {
     sleep(SEC_SLEEP);
     /*Reading number of determinant calculations*/
@@ -81,8 +82,9 @@ void measurement(size_t tid) {
     }
     d[j] = '\0';
     int num = atoi(d);
-    printf("[tid:%zu]->Throughput %d\n", tid, num);
-    fprintf(fp, "%d\n", num);
+    printf("[tid:%zu]->Throughput %d\n", tid, num - prev_num);
+    fprintf(fp, "%d\n", num - prev_num);
+    prev_num = num;
   }
 
   terminate = true;
@@ -118,6 +120,11 @@ void write_back(int fd, size_t tid) {
 }
 
 
+int __attribute__ ((noinline)) read_wrapper(int fd, int *buffer) {
+  return read(fd, buffer, BUFFER_LENGTH);
+}
+
+
 void reader(int fd, size_t tid) {
   printf("[tid:%zu]->Reading from the device...\n", tid);
   size_t order = 1;
@@ -135,7 +142,7 @@ void reader(int fd, size_t tid) {
           return; 
         };
         int *buffer = memory_pool[pool_index];
-        int ret = read(fd, buffer, BUFFER_LENGTH);
+        int ret = read_wrapper(fd, buffer);
         if (ret < 0) {
           perror("Failed to read the message from the device.");
         }
@@ -143,16 +150,15 @@ void reader(int fd, size_t tid) {
         receive_index[i][j] = pool_index;
       }
     }
-    //bool lock = false;
-    //i = 0;
-    //while ((lock = compute_queue_try_lock(head)) == false && i < NUM_COMP_THREADS) {
-    //  head = (head + 1) % NUM_COMP_THREADS;
-    //  ++i;
-    //}
-    //if (lock == false) {
-    //  compute_queue_lock(head);
-    //}
-    compute_queue_lock(head);
+    bool lock = false;
+    i = 0;
+    while ((lock = compute_queue_try_lock(head)) == false && i < NUM_COMP_THREADS) {
+      head = (head + 1) % NUM_COMP_THREADS;
+      ++i;
+    }
+    if (lock == false) {
+      compute_queue_lock(head);
+    }
     for (i = 0; i < NUM_READ_ITERS; ++i) {
       compute_queue_push(head, order, NUM_BULKS, receive[i], receive_index[i]);
       order = order + NUM_BULKS;

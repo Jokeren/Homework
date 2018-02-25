@@ -4,20 +4,23 @@ PROJECT := test
 
 SOURCES := write_back_queue.c compute_queue.c
 
+
 CC := gcc
 
 OBJS := $(SOURCES:.c=.o)
 
 CFLAGS := -O3 -g -fopenmp -mavx2 -std=c99
 
-NUM_COMP_THREADS   ?= 2
-NUM_BULKS          ?= 8
-READ_QUEUE_LENGTH  ?= 256
-WRITE_QUEUE_LENGTH ?= 16
-NUM_READ_ITERS     ?= 1
-NUM_WRITE_ENTRIES  ?= 16
+NUM_COMP_THREADS   ?= 32
+NUM_BULKS          ?= 4
+READ_QUEUE_LENGTH  ?= 384
+WRITE_QUEUE_LENGTH ?= 80
+NUM_READ_ITERS     ?= 4
+NUM_WRITE_ENTRIES  ?= 12
 SEC_SLEEP          ?= 10
-NUM_POOL_SIZE      ?= 8000
+# greater than 10000, or we have memory pool used up problem. consider dynamic memory pool?
+NUM_POOL_SIZE      ?= 10000
+LIFE               ?= 18
 
 DFLAGS := -DNUM_COMP_THREADS=$(NUM_COMP_THREADS) \
           -DNUM_BULKS=$(NUM_BULKS) \
@@ -26,7 +29,8 @@ DFLAGS := -DNUM_COMP_THREADS=$(NUM_COMP_THREADS) \
 		      -DNUM_READ_ITERS=$(NUM_READ_ITERS) \
           -DNUM_WRITE_ENTRIES=$(NUM_WRITE_ENTRIES) \
           -DNUM_POOL_SIZE=$(NUM_POOL_SIZE) \
-          -DSEC_SLEEP=$(SEC_SLEEP)
+          -DSEC_SLEEP=$(SEC_SLEEP) \
+          -DLIFE=$(LIFE)
 
 LDFLAGS := -ldeterminant
 

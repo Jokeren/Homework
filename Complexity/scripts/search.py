@@ -17,21 +17,23 @@
 
 import os
 
-num_threads=2
 
 if __name__ == "__main__":
-    for num_bulks in range(16, 64, 16):
-        for write_queue_length in range(32, 128, 32):
-            if write_queue_length < num_bulks:
-                continue
-            if write_queue_length % num_bulks != 0:
-                continue
-            for read_queue_length in range(64, 512, 64):
-                if read_queue_length < write_queue_length:
+    thread_range = [32]
+    for num_threads in thread_range:
+        for num_bulks in range(2, 8, 2):
+            for write_queue_length in range(48, 96, 16):
+                if write_queue_length < num_bulks:
                     continue
-                if read_queue_length % num_bulks != 0:
+                if write_queue_length % num_bulks != 0:
                     continue
-                for num_read_iters in range(1, 4):
-                    if write_queue_length < num_read_iters * num_bulks:
-                        for num_write_entries in range(8, 16, 8):
-                            os.system("scripts/exec.sh %d %d %d %d %d %d\n" % (num_bulks, read_queue_length, write_queue_length, num_read_iters, num_write_entries, num_threads))
+                for read_queue_length in range(128, 512, 128):
+                    if read_queue_length < write_queue_length:
+                        continue
+                    if read_queue_length % num_bulks != 0:
+                        continue
+                    for num_read_iters in range(3, 7):
+                        if write_queue_length > num_read_iters * num_bulks:
+                            for num_write_entries in range(4, 16, 4):
+                                for num_pool_size in range(2000, 8000, 2000):
+                                    os.system("scripts/exec.sh %d %d %d %d %d %d %d\n" % (num_bulks, read_queue_length, write_queue_length, num_read_iters, num_write_entries, num_threads, num_pool_size))

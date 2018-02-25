@@ -55,7 +55,6 @@ void write_back_queue_set_val(size_t index, long long val) {
     }
   }
   if (i == wq_size[queue_id]) {
-    //printf("resize\n");
     write_back_entry_t *new_queue = (write_back_entry_t *)calloc(
         (wq_size[queue_id] + NUM_WRITE_ENTRIES), sizeof(write_back_entry_t));
     memcpy(new_queue, wq[queue_id], wq_size[queue_id] * sizeof(write_back_entry_t));

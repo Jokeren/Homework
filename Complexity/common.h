@@ -18,7 +18,9 @@
 #define READ_QUEUE_LENGTH 100
 #endif
 
+#ifndef LIFE
 #define LIFE 1
+#endif
 
 #ifndef NUM_COMP_THREADS
 #define NUM_COMP_THREADS 2
