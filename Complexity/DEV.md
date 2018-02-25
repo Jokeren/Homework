@@ -24,7 +24,18 @@ multi-thread:  5100000
 1. reduce lock regions
 
 single-thread: 1150000
-multi-thread:  5100000
+multi-thread:  5600000
 
-2. malloc improvement
+2. memory pool
 
+multi-thread:  5600000
+NUM_COMP_THREADS   ?= 32
+NUM_BULKS          ?= 4
+READ_QUEUE_LENGTH  ?= 384
+WRITE_QUEUE_LENGTH ?= 80
+NUM_READ_ITERS     ?= 4
+NUM_WRITE_ENTRIES  ?= 12
+SEC_SLEEP          ?= 10
+# greater than 10000, or we have memory pool used up problem. consider dynamic memory pool?
+NUM_POOL_SIZE      ?= 10000
+LIFE               ?= 18

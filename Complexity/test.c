@@ -39,6 +39,7 @@ void memory_free() {
 }
 
 
+// TODO: extend it to multiple memory segments
 bool memory_fetch(size_t *pool_index) {
   while (true) {
     if (terminate == true) {
@@ -142,7 +143,9 @@ void reader(int fd, size_t tid) {
           return; 
         };
         int *buffer = memory_pool[pool_index];
+        // Use wrapper when hpcrun is wrappered
         int ret = read_wrapper(fd, buffer);
+        //int ret = read(fd, buffer, BUFFER_LENGTH);
         if (ret < 0) {
           perror("Failed to read the message from the device.");
         }

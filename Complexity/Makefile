@@ -11,7 +11,7 @@ OBJS := $(SOURCES:.c=.o)
 
 CFLAGS := -O3 -g -fopenmp -mavx2 -std=c99
 
-NUM_COMP_THREADS   ?= 32
+NUM_COMP_THREADS   ?= 34
 NUM_BULKS          ?= 4
 READ_QUEUE_LENGTH  ?= 384
 WRITE_QUEUE_LENGTH ?= 80
