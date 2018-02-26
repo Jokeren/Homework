@@ -44,4 +44,10 @@
 
 #define READ_QUEUE_SIZE READ_QUEUE_LENGTH + NUM_BULKS
 
+typedef struct data_entry {
+  size_t tag;
+  size_t mem_index;
+  int *data[NUM_BULKS];
+} data_entry_t;
+
 #endif

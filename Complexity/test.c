@@ -15,7 +15,7 @@
 
 static volatile bool terminate = false;
 static determinant_d_fn_t compute_fn;
-static int *memory_pool[NUM_POOL_SIZE];
+static data_entry_t *memory_pool[NUM_POOL_SIZE];
 static volatile bool memory_in_use[NUM_POOL_SIZE];
 
 
@@ -23,7 +23,11 @@ void memory_init() {
   size_t i;
   for (i = 0; i < NUM_POOL_SIZE; ++i) {
     if (memory_in_use[i] == false) {
-      memory_pool[i] = (int *)malloc(sizeof(int) * D_ARRAY_SIZE * D_ARRAY_SIZE);
+      memory_pool[i] = (data_entry_t *)malloc(sizeof(data_entry_t));
+      size_t j;
+      for (j = 0; j < NUM_BULKS; ++j) {
+        memory_pool[i]->data[j] = (int *)malloc(sizeof(int) * D_ARRAY_SIZE * D_ARRAY_SIZE);
+      }
     }
   }
 }
@@ -33,6 +37,10 @@ void memory_free() {
   size_t i;
   for (i = 0; i < NUM_POOL_SIZE; ++i) {
     if (memory_in_use[i] == false) {
+      size_t j;
+      for (j = 0; j < NUM_BULKS; ++j) {
+        free(memory_pool[i]->data[j]);
+      }
       free(memory_pool[i]);
     }
   }
@@ -135,25 +143,23 @@ void reader(int fd, size_t tid) {
   size_t head = 0;
   size_t pool_index = 0;
   typedef int *buffer_t[NUM_BULKS];
-  buffer_t receive[NUM_READ_ITERS];
-  size_t receive_index[NUM_READ_ITERS][NUM_BULKS];
+  data_entry_t *data_entries[NUM_READ_ITERS];
   while (terminate == false) {
     size_t i = 0;
     for (i = 0; i < NUM_READ_ITERS; ++i) {
+      if (memory_fetch(&pool_index) == false) {
+        return; 
+      };
+      data_entries[i] = memory_pool[pool_index];
+      data_entries[i]->mem_index = pool_index;
       size_t j;
       for (j = 0; j < NUM_BULKS; ++j) {
-        if (memory_fetch(&pool_index) == false) {
-          return; 
-        };
-        int *buffer = memory_pool[pool_index];
         // Use wrapper when hpcrun is wrappered
-        int ret = read_wrapper(fd, buffer);
+        int ret = read_wrapper(fd, data_entries[i]->data[j]);
         //int ret = read(fd, buffer, BUFFER_LENGTH);
         if (ret < 0) {
           perror("Failed to read the message from the device.");
         }
-        receive[i][j] = buffer;
-        receive_index[i][j] = pool_index;
       }
     }
     bool lock = false;
@@ -166,8 +172,9 @@ void reader(int fd, size_t tid) {
       compute_queue_lock(head);
     }
     for (i = 0; i < NUM_READ_ITERS; ++i) {
-      compute_queue_push(head, order, NUM_BULKS, receive[i], receive_index[i]);
-      order = order + NUM_BULKS;
+      data_entries[i]->tag = order;
+      compute_queue_push(head, data_entries[i]);
+      order = order + 1;
     }
     compute_queue_unlock(head);
     head = (head + 1) % NUM_COMP_THREADS;
@@ -179,14 +186,12 @@ void reader(int fd, size_t tid) {
 void compute(size_t tid) {
   printf("[tid:%zu]->Start computing...\n", tid);
   long long results[NUM_BULKS];
-  size_t tags[NUM_BULKS];
-  size_t mem_index[NUM_BULKS];
-  int *data[NUM_BULKS];
+  data_entry_t *data_entry;
   double compute_buffer[D_ARRAY_SIZE * D_ARRAY_SIZE];
   while (terminate == false) {
     bool update = false;
     compute_queue_lock(tid);
-    update = compute_queue_try_pop(tid, NUM_BULKS, data, tags, mem_index);
+    update = compute_queue_try_pop(tid, data_entry);
     compute_queue_unlock(tid);
 
     if (update) {
@@ -194,16 +199,14 @@ void compute(size_t tid) {
       for (i = 0; i < NUM_BULKS; ++i) {
         size_t j;
         for (j = 0; j < D_ARRAY_SIZE * D_ARRAY_SIZE; ++j) {
-          compute_buffer[j] = data[i][j];
+          compute_buffer[j] = data_entry->data[i][j];
         }
-        memory_in_use[mem_index[i]] = false;
         results[i] = compute_fn(D_ARRAY_SIZE, compute_buffer);
       }
-      write_back_queue_lock(tags[0] / NUM_BULKS + 1);
-      //printf("write tag %zu\n", tags[i]);
-      //printf("tags %zu\n", tags[i]);
-      write_back_queue_set_val(tags[0] / NUM_BULKS + 1, results); 
-      write_back_queue_unlock(tags[0] / NUM_BULKS + 1);
+      memory_in_use[data_entry->mem_index] = false;
+      write_back_queue_lock(data_entry->tag);
+      write_back_queue_set_val(data_entry->tag, results); 
+      write_back_queue_unlock(data_entry->tag);
     }
   }
   printf("[tid:%zu]->End computing...\n", tid);

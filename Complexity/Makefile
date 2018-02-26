@@ -14,13 +14,13 @@ CFLAGS := -O3 -g -fopenmp -mavx2 -std=c99
 NUM_COMP_THREADS   ?= 34
 NUM_BULKS          ?= 4
 READ_QUEUE_LENGTH  ?= 384
-WRITE_QUEUE_LENGTH ?= 80
+WRITE_QUEUE_LENGTH ?= 256
 NUM_READ_ITERS     ?= 4
 NUM_WRITE_ENTRIES  ?= 12
 SEC_SLEEP          ?= 10
 # greater than 10000, or we have memory pool used up problem. consider dynamic memory pool?
-NUM_POOL_SIZE      ?= 10000
-LIFE               ?= 18
+NUM_POOL_SIZE      ?= 6000
+LIFE               ?= 1
 
 DFLAGS := -DNUM_COMP_THREADS=$(NUM_COMP_THREADS) \
           -DNUM_BULKS=$(NUM_BULKS) \
@@ -32,7 +32,7 @@ DFLAGS := -DNUM_COMP_THREADS=$(NUM_COMP_THREADS) \
           -DSEC_SLEEP=$(SEC_SLEEP) \
           -DLIFE=$(LIFE)
 
-LDFLAGS := -ldeterminant
+LDFLAGS := -ldeterminant -lpthread
 
 all: bin objs
 
