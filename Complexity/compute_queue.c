@@ -66,13 +66,13 @@ void compute_queue_unlock(size_t queue_id) {
 }
 
 
-bool compute_queue_try_pop(size_t queue_id, data_entry_t *data_entry) {
+bool compute_queue_try_pop(size_t queue_id, data_entry_t **data_entry) {
   if (cq_tail[queue_id] == cq_head[queue_id]) {
     return false;
   }
 
   size_t idx = cq_tail[queue_id];
-  data_entry = cq[queue_id][idx];
+  *data_entry = cq[queue_id][idx];
 
   //--msize;
   cq_tail[queue_id] = (cq_tail[queue_id] + 1) % cq_size[queue_id];

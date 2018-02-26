@@ -23,6 +23,6 @@ void compute_queue_unlock(size_t queue_id);
 
 void compute_queue_push(size_t queue_id, data_entry_t *data_entry);
 
-bool compute_queue_try_pop(size_t queue_id, data_entry_t *data_entry);
+bool compute_queue_try_pop(size_t queue_id, data_entry_t **data_entry);
 
 #endif

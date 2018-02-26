@@ -191,7 +191,7 @@ void compute(size_t tid) {
   while (terminate == false) {
     bool update = false;
     compute_queue_lock(tid);
-    update = compute_queue_try_pop(tid, data_entry);
+    update = compute_queue_try_pop(tid, &data_entry);
     compute_queue_unlock(tid);
 
     if (update) {
@@ -199,7 +199,7 @@ void compute(size_t tid) {
       for (i = 0; i < NUM_BULKS; ++i) {
         size_t j;
         for (j = 0; j < D_ARRAY_SIZE * D_ARRAY_SIZE; ++j) {
-          compute_buffer[j] = data_entry->data[i][j];
+          compute_buffer[j] = (data_entry->data[i])[j];
         }
         results[i] = compute_fn(D_ARRAY_SIZE, compute_buffer);
       }
