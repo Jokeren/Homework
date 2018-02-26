@@ -2,10 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include "queues/queue.h"
-//#include "queues/delay.h"
+#include "queues/delay.h"
 #include "queues/primitives.h"
 #include "queues/align.h"
-//#include "queues/hzdptr.h"
+#include "queues/hzdptr.h"
 
 static queue_t *cq[NUM_COMP_THREADS];
 static handle_t *cq_handle[NUM_COMP_THREADS];
@@ -64,10 +64,10 @@ void * dequeue(queue_t * q, handle_t * handle)
   node_t * next;
 
   while (1) {
-//    head = hzdptr_setv(&q->head, &handle->hzd, 0);
+//   head = hzdptr_setv(&q->head, &handle->hzd, 0);
     head = q->head;
     tail = q->tail;
-//   next = hzdptr_set(&head->next, &handle->hzd, 1);
+//    next = hzdptr_set(&head->next, &handle->hzd, 1);
     next = head->next;
 
     if (head != q->head) {
@@ -96,7 +96,9 @@ void queue_free(queue_t *queue, handle_t *handle) {}
 void compute_queue_init() {
   size_t i;
   for (i = 0; i < NUM_COMP_THREADS; ++i) {
+    cq[i] = align_malloc(PAGE_SIZE, sizeof(queue_t));
     queue_init(cq[i], 2);
+    cq_handle[i] = align_malloc(PAGE_SIZE, sizeof(handle_t * [2]));
     queue_register(cq[i], cq_handle[i], i);
   }
 }
@@ -111,7 +113,7 @@ void compute_queue_destory() {
 
 bool compute_queue_try_pop(size_t queue_id, data_entry_t **data_entry) {
   void *ret = NULL;
-  if ((ret == dequeue(cq[queue_id], cq_handle[queue_id])) == EMPTY) {
+  if ((ret = dequeue(cq[queue_id], cq_handle[queue_id])) == EMPTY) {
     return false;
   } else {
     *data_entry = (data_entry_t *)ret;
