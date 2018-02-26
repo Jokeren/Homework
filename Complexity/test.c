@@ -10,7 +10,7 @@
 #include <determinant.h>
 
 #include "common.h"
-#include "compute_queue.h"
+#include "lf_compute_queue.h"
 #include "write_back_queue.h"
 
 static volatile bool terminate = false;

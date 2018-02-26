@@ -2,14 +2,14 @@
 
 PROJECT := test
 
-SOURCES := write_back_queue.c compute_queue.c
+SOURCES := write_back_queue.c lf_compute_queue.c
 
 
 CC := gcc
 
 OBJS := $(SOURCES:.c=.o)
 
-CFLAGS := -O3 -g -fopenmp -mavx2 -std=c99
+CFLAGS := -O3 -g -fopenmp -mavx2 -std=c99 -D_GNU_SOURCE -lpthread -DMSQUEUE
 
 NUM_COMP_THREADS   ?= 34
 NUM_BULKS          ?= 4
