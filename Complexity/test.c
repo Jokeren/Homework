@@ -100,16 +100,19 @@ void measurement(size_t tid) {
 void write_back(int fd, size_t tid) {
   printf("[tid:%zu]->Writing to the device...\n", tid);
   size_t order = 1;
+  long long result[NUM_BULKS];
   while (terminate == false) {
     write_back_queue_lock(order);
-    long long result = 0;
-    if (write_back_queue_try_get_val(order, &result)) {
-      //printf("write back %lld\n", result);
-      int ret = write(fd, &result, sizeof(long long)); 
-      if (ret < 0) {
-        printf("incorrect answer %lld\n", result);
-      } else {
-        //printf("correct answer %lld\n", result);
+    if (write_back_queue_try_get_val(order, result)) {
+      size_t i;
+      for (i = 0; i < NUM_BULKS; ++i) {
+        //printf("write back %lld\n", result);
+        int ret = write(fd, &result[i], sizeof(long long)); 
+        if (ret < 0) {
+          printf("incorrect answer %lld\n", result[i]);
+        } else {
+          //printf("correct answer %lld\n", result);
+        }
       }
       write_back_queue_unlock(order);
       order = order + 1;
@@ -195,12 +198,12 @@ void compute(size_t tid) {
         }
         memory_in_use[mem_index[i]] = false;
         results[i] = compute_fn(D_ARRAY_SIZE, compute_buffer);
-        write_back_queue_lock(tags[i]);
-        //printf("write tag %zu\n", tags[i]);
-        //printf("tags %zu\n", tags[i]);
-        write_back_queue_set_val(tags[i], results[i]); 
-        write_back_queue_unlock(tags[i]);
       }
+      write_back_queue_lock(tags[0] / NUM_BULKS + 1);
+      //printf("write tag %zu\n", tags[i]);
+      //printf("tags %zu\n", tags[i]);
+      write_back_queue_set_val(tags[0] / NUM_BULKS + 1, results); 
+      write_back_queue_unlock(tags[0] / NUM_BULKS + 1);
     }
   }
   printf("[tid:%zu]->End computing...\n", tid);
