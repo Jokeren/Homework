@@ -1,0 +1,33 @@
+.PHONY : all bin objs clean
+
+PROJECT := test-seq
+
+SOURCES := write_back_queue.c compute_queue.c
+
+CC := gcc
+
+OBJS := $(SOURCES:.c=.o)
+
+CFLAGS := -O3 -g -fopenmp -mavx2 -std=c99
+
+DFLAGS := -DNUM_COMP_THREADS=1 -DNUM_BULKS=10
+
+LDFLAGS := -ldeterminant
+
+all: bin objs
+
+bin: $(PROJECT)
+
+objs: $(OBJS)
+
+$(PROJECT): $(OBJS) $(PROJECT).c
+	$(CC) $(CFLAGS) $(LDFLAGS) $(DFLAGS) -o $@ $^
+
+$(OBJS): %.o : %.c
+	$(CC) $(CFLAGS) $(LDFLAGS) $(DFLAGS) -c $<
+
+clean:
+	rm $(OBJS) $(PROJECT)
+
+#utils
+print-% : ; $(info $* is $(flavor $*) variable set to [$($*)]) @true

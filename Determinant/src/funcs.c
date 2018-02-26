@@ -38,14 +38,8 @@ type func(size_t N, type *M) {                      \
   struct timeval end;                               \
   float elapsed = 0.0f;                             \
   CPU_TIMER_START(elapsed, start);                  \
-  if (N == 0) {                                     \
-    LOG_ERROR(STR(func), "N: %zu", N);              \
-  } else {                                          \
-    LOG_INFO(STR(func), "N: %zu", N);               \
-  }                                                 \
   type result = func##_kernel(N, M);                \
   CPU_TIMER_END(elapsed, start, end);               \
-  LOG_INFO(STR(func), "elapsed time: %f", elapsed); \
   return result;                                    \
 }
 FOREACH_FUNC_NAME(DETERMINANT_FUNC)

@@ -43,8 +43,8 @@ static ssize_t dev_write(struct file *, const char *, size_t, loff_t *);
 /*
 *	Stores the device number -- determined automatically
 */
-static int    majorNumber;                  
-static int  size_of_message = sizeof(int)*D_ARRAY_SIZE*D_ARRAY_SIZE;              
+static int  majorNumber;                  
+static int  size_of_message = sizeof(int) * D_ARRAY_SIZE*D_ARRAY_SIZE;              
 
 
 /*
@@ -83,6 +83,11 @@ atomic_t correct_det_calculations;
 */
 static int no_of_reads;
 static int no_of_det_cals;
+
+
+
+/*tolerance */
+const int tolerance = 10000; //(.01%)
 
 /*
 *	sysfs set function
@@ -277,29 +282,61 @@ static ssize_t dev_read(struct file *filep, char *buffer, size_t len, loff_t *of
 
 static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, loff_t *offset)
 {
-	long long det_current_mat, tmp_det_result;
+	long long det_current_mat, tmp_det_result, tol_range;
+
 	int error_count = 0;
 	size_of_message = sizeof(long long);
 	//printk(KERN_INFO "dummy: inside dev write\n");
 
 	error_count = copy_from_user(&det_current_mat, buffer, len); 
-	if (error_count==0){            
+	if (error_count==0){         
+
+		
 		tmp_det_result = det_results [atomic_read(&current_det_pos) % NO_OF_ARRAYS];
-		//printk(KERN_INFO "dummy: read from the user  %lld %lld\n", det_current_mat, tmp_det_result);
-		/*
-		/* Correct determinant result, return 0
-		*/
+		tol_range = det_current_mat/tolerance;
+
+		/**
+		* Correct determinant result, return 0
+		*accept only certain value  */ 
 		if (det_current_mat == tmp_det_result) {
 			atomic_add(1, &current_det_pos);
 			atomic_add(1, &correct_det_calculations);
 			return 0;
 		}
+
+		/*accept range of values*/
+		if (det_current_mat >= 0) {
+			if (det_current_mat > tmp_det_result - tol_range && det_current_mat < tmp_det_result + tol_range){
+				atomic_add(1, &current_det_pos);
+				atomic_add(1, &correct_det_calculations);
+				return 0;
+			}
+			else {
+                printk(KERN_INFO "correct order %d current val %lld\n", current_det_pos, det_current_mat);
+                return -1;
+            }
+		} 
+
+		if (det_current_mat < 0) {
+			if (det_current_mat > tmp_det_result + tol_range && det_current_mat < tmp_det_result - tol_range){
+				atomic_add(1, &current_det_pos);
+				atomic_add(1, &correct_det_calculations);
+				return 0;
+			}
+			else {
+                printk(KERN_INFO "correct order %d current val %lld\n", current_det_pos, det_current_mat);
+                return -1;
+            }
+		} 
+
+
+
+
 		/*
-		/* Incorrect determinant result, return -1
+		* Incorrect determinant result, return -1
 		*/
-		else {
-			return -1;
-		}
+		return -1;
+
 
 		return (size_of_message);  
 	}
