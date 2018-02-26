@@ -1,17 +1,17 @@
 .PHONY : all bin objs clean
 
-PROJECT := test
+PROJECT := test-simple
 
-SOURCES := write_back_queue.c lf_compute_queue.c
+SOURCES := write_back_queue.c compute_queue.c
 
 
 CC := gcc
 
 OBJS := $(SOURCES:.c=.o)
 
-CFLAGS := -O4 -g -fopenmp -mavx2 -std=c99 -D_GNU_SOURCE -lpthread -DMSQUEUE
+CFLAGS := -O3 -ffast-math -fopenmp -mavx2 -std=c99 -D_GNU_SOURCE -lpthread -fno-aggressive-loop-optimizations
 
-NUM_COMP_THREADS   ?= 33
+NUM_COMP_THREADS   ?= 16
 NUM_BULKS          ?= 4
 READ_QUEUE_LENGTH  ?= 384
 WRITE_QUEUE_LENGTH ?= 512
@@ -41,7 +41,7 @@ bin: $(PROJECT)
 objs: $(OBJS)
 
 $(PROJECT): $(OBJS) $(PROJECT).c
-	$(CC) $(CFLAGS) $(LDFLAGS) $(DFLAGS) -o $@ $^ queues/hzdptr.o queues/xxhash.o
+	$(CC) $(CFLAGS) $(LDFLAGS) $(DFLAGS) -o $@ $^
 
 $(OBJS): %.o : %.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $(DFLAGS) -c $<

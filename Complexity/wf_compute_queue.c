@@ -1,4 +1,5 @@
 #include "wf_compute_queue.h"
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include "queues/queue.h"
@@ -6,460 +7,244 @@
 #include "queues/primitives.h"
 #include "queues/align.h"
 #include "queues/hzdptr.h"
-#include "queues/wfqueue.h"
+#include "queues/lcrq.h"
+
+#define RING_SIZE LCRQ_RING_SIZE
 
 static queue_t *cq[NUM_COMP_THREADS];
 static handle_t *cq_handle[NUM_COMP_THREADS];
 
-#define N WFQUEUE_NODE_SIZE
-#define BOT ((void *)0)
-#define TOP ((void *)-1)
+static inline int is_empty(uint64_t v) __attribute__ ((pure));
+static inline uint64_t node_index(uint64_t i) __attribute__ ((pure));
+static inline uint64_t set_unsafe(uint64_t i) __attribute__ ((pure));
+static inline uint64_t node_unsafe(uint64_t i) __attribute__ ((pure));
+static inline uint64_t tail_index(uint64_t t) __attribute__ ((pure));
+static inline int crq_is_closed(uint64_t t) __attribute__ ((pure));
 
-#define MAX_GARBAGE(n) (2 * n)
+static inline void init_ring(RingQueue *r) {
+  int i;
 
-#ifndef MAX_SPIN
-#define MAX_SPIN 100
-#endif
+  for (i = 0; i < RING_SIZE; i++) {
+    r->array[i].val = -1;
+    r->array[i].idx = i;
+  }
 
-#ifndef MAX_PATIENCE
-#define MAX_PATIENCE 10
-#endif
+  r->head = r->tail = 0;
+  r->next = NULL;
+}
 
-typedef struct _enq_t enq_t;
-typedef struct _deq_t deq_t;
-typedef struct _cell_t cell_t;
-typedef struct _node_t node_t;
+inline int is_empty(uint64_t v)  {
+  return (v == (uint64_t)-1);
+}
 
-static inline void *spin(void *volatile *p) {
-    int patience = MAX_SPIN;
-    void *v = *p;
 
-    while (!v && patience-- > 0) {
-        v = *p;
-        PAUSE();
+inline uint64_t node_index(uint64_t i) {
+  return (i & ~(1ull << 63));
+}
+
+
+inline uint64_t set_unsafe(uint64_t i) {
+  return (i | (1ull << 63));
+}
+
+
+inline uint64_t node_unsafe(uint64_t i) {
+  return (i & (1ull << 63));
+}
+
+
+inline uint64_t tail_index(uint64_t t) {
+  return (t & ~(1ull << 63));
+}
+
+
+inline int crq_is_closed(uint64_t t) {
+  return (t & (1ull << 63)) != 0;
+}
+
+void queue_init(queue_t * q, int nprocs)
+{
+  RingQueue *rq = align_malloc(PAGE_SIZE, sizeof(RingQueue));
+  init_ring(rq);
+
+  q->head = rq;
+  q->tail = rq;
+  q->nprocs = nprocs;
+}
+
+static inline void fixState(RingQueue *rq) {
+
+  while (1) {
+    uint64_t t = rq->tail;
+    uint64_t h = rq->head;
+
+    if (rq->tail != t)
+      continue;
+
+    if (h > t) {
+      if (CAS(&rq->tail, &t, h)) break;
+      continue;
+    }
+    break;
+  }
+}
+
+static inline int close_crq(RingQueue *rq, const uint64_t t, const int tries) {
+  uint64_t tt = t + 1;
+
+  if (tries < 10)
+    return CAS(&rq->tail, &tt, tt|(1ull<<63));
+  else
+    return BTAS(&rq->tail, 63);
+}
+
+static void lcrq_put(queue_t * q, handle_t * handle, uint64_t arg) {
+  int try_close = 0;
+
+  while (1) {
+    RingQueue *rq = hzdptr_setv(&q->tail, &handle->hzdptr, 0);
+    RingQueue *next = rq->next;
+
+    if (next != NULL) {
+      CAS(&q->tail, &rq, next);
+      continue;
     }
 
-    return v;
-}
+    uint64_t t = FAA(&rq->tail, 1);
 
-static inline node_t *new_node() {
-    node_t *n = align_malloc(PAGE_SIZE, sizeof(node_t));
-    memset(n, 0, sizeof(node_t));
-    return n;
-}
+    if (crq_is_closed(t)) {
+      RingQueue * nrq;
+alloc:
+      nrq = handle->next;
 
-static node_t *check(unsigned long volatile *p_hzd_node_id, node_t *cur,
-                     node_t *old) {
-    unsigned long hzd_node_id = ACQUIRE(p_hzd_node_id);
+      if (nrq == NULL) {
+        nrq = align_malloc(PAGE_SIZE, sizeof(RingQueue));
+        init_ring(nrq);
+      }
 
-    if (hzd_node_id < cur->id) {
-        node_t *tmp = old;
-        while (tmp->id < hzd_node_id) {
-            tmp = tmp->next;
+      // Solo enqueue
+      nrq->tail = 1;
+      nrq->array[0].val = (uint64_t) arg;
+      nrq->array[0].idx = 0;
+
+      if (CAS(&rq->next, &next, nrq)) {
+        CAS(&q->tail, &rq, nrq);
+        handle->next = NULL;
+        return;
+      }
+      continue;
+    }
+
+    RingNode* cell = &rq->array[t & (RING_SIZE-1)];
+
+    uint64_t idx = cell->idx;
+    uint64_t val = cell->val;
+
+    if (is_empty(val)) {
+      if (node_index(idx) <= t) {
+        if ((!node_unsafe(idx) || rq->head < t) &&
+            CAS2(cell, &val, &idx, arg, t)) {
+          return;
         }
-        cur = tmp;
+      }
     }
 
-    return cur;
+    uint64_t h = rq->head;
+
+    if ((int64_t)(t - h) >= (int64_t)RING_SIZE &&
+        close_crq(rq, t, ++try_close)) {
+      goto alloc;
+    }
+  }
+
+  hzdptr_clear(&handle->hzdptr, 0);
 }
 
-static node_t *update(node_t *volatile *pPn, node_t *cur,
-                      unsigned long volatile *p_hzd_node_id, node_t *old) {
-    node_t *ptr = ACQUIRE(pPn);
+static uint64_t lcrq_get(queue_t * q, handle_t * handle) {
+  while (1) {
+    RingQueue *rq = hzdptr_setv(&q->head, &handle->hzdptr, 0);
+    RingQueue *next;
 
-    if (ptr->id < cur->id) {
-        if (!CAScs(pPn, &ptr, cur)) {
-            if (ptr->id < cur->id) cur = ptr;
-        }
+    uint64_t h = FAA(&rq->head, 1);
 
-        cur = check(p_hzd_node_id, cur, old);
-    }
+    RingNode* cell = &rq->array[h & (RING_SIZE-1)];
 
-    return cur;
-}
+    uint64_t tt = 0;
+    int r = 0;
 
-static void cleanup(queue_t *q, handle_t *th) {
-    long oid = ACQUIRE(&q->Hi);
-    node_t *new = th->Dp;
-
-    if (oid == -1) return;
-    if (new->id - oid < MAX_GARBAGE(q->nprocs)) return;
-    if (!CASa(&q->Hi, &oid, -1)) return;
-
-    node_t *old = q->Hp;
-    handle_t *ph = th;
-    handle_t *phs[q->nprocs];
-    int i = 0;
-
-    do {
-        new = check(&ph->hzd_node_id, new, old);
-        new = update(&ph->Ep, new, &ph->hzd_node_id, old);
-        new = update(&ph->Dp, new, &ph->hzd_node_id, old);
-
-        phs[i++] = ph;
-        ph = ph->next;
-    } while (new->id > oid && ph != th);
-
-    while (new->id > oid && --i >= 0) {
-        new = check(&phs[i]->hzd_node_id, new, old);
-    }
-
-    long nid = new->id;
-
-    if (nid <= oid) {
-        RELEASE(&q->Hi, oid);
-    } else {
-        q->Hp = new;
-        RELEASE(&q->Hi, nid);
-
-        while (old != new) {
-            node_t *tmp = old->next;
-            free(old);
-            old = tmp;
-        }
-    }
-}
-
-static cell_t *find_cell(node_t *volatile *ptr, long i, handle_t *th) {
-    node_t *curr = *ptr;
-
-    long j;
-    for (j = curr->id; j < i / N; ++j) {
-        node_t *next = curr->next;
-
-        if (next == NULL) {
-            node_t *temp = th->spare;
-
-            if (!temp) {
-                temp = new_node();
-                th->spare = temp;
-            }
-
-            temp->id = j + 1;
-
-            if (CASra(&curr->next, &next, temp)) {
-                next = temp;
-                th->spare = NULL;
-            }
-        }
-
-        curr = next;
-    }
-
-    *ptr = curr;
-    return &curr->cells[i % N];
-}
-
-static int enq_fast(queue_t *q, handle_t *th, void *v, long *id) {
-    long i = FAAcs(&q->Ei, 1);
-    cell_t *c = find_cell(&th->Ep, i, th);
-    void *cv = BOT;
-
-    if (CAS(&c->val, &cv, v)) {
-#ifdef RECORD
-        th->fastenq++;
-#endif
-        return 1;
-    } else {
-        *id = i;
-        return 0;
-    }
-}
-
-static void enq_slow(queue_t *q, handle_t *th, void *v, long id) {
-    enq_t *enq = &th->Er;
-    enq->val = v;
-    RELEASE(&enq->id, id);
-
-    node_t *tail = th->Ep;
-    long i;
-    cell_t *c;
-
-    do {
-        i = FAA(&q->Ei, 1);
-        c = find_cell(&tail, i, th);
-        enq_t *ce = BOT;
-
-        if (CAScs(&c->enq, &ce, enq) && c->val != TOP) {
-            if (CAS(&enq->id, &id, -i)) id = -i;
-            break;
-        }
-    } while (enq->id > 0);
-
-    id = -enq->id;
-    c = find_cell(&th->Ep, id, th);
-    if (id > i) {
-        long Ei = q->Ei;
-        while (Ei <= id && !CAS(&q->Ei, &Ei, id + 1))
-            ;
-    }
-    c->val = v;
-
-#ifdef RECORD
-    th->slowenq++;
-#endif
-}
-
-void enqueue(queue_t *q, handle_t *th, void *v) {
-    th->hzd_node_id = th->enq_node_id;
-
-    long id;
-    int p = MAX_PATIENCE;
-    while (!enq_fast(q, th, v, &id) && p-- > 0)
-        ;
-    if (p < 0) enq_slow(q, th, v, id);
-
-    th->enq_node_id = th->Ep->id;
-    RELEASE(&th->hzd_node_id, -1);
-}
-
-static void *help_enq(queue_t *q, handle_t *th, cell_t *c, long i) {
-    void *v = spin(&c->val);
-
-    if ((v != TOP && v != BOT) ||
-        (v == BOT && !CAScs(&c->val, &v, TOP) && v != TOP)) {
-        return v;
-    }
-
-    enq_t *e = c->enq;
-
-    if (e == BOT) {
-        handle_t *ph;
-        enq_t *pe;
-        long id;
-        ph = th->Eh, pe = &ph->Er, id = pe->id;
-
-        if (th->Ei != 0 && th->Ei != id) {
-            th->Ei = 0;
-            th->Eh = ph->next;
-            ph = th->Eh, pe = &ph->Er, id = pe->id;
-        }
-
-        if (id > 0 && id <= i && !CAS(&c->enq, &e, pe))
-            th->Ei = id;
-        else
-            th->Eh = ph->next;
-
-        if (e == BOT && CAS(&c->enq, &e, TOP)) e = TOP;
-    }
-
-    if (e == TOP) return (q->Ei <= i ? BOT : TOP);
-
-    long ei = ACQUIRE(&e->id);
-    void *ev = ACQUIRE(&e->val);
-
-    if (ei > i) {
-        if (c->val == TOP && q->Ei <= i) return BOT;
-    } else {
-        if ((ei > 0 && CAS(&e->id, &ei, -i)) || (ei == -i && c->val == TOP)) {
-            long Ei = q->Ei;
-            while (Ei <= i && !CAS(&q->Ei, &Ei, i + 1))
-                ;
-            c->val = ev;
-        }
-    }
-
-    return c->val;
-}
-
-static void help_deq(queue_t *q, handle_t *th, handle_t *ph) {
-    deq_t *deq = &ph->Dr;
-    long idx = ACQUIRE(&deq->idx);
-    long id = deq->id;
-
-    if (idx < id) return;
-
-    node_t *Dp = ph->Dp;
-    th->hzd_node_id = ph->hzd_node_id;
-    FENCE();
-    idx = deq->idx;
-
-    long i = id + 1, old = id, new = 0;
     while (1) {
-        node_t *h = Dp;
-        for (; idx == old && new == 0; ++i) {
-            cell_t *c = find_cell(&h, i, th);
 
-            long Di = q->Di;
-            while (Di <= i && !CAS(&q->Di, &Di, i + 1))
-                ;
+      uint64_t cell_idx = cell->idx;
+      uint64_t unsafe = node_unsafe(cell_idx);
+      uint64_t idx = node_index(cell_idx);
+      uint64_t val = cell->val;
 
-            void *v = help_enq(q, th, c, i);
-            if (v == BOT || (v != TOP && c->deq == BOT))
-                new = i;
-            else
-                idx = ACQUIRE(&deq->idx);
-        }
+      if (idx > h) break;
 
-        if (new != 0) {
-            if (CASra(&deq->idx, &idx, new)) idx = new;
-            if (idx >= new) new = 0;
-        }
-
-        if (idx < 0 || deq->id != id) break;
-
-        cell_t *c = find_cell(&Dp, idx, th);
-        deq_t *cd = BOT;
-        if (c->val == TOP || CAS(&c->deq, &cd, deq) || cd == deq) {
-            CAS(&deq->idx, &idx, -idx);
+      if (!is_empty(val)) {
+        if (idx == h) {
+          if (CAS2(cell, &val, &cell_idx, -1, (unsafe | h) + RING_SIZE))
+            return val;
+        } else {
+          if (CAS2(cell, &val, &cell_idx, val, set_unsafe(idx))) {
             break;
+          }
         }
+      } else {
+        if ((r & ((1ull << 10) - 1)) == 0)
+          tt = rq->tail;
 
-        old = idx;
-        if (idx >= i) i = idx + 1;
-    }
-}
+        // Optimization: try to bail quickly if queue is closed.
+        int crq_closed = crq_is_closed(tt);
+        uint64_t t = tail_index(tt);
 
-static void *deq_fast(queue_t *q, handle_t *th, long *id) {
-    long i = FAAcs(&q->Di, 1);
-    cell_t *c = find_cell(&th->Dp, i, th);
-    void *v = help_enq(q, th, c, i);
-    deq_t *cd = BOT;
-
-    if (v == BOT) return BOT;
-    if (v != TOP && CAS(&c->deq, &cd, TOP)) return v;
-
-    *id = i;
-    return TOP;
-}
-
-static void *deq_slow(queue_t *q, handle_t *th, long id) {
-    deq_t *deq = &th->Dr;
-    RELEASE(&deq->id, id);
-    RELEASE(&deq->idx, id);
-
-    help_deq(q, th, th);
-    long i = -deq->idx;
-    cell_t *c = find_cell(&th->Dp, i, th);
-    void *val = c->val;
-
-#ifdef RECORD
-    th->slowdeq++;
-#endif
-    return val == TOP ? BOT : val;
-}
-
-void *dequeue(queue_t *q, handle_t *th) {
-    th->hzd_node_id = th->deq_node_id;
-
-    void *v;
-    long id = 0;
-    int p = MAX_PATIENCE;
-
-    do
-        v = deq_fast(q, th, &id);
-    while (v == TOP && p-- > 0);
-    if (v == TOP)
-        v = deq_slow(q, th, id);
-    else {
-#ifdef RECORD
-        th->fastdeq++;
-#endif
-    }
-
-    if (v != EMPTY) {
-        help_deq(q, th, th->Dh);
-        th->Dh = th->Dh->next;
-    }
-
-    th->deq_node_id = th->Dp->id;
-    RELEASE(&th->hzd_node_id, -1);
-
-    if (th->spare == NULL) {
-        cleanup(q, th);
-        th->spare = new_node();
-    }
-
-#ifdef RECORD
-    if (v == EMPTY) th->empty++;
-#endif
-    return v;
-}
-
-static pthread_barrier_t barrier;
-
-void queue_init(queue_t *q, int nprocs) {
-    q->Hi = 0;
-    q->Hp = new_node();
-
-    q->Ei = 1;
-    q->Di = 1;
-
-    q->nprocs = nprocs;
-
-#ifdef RECORD
-    q->fastenq = 0;
-    q->slowenq = 0;
-    q->fastdeq = 0;
-    q->slowdeq = 0;
-    q->empty = 0;
-#endif
-    pthread_barrier_init(&barrier, NULL, nprocs);
-}
-
-void queue_free(queue_t *q, handle_t *h) {
-#ifdef RECORD
-    static int lock = 0;
-
-    FAA(&q->fastenq, h->fastenq);
-    FAA(&q->slowenq, h->slowenq);
-    FAA(&q->fastdeq, h->fastdeq);
-    FAA(&q->slowdeq, h->slowdeq);
-    FAA(&q->empty, h->empty);
-
-    pthread_barrier_wait(&barrier);
-
-    if (FAA(&lock, 1) == 0)
-        printf("Enq: %f Deq: %f Empty: %f\n",
-               q->slowenq * 100.0 / (q->fastenq + q->slowenq),
-               q->slowdeq * 100.0 / (q->fastdeq + q->slowdeq),
-               q->empty * 100.0 / (q->fastdeq + q->slowdeq));
-#endif
-}
-
-void queue_register(queue_t *q, handle_t *th, int id) {
-    th->next = NULL;
-    th->hzd_node_id = -1;
-    th->Ep = q->Hp;
-    th->enq_node_id = th->Ep->id;
-    th->Dp = q->Hp;
-    th->deq_node_id = th->Dp->id;
-
-    th->Er.id = 0;
-    th->Er.val = BOT;
-    th->Dr.id = 0;
-    th->Dr.idx = -1;
-
-    th->Ei = 0;
-    th->spare = new_node();
-#ifdef RECORD
-    th->slowenq = 0;
-    th->slowdeq = 0;
-    th->fastenq = 0;
-    th->fastdeq = 0;
-    th->empty = 0;
-#endif
-
-    static handle_t *volatile _tail;
-    handle_t *tail = _tail;
-
-    if (tail == NULL) {
-        th->next = th;
-        if (CASra(&_tail, &tail, th)) {
-            th->Eh = th->next;
-            th->Dh = th->next;
-            return;
+        if (unsafe) { // Nothing to do, move along
+          if (CAS2(cell, &val, &cell_idx, val, (unsafe | h) + RING_SIZE))
+            break;
+        } else if (t < h + 1 || r > 200000 || crq_closed) {
+          if (CAS2(cell, &val, &idx, val, h + RING_SIZE)) {
+            if (r > 200000 && tt > RING_SIZE)
+              BTAS(&rq->tail, 63);
+            break;
+          }
+        } else {
+          ++r;
         }
+      }
     }
 
-    handle_t *next = tail->next;
-    do
-        th->next = next;
-    while (!CASra(&tail->next, &next, th));
+    if (tail_index(rq->tail) <= h + 1) {
+      fixState(rq);
+      // try to return empty
+      next = rq->next;
+      if (next == NULL)
+        return -1;  // EMPTY
+      if (tail_index(rq->tail) <= h + 1) {
+        if (CAS(&q->head, &rq, next)) {
+          hzdptr_retire(&handle->hzdptr, rq);
+        }
+      }
+    }
+  }
 
-    th->Eh = th->next;
-    th->Dh = th->next;
+  hzdptr_clear(&handle->hzdptr, 0);
 }
+
+void queue_register(queue_t * q, handle_t * th, int id)
+{
+  hzdptr_init(&th->hzdptr, q->nprocs, 1);
+}
+
+void enqueue(queue_t * q, handle_t * th, void * val)
+{
+  lcrq_put(q, th, (uint64_t) val);
+}
+
+void * dequeue(queue_t * q, handle_t * th)
+{
+  return (void *) lcrq_get(q, th);
+}
+
 
 void compute_queue_init() {
   size_t i;
@@ -473,10 +258,10 @@ void compute_queue_init() {
 
 
 void compute_queue_destory() {
-  size_t i;
-  for (i = 0; i < NUM_COMP_THREADS; ++i) {
-    queue_free(cq[i], cq_handle[i]);
-  }
+  //size_t i;
+  //for (i = 0; i < NUM_COMP_THREADS; ++i) {
+  //  queue_free(cq[i], cq_handle[i]);
+  //}
 }
 
 bool compute_queue_try_pop(size_t queue_id, data_entry_t **data_entry) {

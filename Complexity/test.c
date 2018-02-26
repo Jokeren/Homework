@@ -10,7 +10,7 @@
 #include <determinant.h>
 
 #include "common.h"
-#include "wf_compute_queue.h"
+#include "lf_compute_queue.h"
 #include "write_back_queue.h"
 
 static volatile bool terminate = false;
@@ -162,21 +162,21 @@ void reader(int fd, size_t tid) {
         }
       }
     }
-    bool lock = false;
-    i = 0;
-    while ((lock = compute_queue_try_lock(head)) == false && i < NUM_COMP_THREADS) {
-      head = (head + 1) % NUM_COMP_THREADS;
-      ++i;
-    }
-    if (lock == false) {
-      compute_queue_lock(head);
-    }
+    //bool lock = false;
+    //i = 0;
+    //while ((lock = compute_queue_try_lock(head)) == false && i < NUM_COMP_THREADS) {
+    //  head = (head + 1) % NUM_COMP_THREADS;
+    //  ++i;
+    //}
+    //if (lock == false) {
+    //  compute_queue_lock(head);
+    //}
     for (i = 0; i < NUM_READ_ITERS; ++i) {
       data_entries[i]->tag = order;
       compute_queue_push(head, data_entries[i]);
       order = order + 1;
     }
-    compute_queue_unlock(head);
+    //compute_queue_unlock(head);
     head = (head + 1) % NUM_COMP_THREADS;
   }
   printf("[tid:%zu]->End reading...\n", tid);
