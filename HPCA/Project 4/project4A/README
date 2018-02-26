@@ -1,0 +1,35 @@
+Source Files
+------------
+sim.c: Simulation Driver, Client, Scheduler,  Device Controller
+maketrace.c Trace file generator 
+
+Header Files
+------------
+global.h: Global definitions
+sim.h: Required by Yacsim
+
+Object Files
+------------
+yacsim.o: Simulator code
+utils.o: Precompiled helper functions
+
+Text Files:
+README -- This file
+
+Instructions to run simulator
+-------------------------------
+To change workload and simlulation parameters:
+   Edit "global.h"
+
+
+To Compile and Execute:
+-----------------------
+ Trace Generator:  
+       gcc maketrace.c  
+ Execute:  ./a.out
+
+ Simulator:
+	gcc sim.c utils.o  ./yacsim.o -lm -o runme
+  Execute:    ./runme
+
+
