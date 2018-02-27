@@ -7,7 +7,6 @@
 #include <kernels/plain.h>
 #include <kernels/blas.h>
 #include <kernels/simd.h>
-#include <utils/timer.h>
 #include <utils/log.h>
 
 #define STR(x) #x
@@ -34,12 +33,7 @@
 #ifdef PERFORMANCE
 #define DETERMINANT_FUNC(type, name, func)          \
 type func(size_t N, type *M) {                      \
-  struct timeval start;                             \
-  struct timeval end;                               \
-  float elapsed = 0.0f;                             \
-  CPU_TIMER_START(elapsed, start);                  \
   type result = func##_kernel(N, M);                \
-  CPU_TIMER_END(elapsed, start, end);               \
   return result;                                    \
 }
 FOREACH_FUNC_NAME(DETERMINANT_FUNC)
