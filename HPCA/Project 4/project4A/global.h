@@ -15,10 +15,16 @@
 #define WRITE_TIME 0.4
 
 #define FCFS_SCHED  TRUE
+#ifndef STRIPED
 #define STRIPED    FALSE
+#endif
 
+#ifndef NUM_OUTSTANDING_REQUESTS
 #define NUM_OUTSTANDING_REQUESTS 1
+#endif
+#ifndef READ_FRACTION
 #define READ_FRACTION  1.0
+#endif
 
 #define MAX_STORAGEQ 120
 
