@@ -34,7 +34,7 @@ ifdef ARCH
 OFLAGS += -m$(ARCH)
 endif
 
-CFLAGS := -fPIC $(OFLAGS)
+CFLAGS := -fPIC -std=c99 $(OFLAGS)
 LDFLAGS := 
 SRCS := $(shell find . -maxdepth 3 -name "*.c")
 OBJECTS := $(addprefix $(BUILD_DIR), $(patsubst %.c, %.o, $(SRCS)))
