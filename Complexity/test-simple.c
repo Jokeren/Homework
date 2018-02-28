@@ -11,8 +11,9 @@
 #include <determinant.h>
 
 #include "common.h"
-#include "write_back_queue.h"
+#ifndef OVERLAP
 #define OVERLAP 8
+#endif
 
 static volatile bool terminate = false;
 static volatile size_t life = 0;
@@ -26,9 +27,9 @@ static volatile int write_allow_write_sems_b[OVERLAP];
 static volatile int write_allow_read_sems_b[OVERLAP];
 static volatile int comp_allow_write_sems_b[OVERLAP];
 static volatile int comp_allow_read_sems_b[OVERLAP];
-static long long write_values[OVERLAP];
-static int buffer1[OVERLAP][D_ARRAY_SIZE * D_ARRAY_SIZE];
-static int buffer2[OVERLAP][D_ARRAY_SIZE * D_ARRAY_SIZE];
+static long long write_values[OVERLAP][NUM_BULKS];
+static int *buffer1[OVERLAP];
+static int *buffer2[OVERLAP];
 
 void measurement(size_t tid) {
   printf("[tid:%zu]->Start measurement...\n", tid);
@@ -74,21 +75,26 @@ void measurement(size_t tid) {
 void write_back(int fd, size_t tid) {
   printf("[tid:%zu]->Writing to the device...\n", tid);
   size_t order = 0;
-  if (life + 1 < LIFE) {
-    while (life + 1 < LIFE) {
-      //sem_wait(&write_allow_read_sems[order % OVERLAP]);
-      while(__sync_bool_compare_and_swap(&write_allow_read_sems_b[order % OVERLAP], 1, 0) == false);
-      long long result = write_values[order % OVERLAP];
-      __sync_add_and_fetch(&write_allow_write_sems_b[order % OVERLAP], 1);
-      //sem_post(&write_allow_write_sems[order % OVERLAP]);
-      int ret = write(fd, &result, sizeof(long long)); 
-      if (ret < 0) {
-        printf("incorrect answer %lld tid %zu\n", result, tid);
-      } else {
-        //printf("correct answer %lld tid %zu\n", result, tid);
-      }
-      order = order + 1;
+  long long results[NUM_BULKS];
+  /*Do not have to wait for terminate in the first interval*/
+  while (life + 1 < LIFE) {
+    //sem_wait(&write_allow_read_sems[order % OVERLAP]);
+    while(__sync_bool_compare_and_swap(&write_allow_read_sems_b[order % OVERLAP], 1, 0) == false);
+    size_t i;
+    for (i = 0; i < NUM_BULKS; ++i) {
+      results[i] = write_values[order % OVERLAP][i];
     }
+    __sync_add_and_fetch(&write_allow_write_sems_b[order % OVERLAP], 1);
+    //sem_post(&write_allow_write_sems[order % OVERLAP]);
+    for (i = 0; i < NUM_BULKS; ++i) {
+      int ret = write(fd, &results[i], sizeof(long long)); 
+      if (ret < 0) {
+        printf("incorrect answer %lld tid %zu\n", results[i], tid);
+      } else {
+        //printf("correct answer %lld tid %zu\n", results[i], tid);
+      }
+    }
+    order = order + 1;
   }
   while (terminate == false) {
     //sem_wait(&write_allow_read_sems[order % OVERLAP]);
@@ -97,14 +103,19 @@ void write_back(int fd, size_t tid) {
         return;
       }
     }
-    long long result = write_values[order % OVERLAP];
+    size_t i;
+    for (i = 0; i < NUM_BULKS; ++i) {
+      results[i] = write_values[order % OVERLAP][i];
+    }
     __sync_add_and_fetch(&write_allow_write_sems_b[order % OVERLAP], 1);
     //sem_post(&write_allow_write_sems[order % OVERLAP]);
-    int ret = write(fd, &result, sizeof(long long)); 
-    if (ret < 0) {
-      printf("incorrect answer %lld tid %zu\n", result, tid);
-    } else {
-      //printf("correct answer %lld tid %zu\n", result, tid);
+    for (i = 0; i < NUM_BULKS; ++i) {
+      int ret = write(fd, &results[i], sizeof(long long)); 
+      if (ret < 0) {
+        printf("incorrect answer %lld tid %zu\n", results[i], tid);
+      } else {
+        //printf("correct answer %lld tid %zu\n", results[i], tid);
+      }
     }
     order = order + 1;
   }
@@ -112,7 +123,7 @@ void write_back(int fd, size_t tid) {
 }
 
 
-int __attribute__ ((noinline)) read_wrapper(int fd, int *buffer) {
+int read_wrapper(int fd, int *buffer) {
   return read(fd, buffer, BUFFER_LENGTH);
 }
 
@@ -121,36 +132,41 @@ void reader(int fd, size_t tid) {
   printf("[tid:%zu]->Reading from the device...\n", tid);
   size_t order = 0;
   size_t head = 0;
-  if (life + 1 < LIFE) {
-    while (life + 1 < LIFE) {
-      size_t i = 0;
-      for (i = 0; i < OVERLAP; ++i) {
-        int *buffer = (order & 0x1) == 0 ? buffer1[i] : buffer2[i];
+  /*Do not have to wait for terminate in the first interval*/
+  while (life + 1 < LIFE) {
+    size_t i;
+    for (i = 0; i < OVERLAP; ++i) {
+      int *buffer = (order & 0x1) == 0 ? buffer1[i] : buffer2[i];
+      size_t j;
+      for (j = 0; j < NUM_BULKS; ++j) {
         // Use wrapper when hpcrun is wrappered
-        int ret = read_wrapper(fd, buffer);
+        int ret = read_wrapper(fd, buffer + j * D_ARRAY_SIZE * D_ARRAY_SIZE);
         //int ret = read(fd, buffer, BUFFER_LENGTH);
         if (ret < 0) {
           perror("Failed to read the message from the device.");
         }
       }
-      for (i = 0; i < OVERLAP; ++i) {
-        //sem_wait(&comp_allow_write_sems[i]);
-        while (__sync_bool_compare_and_swap(&comp_allow_write_sems_b[i], 1, 0) == false);
-        __sync_add_and_fetch(&comp_allow_read_sems_b[i], 1);
-        //sem_post(&comp_allow_read_sems[i]);
-      }
-      order = order + 1;
     }
+    for (i = 0; i < OVERLAP; ++i) {
+      //sem_wait(&comp_allow_write_sems[i]);
+      while (__sync_bool_compare_and_swap(&comp_allow_write_sems_b[i], 1, 0) == false);
+      __sync_add_and_fetch(&comp_allow_read_sems_b[i], 1);
+      //sem_post(&comp_allow_read_sems[i]);
+    }
+    order = order + 1;
   }
   while (terminate == false) {
-    size_t i = 0;
+    size_t i;
     for (i = 0; i < OVERLAP; ++i) {
       int *buffer = (order & 0x1) == 0 ? buffer1[i] : buffer2[i];
-      // Use wrapper when hpcrun is wrappered
-      int ret = read_wrapper(fd, buffer);
-      //int ret = read(fd, buffer, BUFFER_LENGTH);
-      if (ret < 0) {
-        perror("Failed to read the message from the device.");
+      size_t j;
+      for (j = 0; j < NUM_BULKS; ++j) {
+        // Use wrapper when hpcrun is wrappered
+        int ret = read_wrapper(fd, buffer + j * D_ARRAY_SIZE * D_ARRAY_SIZE);
+        //int ret = read(fd, buffer, BUFFER_LENGTH);
+        if (ret < 0) {
+          perror("Failed to read the message from the device.");
+        }
       }
     }
     for (i = 0; i < OVERLAP; ++i) {
@@ -174,29 +190,33 @@ void compute(int fd, size_t tid) {
     return;
   }
   printf("[tid:%zu]->Start computing...\n", tid);
-  double compute_buffer[D_ARRAY_SIZE * D_ARRAY_SIZE];
+  double *compute_buffer = (double *)malloc(sizeof(double) * NUM_BULKS * D_ARRAY_SIZE * D_ARRAY_SIZE);
+  long long results[NUM_BULKS];
   size_t order = 0;
-  if (life + 1 < LIFE) {
-    while (life + 1 < LIFE) {
-      //sem_wait(&comp_allow_read_sems[tid]);
-      while(__sync_bool_compare_and_swap(&comp_allow_read_sems_b[tid], 1, 0) == false);
-      int *buffer = (order & 0x1) == 0 ? buffer1[tid] : buffer2[tid];
-      size_t j = 0;
-      for (j = 0; j < D_ARRAY_SIZE * D_ARRAY_SIZE; ++j) {
-        compute_buffer[j] = buffer[j];
-      }
-      //sem_post(&comp_allow_write_sems[tid]);
-      __sync_add_and_fetch(&comp_allow_write_sems_b[tid], 1);
-      long long result = compute_fn(D_ARRAY_SIZE, compute_buffer);
-
-      //sem_wait(&write_allow_write_sems[tid]);
-      while(__sync_bool_compare_and_swap(&write_allow_write_sems_b[tid], 1, 0) == false);
-      write_values[tid] = result;
-      __sync_add_and_fetch(&write_allow_read_sems_b[tid], 1);
-      //sem_post(&write_allow_read_sems[tid]);
-
-      order = order + 1;
+  /*Do not have to wait for terminate in the first interval*/
+  while (life + 1 < LIFE) {
+    //sem_wait(&comp_allow_read_sems[tid]);
+    while(__sync_bool_compare_and_swap(&comp_allow_read_sems_b[tid], 1, 0) == false);
+    int *buffer = (order & 0x1) == 0 ? buffer1[tid] : buffer2[tid];
+    size_t i = 0;
+    for (i = 0; i < NUM_BULKS * D_ARRAY_SIZE * D_ARRAY_SIZE; ++i) {
+      compute_buffer[i] = buffer[i];
     }
+    //sem_post(&comp_allow_write_sems[tid]);
+    __sync_add_and_fetch(&comp_allow_write_sems_b[tid], 1);
+    for (i = 0; i < NUM_BULKS; ++i) {
+      results[i] = compute_fn(D_ARRAY_SIZE, compute_buffer + i * D_ARRAY_SIZE * D_ARRAY_SIZE);
+    }
+
+    //sem_wait(&write_allow_write_sems[tid]);
+    while(__sync_bool_compare_and_swap(&write_allow_write_sems_b[tid], 1, 0) == false);
+    for (i = 0; i < NUM_BULKS; ++i) {
+      write_values[tid][i] = results[i];
+    }
+    __sync_add_and_fetch(&write_allow_read_sems_b[tid], 1);
+    //sem_post(&write_allow_read_sems[tid]);
+
+    order = order + 1;
   }
   while (terminate == false) {
     //sem_wait(&comp_allow_read_sems[tid]);
@@ -206,9 +226,9 @@ void compute(int fd, size_t tid) {
       }
     }
     int *buffer = (order & 0x1) == 0 ? buffer1[tid] : buffer2[tid];
-    size_t j = 0;
-    for (j = 0; j < D_ARRAY_SIZE * D_ARRAY_SIZE; ++j) {
-      compute_buffer[j] = buffer[j];
+    size_t i = 0;
+    for (i = 0; i < NUM_BULKS * D_ARRAY_SIZE * D_ARRAY_SIZE; ++i) {
+      compute_buffer[i] = buffer[i];
     }
     //sem_post(&comp_allow_write_sems[tid]);
     __sync_add_and_fetch(&comp_allow_write_sems_b[tid], 1);
@@ -220,7 +240,9 @@ void compute(int fd, size_t tid) {
         return;
       }
     }
-    write_values[tid] = result;
+    for (i = 0; i < NUM_BULKS; ++i) {
+      write_values[tid][i] = results[i];
+    }
     __sync_add_and_fetch(&write_allow_read_sems_b[tid], 1);
     //sem_post(&write_allow_read_sems[tid]);
 
@@ -242,6 +264,8 @@ void init() {
     write_allow_write_sems_b[i] = 1;
     comp_allow_write_sems_b[i] = 1;
     comp_allow_read_sems_b[i] = 0;
+    buffer1[i] = (int *)malloc(sizeof(int) * NUM_BULKS * D_ARRAY_SIZE * D_ARRAY_SIZE);
+    buffer2[i] = (int *)malloc(sizeof(int) * NUM_BULKS * D_ARRAY_SIZE * D_ARRAY_SIZE);
   }
 }
 
@@ -253,11 +277,14 @@ void destroy() {
     sem_destroy(&write_allow_write_sems[i]);
     sem_destroy(&comp_allow_write_sems[i]);
     sem_destroy(&comp_allow_read_sems[i]);
+    free(buffer1[i]);
+    free(buffer2[i]);
   }
 }
 
 
 int main() {
+  /*Init semaphores and buffers*/
   init();
 
   /*Resetting the dummy*/
@@ -300,6 +327,7 @@ int main() {
   /*Destory queues and locks*/
   printf("End of the program\n");
   close(fd);
+  /*Destroy semaphores and buffers*/
   destroy();
 
   return 0;

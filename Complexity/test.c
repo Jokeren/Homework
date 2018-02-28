@@ -18,7 +18,7 @@ static determinant_d_fn_t compute_fn;
 static data_entry_t *memory_pool[NUM_POOL_SIZE];
 static volatile bool memory_in_use[NUM_POOL_SIZE];
 
-
+/*Set initial buffers in memory pool*/
 void memory_init() {
   size_t i;
   for (i = 0; i < NUM_POOL_SIZE; ++i) {
@@ -33,6 +33,7 @@ void memory_init() {
 }
 
 
+/*Destroy memory pool in the end*/
 void memory_free() {
   size_t i;
   for (i = 0; i < NUM_POOL_SIZE; ++i) {
@@ -48,6 +49,7 @@ void memory_free() {
 
 
 // TODO: extend it to multiple memory segments
+/*Fetch a segment and increase pool_index*/
 bool memory_fetch(size_t *pool_index) {
   while (true) {
     if (terminate == true) {
@@ -137,6 +139,7 @@ int __attribute__ ((noinline)) read_wrapper(int fd, int *buffer) {
 }
 
 
+/*Read determinant values*/
 void reader(int fd, size_t tid) {
   printf("[tid:%zu]->Reading from the device...\n", tid);
   size_t order = 1;
@@ -162,6 +165,7 @@ void reader(int fd, size_t tid) {
         }
       }
     }
+    /*Uncomment it when balanced queue is chosen*/
     //bool lock = false;
     //i = 0;
     //while ((lock = compute_queue_try_lock(head)) == false && i < NUM_COMP_THREADS) {
@@ -176,6 +180,7 @@ void reader(int fd, size_t tid) {
       compute_queue_push(head, data_entries[i]);
       order = order + 1;
     }
+    /*Uncomment it when balanced queue is chosen*/
     //compute_queue_unlock(head);
     head = (head + 1) % NUM_COMP_THREADS;
   }

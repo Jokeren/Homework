@@ -58,6 +58,7 @@ void write_back_queue_set_val(size_t index, long long vals[NUM_BULKS]) {
       return;
     }
   }
+  // Resize write_back queue
   if (i == wq_size[queue_id]) {
     write_back_entry_t *new_queue = (write_back_entry_t *)calloc(
         (wq_size[queue_id] + NUM_WRITE_ENTRIES), sizeof(write_back_entry_t));
@@ -96,7 +97,7 @@ bool write_back_queue_try_get_val(size_t index, long long vals[NUM_BULKS]) {
   return false;
 }
 
-
+// Debug information
 void write_back_queue_display() {
   size_t queue_id;
   for (queue_id = 0; queue_id < WRITE_QUEUE_LENGTH; ++queue_id) {

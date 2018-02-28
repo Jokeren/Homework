@@ -5,8 +5,6 @@
 #include <semaphore.h>
 #include "common.h"
 
-__thread long long msize = 0;
-
 // TODO improvement by separating them from array
 typedef data_entry_t *data_entry_pointer_t;
 static data_entry_pointer_t *cq[NUM_COMP_THREADS];
@@ -74,13 +72,13 @@ bool compute_queue_try_pop(size_t queue_id, data_entry_t **data_entry) {
   size_t idx = cq_tail[queue_id];
   *data_entry = cq[queue_id][idx];
 
-  //--msize;
   cq_tail[queue_id] = (cq_tail[queue_id] + 1) % cq_size[queue_id];
   return true;
 }
 
 
 static void compute_queue_resize(size_t queue_id) {
+  // Double size like C++ vector
   data_entry_pointer_t *new_queue = (data_entry_pointer_t *)calloc(
       (cq_length[queue_id] * 2 + 1), sizeof(data_entry_pointer_t));
   size_t tail = cq_tail[queue_id];
@@ -103,18 +101,6 @@ static void compute_queue_resize(size_t queue_id) {
 
 
 void compute_queue_push(size_t queue_id, data_entry_t *data_entry) {
-  //size_t tail = cq_tail[queue_id];
-  //printf("before\n");
-  //printf("tail %zu head %zu tag_start %zu\n", tail, cq_head[queue_id], tag_start);
-  //size_t i;
-  //for (i = 0; i < cq_length[queue_id]; ++i) {
-  //  if (tail == cq_size[queue_id]) {
-  //    tail = 0;
-  //  }
-  //  printf("%zu ", cq[queue_id][tail].tag);
-  //  tail = tail + 1;
-  //}
-  //printf("\n");
   if (cq_tail[queue_id] == (cq_head[queue_id] + 1) % cq_size[queue_id]) {
     compute_queue_resize(queue_id);
   }
@@ -123,18 +109,4 @@ void compute_queue_push(size_t queue_id, data_entry_t *data_entry) {
   cq[queue_id][head_idx] = data_entry;
 
   cq_head[queue_id] = (cq_head[queue_id] + 1) % cq_size[queue_id];
-  //++msize;
-  //printf("resize %zu\n", msize);
-  //printf("afater\n");
-  //printf("tail %zu head %zu tag_start %zu\n", tail, cq_head[queue_id], tag_start);
-  ////size_t i;
-  //tail = cq_tail[queue_id];
-  //for (i = 0; i < cq_length[queue_id]; ++i) {
-  //  if (tail == cq_size[queue_id]) {
-  //    tail = 0;
-  //  }
-  //  printf("%zu ", cq[queue_id][tail].tag);
-  //  tail = tail + 1;
-  //}
-  //printf("\n");
 }
