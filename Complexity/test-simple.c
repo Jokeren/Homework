@@ -198,7 +198,7 @@ void compute(int fd, size_t tid) {
     //sem_wait(&comp_allow_read_sems[tid]);
     while(__sync_bool_compare_and_swap(&comp_allow_read_sems_b[tid], 1, 0) == false);
     int *buffer = (order & 0x1) == 0 ? buffer1[tid] : buffer2[tid];
-    size_t i = 0;
+    size_t i;
     for (i = 0; i < NUM_BULKS * D_ARRAY_SIZE * D_ARRAY_SIZE; ++i) {
       compute_buffer[i] = buffer[i];
     }
@@ -232,7 +232,9 @@ void compute(int fd, size_t tid) {
     }
     //sem_post(&comp_allow_write_sems[tid]);
     __sync_add_and_fetch(&comp_allow_write_sems_b[tid], 1);
-    long long result = compute_fn(D_ARRAY_SIZE, compute_buffer);
+    for (i = 0; i < NUM_BULKS; ++i) {
+      results[i] = compute_fn(D_ARRAY_SIZE, compute_buffer + i * D_ARRAY_SIZE * D_ARRAY_SIZE);
+    }
 
     //sem_wait(&write_allow_write_sems[tid]);
     while(__sync_bool_compare_and_swap(&write_allow_write_sems_b[tid], 1, 0) == false) {

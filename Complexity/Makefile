@@ -2,7 +2,7 @@
 
 PROJECT := test
 
-SOURCES := write_back_queue.c lf_compute_queue.c compute_queue.c
+SOURCES := write_back_queue.c lf_compute_queue.c
 
 
 CC := gcc
@@ -11,7 +11,7 @@ OBJS := $(SOURCES:.c=.o)
 
 CFLAGS := -O4 -g -fopenmp -mavx2 -std=c99 -D_GNU_SOURCE -lpthread -DMSQUEUE
 
-NUM_COMP_THREADS   ?= 32
+NUM_COMP_THREADS   ?= 12
 NUM_BULKS          ?= 4
 READ_QUEUE_LENGTH  ?= 384
 WRITE_QUEUE_LENGTH ?= 512

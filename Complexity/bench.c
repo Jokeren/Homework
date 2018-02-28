@@ -26,7 +26,7 @@
     elapsed_time /= 1000.0; \
   } while (0)
 
-#define TIMES 10000
+#define TIMES 100000
 
 static determinant_d_fn_t compute_fn;
 
