@@ -195,9 +195,9 @@ void compute(size_t tid) {
   double compute_buffer[D_ARRAY_SIZE * D_ARRAY_SIZE];
   while (terminate == false) {
     bool update = false;
-    compute_queue_lock(tid);
+    //compute_queue_lock(tid);
     update = compute_queue_try_pop(tid, &data_entry);
-    compute_queue_unlock(tid);
+    //compute_queue_unlock(tid);
 
     if (update) {
       size_t i;

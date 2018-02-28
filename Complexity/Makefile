@@ -11,12 +11,12 @@ OBJS := $(SOURCES:.c=.o)
 
 CFLAGS := -O4 -g -fopenmp -mavx2 -std=c99 -D_GNU_SOURCE -lpthread -DMSQUEUE
 
-NUM_COMP_THREADS   ?= 12
+NUM_COMP_THREADS   ?= 32
 NUM_BULKS          ?= 4
 READ_QUEUE_LENGTH  ?= 384
 WRITE_QUEUE_LENGTH ?= 512
 NUM_READ_ITERS     ?= 4
-NUM_WRITE_ENTRIES  ?= 24
+NUM_WRITE_ENTRIES  ?= 12
 SEC_SLEEP          ?= 10
 NUM_POOL_SIZE      ?= 6000
 LIFE               ?= 18
