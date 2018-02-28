@@ -15,9 +15,9 @@ void write_back_queue_lock(size_t index);
 
 void write_back_queue_unlock(size_t index);
 
-bool write_back_queue_try_get_val(size_t index, long long *val);
+bool write_back_queue_try_get_val(size_t index, long long vals[NUM_BULKS]);
 
-void write_back_queue_set_val(size_t index, long long val);
+void write_back_queue_set_val(size_t index, long long vals[NUM_BULKS]);
 
 void write_back_queue_display();
 

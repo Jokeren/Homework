@@ -42,6 +42,12 @@
 #define NUM_POOL_SIZE 8000
 #endif
 
-#define READ_QUEUE_SIZE READ_QUEUE_LENGTH + NUM_BULKS
+#define READ_QUEUE_SIZE READ_QUEUE_LENGTH + 1
+
+typedef struct data_entry {
+  size_t tag;
+  size_t mem_index;
+  int *data[NUM_BULKS];
+} data_entry_t;
 
 #endif

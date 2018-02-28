@@ -1,25 +1,27 @@
 .PHONY : all bin objs clean
 
-PROJECT := test
+PROJECT := test-simple
 
-SOURCES := write_back_queue.c lf_compute_queue.c
+SOURCES := write_back_queue.c compute_queue.c
 
 
 CC := gcc
 
 OBJS := $(SOURCES:.c=.o)
 
-CFLAGS := -O4 -g -fopenmp -mavx2 -std=c99 -D_GNU_SOURCE -lpthread -DMSQUEUE
+CFLAGS := -O3 -g -ffast-math -fopenmp -mavx2 -std=c99 -D_GNU_SOURCE -lpthread
 
 NUM_COMP_THREADS   ?= 32
-NUM_BULKS          ?= 4
+NUM_BULKS          ?= 24
 READ_QUEUE_LENGTH  ?= 384
 WRITE_QUEUE_LENGTH ?= 512
 NUM_READ_ITERS     ?= 4
-NUM_WRITE_ENTRIES  ?= 12
+NUM_WRITE_ENTRIES  ?= 24
 SEC_SLEEP          ?= 10
+# greater than 10000, or we have memory pool used up problem. consider dynamic memory pool?
 NUM_POOL_SIZE      ?= 6000
 LIFE               ?= 18
+OVERLAP            ?= 12
 
 DFLAGS := -DNUM_COMP_THREADS=$(NUM_COMP_THREADS) \
           -DNUM_BULKS=$(NUM_BULKS) \
@@ -29,7 +31,8 @@ DFLAGS := -DNUM_COMP_THREADS=$(NUM_COMP_THREADS) \
           -DNUM_WRITE_ENTRIES=$(NUM_WRITE_ENTRIES) \
           -DNUM_POOL_SIZE=$(NUM_POOL_SIZE) \
           -DSEC_SLEEP=$(SEC_SLEEP) \
-          -DLIFE=$(LIFE)
+          -DLIFE=$(LIFE) \
+          -DOVERLAP=$(OVERLAP)
 
 LDFLAGS := -ldeterminant -lpthread
 
@@ -40,7 +43,7 @@ bin: $(PROJECT)
 objs: $(OBJS)
 
 $(PROJECT): $(OBJS) $(PROJECT).c
-	$(CC) $(CFLAGS) $(LDFLAGS) $(DFLAGS) -o $@ $^ queues/hzdptr.o queues/xxhash.o
+	$(CC) $(CFLAGS) $(LDFLAGS) $(DFLAGS) -o $@ $^
 
 $(OBJS): %.o : %.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $(DFLAGS) -c $<
