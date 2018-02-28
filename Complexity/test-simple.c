@@ -136,6 +136,7 @@ void reader(int fd, size_t tid) {
   while (life + 1 < LIFE) {
     size_t i;
     for (i = 0; i < OVERLAP; ++i) {
+      /*odd iteration->buffer2, even iteration->buffer1*/
       int *buffer = (order & 0x1) == 0 ? buffer1[i] : buffer2[i];
       size_t j;
       for (j = 0; j < NUM_BULKS; ++j) {
@@ -147,6 +148,7 @@ void reader(int fd, size_t tid) {
         }
       }
     }
+    /*wait for all threads write values*/
     for (i = 0; i < OVERLAP; ++i) {
       //sem_wait(&comp_allow_write_sems[i]);
       while (__sync_bool_compare_and_swap(&comp_allow_write_sems_b[i], 1, 0) == false);
@@ -158,6 +160,7 @@ void reader(int fd, size_t tid) {
   while (terminate == false) {
     size_t i;
     for (i = 0; i < OVERLAP; ++i) {
+      /*odd iteration->buffer2, even iteration->buffer1*/
       int *buffer = (order & 0x1) == 0 ? buffer1[i] : buffer2[i];
       size_t j;
       for (j = 0; j < NUM_BULKS; ++j) {
@@ -169,6 +172,7 @@ void reader(int fd, size_t tid) {
         }
       }
     }
+    /*wait for all threads write values*/
     for (i = 0; i < OVERLAP; ++i) {
       //sem_wait(&comp_allow_write_sems[i]);
       while (__sync_bool_compare_and_swap(&comp_allow_write_sems_b[i], 1, 0) == false) {
@@ -197,6 +201,7 @@ void compute(int fd, size_t tid) {
   while (life + 1 < LIFE) {
     //sem_wait(&comp_allow_read_sems[tid]);
     while(__sync_bool_compare_and_swap(&comp_allow_read_sems_b[tid], 1, 0) == false);
+    /*odd iteration->buffer2, even iteration->buffer1*/
     int *buffer = (order & 0x1) == 0 ? buffer1[tid] : buffer2[tid];
     size_t i;
     for (i = 0; i < NUM_BULKS * D_ARRAY_SIZE * D_ARRAY_SIZE; ++i) {
@@ -225,6 +230,7 @@ void compute(int fd, size_t tid) {
         return;
       }
     }
+    /*odd iteration->buffer2, even iteration->buffer1*/
     int *buffer = (order & 0x1) == 0 ? buffer1[tid] : buffer2[tid];
     size_t i = 0;
     for (i = 0; i < NUM_BULKS * D_ARRAY_SIZE * D_ARRAY_SIZE; ++i) {

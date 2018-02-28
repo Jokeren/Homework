@@ -113,6 +113,7 @@ void write_back(int fd, size_t tid) {
   long long result[NUM_BULKS];
   while (terminate == false) {
     write_back_queue_lock(order);
+    /*If order value if available, pop it; or lock the queue again and try*/
     if (write_back_queue_try_get_val(order, result)) {
       size_t i;
       for (i = 0; i < NUM_BULKS; ++i) {
@@ -149,6 +150,7 @@ void reader(int fd, size_t tid) {
   data_entry_t *data_entries[NUM_READ_ITERS];
   while (terminate == false) {
     size_t i = 0;
+    /*Read several iterations, keep it busy*/
     for (i = 0; i < NUM_READ_ITERS; ++i) {
       if (memory_fetch(&pool_index) == false) {
         return; 
@@ -208,6 +210,7 @@ void compute(size_t tid) {
         }
         results[i] = compute_fn(D_ARRAY_SIZE, compute_buffer);
       }
+      /*Release memory*/
       memory_in_use[data_entry->mem_index] = false;
       write_back_queue_lock(data_entry->tag);
       write_back_queue_set_val(data_entry->tag, results); 
