@@ -1,20 +1,16 @@
-
-
 use std::env;
+use std::mem;
+use std::thread;
 use std::fs::OpenOptions;
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::Cursor;
-use std::mem;
-use std::thread;
 use std::time::Duration;
 use std::sync::mpsc::{Sender, Receiver};
 use std::sync::mpsc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 use std::sync::Mutex;
-
-//use threadpool::ThreadPool;
 
 const MATRIX_LEN: usize = 32;
 const N_WORKERS: usize = 8;
@@ -26,6 +22,7 @@ static mut TERMINATE: AtomicBool = AtomicBool::new(false);
 static mut GLOBAL_BUFFER1: [[[u8; MATRIX_LEN * MATRIX_LEN * 4]; NUM_BULKS]; N_WORKERS] = [[[0; MATRIX_LEN * MATRIX_LEN * 4]; NUM_BULKS]; N_WORKERS];
 static mut GLOBAL_BUFFER2: [[[u8; MATRIX_LEN * MATRIX_LEN * 4]; NUM_BULKS]; N_WORKERS] = [[[0; MATRIX_LEN * MATRIX_LEN * 4]; NUM_BULKS]; N_WORKERS];
 static mut WRITE_VALUES: [[i64; NUM_BULKS]; N_WORKERS] = [[0; N_WORKERS]; N_WORKERS];
+
 
 fn measurement(tid: &thread::ThreadId) {
   println!("[{:?}]->Start measurement...", tid);
@@ -45,6 +42,7 @@ fn measurement(tid: &thread::ThreadId) {
                                          .open(no_of_det_cals).expect("Unable to read no_of_det_cals");
     thread::sleep(dur);
 
+    // Read no_of_det_cals into a string and parse it into a number
     let end = false;
     let mut det = String::new(); 
     while end == false {
@@ -79,6 +77,7 @@ fn reader(f: &mut File, compute_read_sems: &mut Vec<Arc<AtomicBool> >, compute_w
       break;
     }
 
+    // Pingpong buffer switch between GLOBAL_BUFFER1 and GLOBAL_BUFFER2
     if order % 2 == 0 {
       unsafe {
         for t in 0..N_WORKERS {
@@ -107,7 +106,7 @@ fn reader(f: &mut File, compute_read_sems: &mut Vec<Arc<AtomicBool> >, compute_w
           return;
         }
       }
-      compute_read_sems[i].store(true, Ordering::Relaxed); 
+      compute_read_sems[i].store(true, Ordering::Release); 
     }
 
     order = order + 1;
@@ -179,6 +178,7 @@ fn compute(compute_read_sem: &mut Arc<AtomicBool>,
       }
     }
 
+    // Pingpong buffer switch between GLOBAL_BUFFER1 and GLOBAL_BUFFER2
     let matrix = unsafe {
       if order % 2 == 0 {
         mem::transmute::<[[u8; MATRIX_LEN * MATRIX_LEN * 4]; NUM_BULKS], [[i32; MATRIX_LEN * MATRIX_LEN]; NUM_BULKS]>(GLOBAL_BUFFER1[index])
@@ -189,6 +189,7 @@ fn compute(compute_read_sem: &mut Arc<AtomicBool>,
 
     compute_write_sem.store(true, Ordering::Relaxed);
 
+    // Compute det values
     for i in 0..(NUM_BULKS) {
       for j in 0..(MATRIX_LEN * MATRIX_LEN) {
         compute_buffer[j] = matrix[i][j] as f64;
@@ -211,7 +212,7 @@ fn compute(compute_read_sem: &mut Arc<AtomicBool>,
       WRITE_VALUES[index][i] = dets[i];
     }
 
-    writer_read_sem.store(true, Ordering::Relaxed);
+    writer_read_sem.store(true, Ordering::Release);
   }
   println!("[{:?}]->End compute...", tid);
 }
@@ -229,7 +230,7 @@ fn writer(f: &mut File, tid: &thread::ThreadId) {
     if is_terminate == true {
       break;
     }
-    while read_sems[order % N_WORKERS].compare_and_swap(true, false, Ordering::Relaxed) == false {
+    while read_sems[order % N_WORKERS].compare_and_swap(true, false, Ordering::Acquire) == false {
       let is_terminate = unsafe {
         TERMINATE.load(Ordering::Relaxed)
       };
@@ -250,6 +251,8 @@ fn writer(f: &mut File, tid: &thread::ThreadId) {
       };
       f.write(&answer).expect("Unable to write");
     }
+
+    order = order + 1;
   }
   
   println!("[{:?}]->End writing...", tid);
@@ -271,12 +274,14 @@ fn main() {
     writer_read_sems.push(Arc::new(AtomicBool::new(false)));
   }
 
+  // Reset device
   let no_of_reads = String::from("/sys/module/dummy/parameters/no_of_reads");
   let mut f = OpenOptions::new()
     .write(true)
     .open(no_of_reads).expect("Unable to open no_of_reads");
   write!(f, "{}", '0').expect("Unable to reset");
 
+  // Open dummy
   let dummy = String::from("/dev/dummychar");
   let mut f = OpenOptions::new()
     .read(true)
@@ -288,8 +293,6 @@ fn main() {
       });
 
   // Init compute thread pool
-  //let pool:[thread; N_WORKERS] = [threadThreadPool::new(N_WORKERS)];
-
   for i in 0..N_WORKERS {
     let mut compute_write_sem = compute_write_sems[i].clone();
     let mut compute_read_sem = compute_read_sems[i].clone();
@@ -306,19 +309,18 @@ fn main() {
       reader(&mut f, &mut compute_read_sems, &mut compute_write_sems, &thread::current().id());
       });
 
-
+  // Init writer thread
   let mut f = OpenOptions::new()
     .create(true)
     .write(true)
     .append(true)
     .open(&dummy).expect("Unable to open dummychar for write");
 
-  // Init writer thread
   let writer_thread = thread::spawn(move || {
       writer(&mut f, &thread::current().id());
       });
 
-
+  // Join threads
   measurement_thread.join();
   reader_thread.join();
   for t in compute_threads.lock().unwrap().take().unwrap().into_iter() {
