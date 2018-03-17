@@ -9,8 +9,8 @@ use std::sync::Arc;
 use std::sync::Mutex;
 
 const MATRIX_LEN: usize = 32;
-const N_WORKERS: usize = 14;
-const NUM_BULKS: usize = 6;
+const N_WORKERS: usize = 12;
+const NUM_BULKS: usize = 4;
 const LIFE: i32 = 18;
 const TEN_SEC: u64 = 10;
 
@@ -118,10 +118,8 @@ fn determinant(matrix: &mut [f64; MATRIX_LEN * MATRIX_LEN])->i64 {
 
   for i in 0..MATRIX_LEN {
     let mut max_loc = i;
-    let mut max_val = matrix[i * MATRIX_LEN + i].abs();
     for j in (i + 1)..MATRIX_LEN {
-      if matrix[j * MATRIX_LEN + i] > max_val {
-        max_val = matrix[j * MATRIX_LEN + i];
+      if matrix[j * MATRIX_LEN + i] != 0.0 {
         max_loc = j;
       }
     }
