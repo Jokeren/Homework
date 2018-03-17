@@ -9,9 +9,9 @@ use std::sync::Arc;
 use std::sync::Mutex;
 
 const MATRIX_LEN: usize = 32;
-const N_WORKERS: usize = 1;
-const NUM_BULKS: usize = 1;
-const LIFE: i32 = 1;
+const N_WORKERS: usize = 14;
+const NUM_BULKS: usize = 6;
+const LIFE: i32 = 18;
 const TEN_SEC: u64 = 10;
 
 static mut TERMINATE: AtomicBool = AtomicBool::new(false);
