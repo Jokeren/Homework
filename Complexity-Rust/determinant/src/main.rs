@@ -21,7 +21,7 @@ const TEN_SEC: u64 = 1;
 static mut TERMINATE: AtomicBool = AtomicBool::new(false);
 static mut GLOBAL_BUFFER1: [[[u8; MATRIX_LEN * MATRIX_LEN * 4]; NUM_BULKS]; N_WORKERS] = [[[0; MATRIX_LEN * MATRIX_LEN * 4]; NUM_BULKS]; N_WORKERS];
 static mut GLOBAL_BUFFER2: [[[u8; MATRIX_LEN * MATRIX_LEN * 4]; NUM_BULKS]; N_WORKERS] = [[[0; MATRIX_LEN * MATRIX_LEN * 4]; NUM_BULKS]; N_WORKERS];
-static mut WRITE_VALUES: [[i64; NUM_BULKS]; N_WORKERS] = [[0; N_WORKERS]; N_WORKERS];
+static mut WRITE_VALUES: [[i64; NUM_BULKS]; N_WORKERS] = [[0; NUM_BULKS]; N_WORKERS];
 
 
 fn measurement(tid: &thread::ThreadId) {
@@ -67,7 +67,7 @@ fn measurement(tid: &thread::ThreadId) {
 }
 
 
-fn reader(f: &mut File, compute_read_sems: &mut Vec<Arc<AtomicBool> >, compute_write_sems: &mut Vec<Arc<AtomicBool> >, tid: &thread::ThreadId) {
+fn reader(compute_read_sems: &mut Vec<Arc<AtomicBool> >, compute_write_sems: &mut Vec<Arc<AtomicBool> >, f: &mut File, tid: &thread::ThreadId) {
   let mut order = 0;
   loop {
     let is_terminate = unsafe {
@@ -156,7 +156,7 @@ fn compute(compute_read_sem: &mut Arc<AtomicBool>,
            writer_write_sem: &mut Arc<AtomicBool>,
            tid: &thread::ThreadId,
            index: usize) {
-  println!("[{:?}]->Start compute...", tid);
+  println!("[{:?}]->Start computing...", tid);
   let mut order = 0;
   let mut compute_buffer: [f64; MATRIX_LEN * MATRIX_LEN] = [0.0; MATRIX_LEN * MATRIX_LEN];
   let mut dets: [i64; NUM_BULKS] = [0; NUM_BULKS];
@@ -173,7 +173,7 @@ fn compute(compute_read_sem: &mut Arc<AtomicBool>,
         TERMINATE.load(Ordering::Relaxed)
       };
       if is_terminate == true {
-        println!("[{:?}]->End compute...", tid);
+        println!("[{:?}]->End computing...", tid);
         return;
       }
     }
@@ -208,21 +208,23 @@ fn compute(compute_read_sem: &mut Arc<AtomicBool>,
       }
     }
 
-    for i in 0..NUM_BULKS {
-      WRITE_VALUES[index][i] = dets[i];
+    unsafe {
+      for i in 0..NUM_BULKS {
+        WRITE_VALUES[index][i] = dets[i];
+      }
     }
 
     writer_read_sem.store(true, Ordering::Release);
   }
-  println!("[{:?}]->End compute...", tid);
+  println!("[{:?}]->End computing...", tid);
 }
 
 
-fn writer(f: &mut File, tid: &thread::ThreadId) {
+fn writer(writer_read_sems: &mut Vec<Arc<AtomicBool> >, writer_write_sems: &mut Vec<Arc<AtomicBool> >, f: &mut File, tid: &thread::ThreadId) {
   println!("[{:?}]->Start writing...", tid);
 
-  let mut dets[i64; NUM_BULKS] = [0; NUM_BULKS];
-  let order = 0;
+  let mut dets: [i64; NUM_BULKS] = [0; NUM_BULKS];
+  let mut order = 0;
   loop {
     let is_terminate = unsafe {
       TERMINATE.load(Ordering::Relaxed)
@@ -230,7 +232,7 @@ fn writer(f: &mut File, tid: &thread::ThreadId) {
     if is_terminate == true {
       break;
     }
-    while read_sems[order % N_WORKERS].compare_and_swap(true, false, Ordering::Acquire) == false {
+    while writer_read_sems[order % N_WORKERS].compare_and_swap(true, false, Ordering::Acquire) == false {
       let is_terminate = unsafe {
         TERMINATE.load(Ordering::Relaxed)
       };
@@ -239,10 +241,12 @@ fn writer(f: &mut File, tid: &thread::ThreadId) {
         return;
       }
     }
-    for i in 0..NUM_BULKS {
-      dets[i] = WRITE_VALUES[order % N_WORKERS][i];
+    unsafe {
+      for i in 0..NUM_BULKS {
+        dets[i] = WRITE_VALUES[order % N_WORKERS][i];
+      }
     }
-    writer_sems[order % N_WORKERS].store(true, Ordering::Relaxed);
+    writer_write_sems[order % N_WORKERS].store(true, Ordering::Relaxed);
 
     for i in 0..NUM_BULKS {
       let var = dets[i];
@@ -306,7 +310,7 @@ fn main() {
 
   // Init reader thread
   let reader_thread = thread::spawn(move || {
-      reader(&mut f, &mut compute_read_sems, &mut compute_write_sems, &thread::current().id());
+      reader(&mut compute_read_sems, &mut compute_write_sems, &mut f, &thread::current().id());
       });
 
   // Init writer thread
@@ -317,7 +321,7 @@ fn main() {
     .open(&dummy).expect("Unable to open dummychar for write");
 
   let writer_thread = thread::spawn(move || {
-      writer(&mut f, &thread::current().id());
+      writer(&mut writer_read_sems, &mut writer_write_sems, &mut f, &thread::current().id());
       });
 
   // Join threads
