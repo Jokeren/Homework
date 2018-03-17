@@ -12,7 +12,7 @@ const MATRIX_LEN: usize = 32;
 const N_WORKERS: usize = 1;
 const NUM_BULKS: usize = 1;
 const LIFE: i32 = 1;
-const TEN_SEC: u64 = 1;
+const TEN_SEC: u64 = 10;
 
 static mut TERMINATE: AtomicBool = AtomicBool::new(false);
 static mut GLOBAL_BUFFER1: [[[u8; MATRIX_LEN * MATRIX_LEN * 4]; NUM_BULKS]; N_WORKERS] = [[[0; MATRIX_LEN * MATRIX_LEN * 4]; NUM_BULKS]; N_WORKERS];
@@ -31,7 +31,6 @@ fn measurement(tid: &thread::ThreadId) {
   let mut iter = 0;
   let dur = Duration::new(TEN_SEC, 0);
   while iter < LIFE {
-    println!("[{:?}]->Write out buffer", tid);
     let no_of_det_cals = String::from("/sys/module/dummy/parameters/no_of_det_cals");
     let mut no_of_det_cals = OpenOptions::new()
                                          .read(true)
@@ -52,6 +51,7 @@ fn measurement(tid: &thread::ThreadId) {
     }
     let num: i64 = det.parse::<i64>().unwrap();
     println!("[{:?}]->Throughput {}", tid, num - prev_num);
+    println!("[{:?}]->Write out buffer", tid);
     write!(result, "{}", num - prev_num).expect("Unable to write output");
     prev_num = num;
     iter = iter + 1;
@@ -60,10 +60,12 @@ fn measurement(tid: &thread::ThreadId) {
   unsafe {
     TERMINATE.store(true, Ordering::Relaxed);
   }
+  println!("[{:?}]->End measurement", tid);
 }
 
 
 fn reader(compute_read_sems: &mut Vec<Arc<AtomicBool> >, compute_write_sems: &mut Vec<Arc<AtomicBool> >, f: &mut File, tid: &thread::ThreadId) {
+  println!("[{:?}]->Start reading...", tid);
   let mut order = 0;
   loop {
     let is_terminate = unsafe {
