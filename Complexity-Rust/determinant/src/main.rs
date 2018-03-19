@@ -9,8 +9,8 @@ use std::sync::Arc;
 use std::sync::Mutex;
 
 const MATRIX_LEN: usize = 32;
-const N_WORKERS: usize = 12;
-const NUM_BULKS: usize = 4;
+const N_WORKERS: usize = 16;
+const NUM_BULKS: usize = 8;
 const LIFE: i32 = 18;
 const TEN_SEC: u64 = 10;
 
