@@ -52,7 +52,7 @@ fn measurement(tid: &thread::ThreadId) {
     let num: i64 = det.parse::<i64>().unwrap();
     println!("[{:?}]->Throughput {}", tid, num - prev_num);
     println!("[{:?}]->Write out buffer", tid);
-    write!(result, "{}", num - prev_num).expect("Unable to write output");
+    write!(result, "{}\n", num - prev_num).expect("Unable to write output");
     prev_num = num;
     iter = iter + 1;
   }
@@ -154,7 +154,6 @@ fn compute(compute_read_sem: &mut Arc<AtomicBool>,
   println!("[{:?}]->Start computing...", tid);
   let mut order = 0;
   let mut compute_buffer: [f64; MATRIX_LEN * MATRIX_LEN] = [0.0; MATRIX_LEN * MATRIX_LEN];
-  //let mut matrix: [[i32; MATRIX_LEN * MATRIX_LEN]; NUM_BULKS] = [[0; MATRIX_LEN * MATRIX_LEN]; NUM_BULKS];
   let mut dets: [i64; NUM_BULKS] = [0; NUM_BULKS];
   loop {
     let is_terminate = unsafe {
@@ -238,6 +237,7 @@ fn writer(writer_read_sems: &mut Vec<Arc<AtomicBool> >, writer_write_sems: &mut 
         return;
       }
     }
+    // Read results
     unsafe {
       for i in 0..NUM_BULKS {
         dets[i] = WRITE_VALUES[order % N_WORKERS][i];
@@ -245,6 +245,7 @@ fn writer(writer_read_sems: &mut Vec<Arc<AtomicBool> >, writer_write_sems: &mut 
     }
     writer_write_sems[order % N_WORKERS].store(true, Ordering::Release);
 
+    // Write results
     for i in 0..NUM_BULKS {
       let var = dets[i];
       let mut answer = unsafe {
@@ -253,6 +254,7 @@ fn writer(writer_read_sems: &mut Vec<Arc<AtomicBool> >, writer_write_sems: &mut 
       f.write(&answer).expect("Unable to write");
     }
 
+    // Switch to next compute thread's results
     order = order + 1;
   }
   
