@@ -4,4 +4,11 @@ version = "0.1.0"
 authors = ["Jokeren <robinho364@gmail.com>"]
 
 [dependencies]
-threadpool = "1.0"
+
+[profile.dev]
+opt-level = 2
+debug = true
+
+[profile.release]
+opt-level = 3
+debug = true

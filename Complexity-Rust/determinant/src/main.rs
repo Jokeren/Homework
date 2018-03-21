@@ -1,27 +1,23 @@
-use std::env;
 use std::mem;
 use std::thread;
 use std::fs::OpenOptions;
 use std::fs::File;
 use std::io::prelude::*;
-use std::io::Cursor;
 use std::time::Duration;
-use std::sync::mpsc::{Sender, Receiver};
-use std::sync::mpsc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 use std::sync::Mutex;
 
 const MATRIX_LEN: usize = 32;
-const N_WORKERS: usize = 8;
-const NUM_BULKS: usize = 4;
-const LIFE: i32 = 1;
-const TEN_SEC: u64 = 1;
+const N_WORKERS: usize = 16;
+const NUM_BULKS: usize = 8;
+const LIFE: i32 = 18;
+const TEN_SEC: u64 = 10;
 
 static mut TERMINATE: AtomicBool = AtomicBool::new(false);
 static mut GLOBAL_BUFFER1: [[[u8; MATRIX_LEN * MATRIX_LEN * 4]; NUM_BULKS]; N_WORKERS] = [[[0; MATRIX_LEN * MATRIX_LEN * 4]; NUM_BULKS]; N_WORKERS];
 static mut GLOBAL_BUFFER2: [[[u8; MATRIX_LEN * MATRIX_LEN * 4]; NUM_BULKS]; N_WORKERS] = [[[0; MATRIX_LEN * MATRIX_LEN * 4]; NUM_BULKS]; N_WORKERS];
-static mut WRITE_VALUES: [[i64; NUM_BULKS]; N_WORKERS] = [[0; N_WORKERS]; N_WORKERS];
+static mut WRITE_VALUES: [[i64; NUM_BULKS]; N_WORKERS] = [[0; NUM_BULKS]; N_WORKERS];
 
 
 fn measurement(tid: &thread::ThreadId) {
@@ -35,7 +31,6 @@ fn measurement(tid: &thread::ThreadId) {
   let mut iter = 0;
   let dur = Duration::new(TEN_SEC, 0);
   while iter < LIFE {
-    println!("[{:?}]->Write out buffer", tid);
     let no_of_det_cals = String::from("/sys/module/dummy/parameters/no_of_det_cals");
     let mut no_of_det_cals = OpenOptions::new()
                                          .read(true)
@@ -56,7 +51,8 @@ fn measurement(tid: &thread::ThreadId) {
     }
     let num: i64 = det.parse::<i64>().unwrap();
     println!("[{:?}]->Throughput {}", tid, num - prev_num);
-    write!(result, "{}", num - prev_num).expect("Unable to write output");
+    println!("[{:?}]->Write out buffer", tid);
+    write!(result, "{}\n", num - prev_num).expect("Unable to write output");
     prev_num = num;
     iter = iter + 1;
   }
@@ -64,10 +60,12 @@ fn measurement(tid: &thread::ThreadId) {
   unsafe {
     TERMINATE.store(true, Ordering::Relaxed);
   }
+  println!("[{:?}]->End measurement", tid);
 }
 
 
-fn reader(f: &mut File, compute_read_sems: &mut Vec<Arc<AtomicBool> >, compute_write_sems: &mut Vec<Arc<AtomicBool> >, tid: &thread::ThreadId) {
+fn reader(compute_read_sems: &mut Vec<Arc<AtomicBool> >, compute_write_sems: &mut Vec<Arc<AtomicBool> >, f: &mut File, tid: &thread::ThreadId) {
+  println!("[{:?}]->Start reading...", tid);
   let mut order = 0;
   loop {
     let is_terminate = unsafe {
@@ -97,7 +95,7 @@ fn reader(f: &mut File, compute_read_sems: &mut Vec<Arc<AtomicBool> >, compute_w
     }
 
     for i in 0..N_WORKERS {
-      while compute_write_sems[i].compare_and_swap(true, false, Ordering::Relaxed) == false {
+      while compute_write_sems[i].compare_and_swap(true, false, Ordering::Acquire) == false {
         let is_terminate = unsafe {
           TERMINATE.load(Ordering::Relaxed)
         };
@@ -116,15 +114,12 @@ fn reader(f: &mut File, compute_read_sems: &mut Vec<Arc<AtomicBool> >, compute_w
 
 
 fn determinant(matrix: &mut [f64; MATRIX_LEN * MATRIX_LEN])->i64 {
-  let mut max_loc = 0;
   let mut det: f64 = 1.0;
 
   for i in 0..MATRIX_LEN {
-    max_loc = i;
-    let mut max_val = matrix[i * MATRIX_LEN + i].abs();
+    let mut max_loc = i;
     for j in (i + 1)..MATRIX_LEN {
-      if matrix[j * MATRIX_LEN + i] > max_val {
-        max_val = matrix[j * MATRIX_LEN + i];
+      if matrix[j * MATRIX_LEN + i] != 0.0 {
         max_loc = j;
       }
     }
@@ -156,7 +151,7 @@ fn compute(compute_read_sem: &mut Arc<AtomicBool>,
            writer_write_sem: &mut Arc<AtomicBool>,
            tid: &thread::ThreadId,
            index: usize) {
-  println!("[{:?}]->Start compute...", tid);
+  println!("[{:?}]->Start computing...", tid);
   let mut order = 0;
   let mut compute_buffer: [f64; MATRIX_LEN * MATRIX_LEN] = [0.0; MATRIX_LEN * MATRIX_LEN];
   let mut dets: [i64; NUM_BULKS] = [0; NUM_BULKS];
@@ -168,12 +163,12 @@ fn compute(compute_read_sem: &mut Arc<AtomicBool>,
       break;
     }
 
-    while compute_read_sem.compare_and_swap(true, false, Ordering::Relaxed) == false {
+    while compute_read_sem.compare_and_swap(true, false, Ordering::Acquire) == false {
       let is_terminate = unsafe {
         TERMINATE.load(Ordering::Relaxed)
       };
       if is_terminate == true {
-        println!("[{:?}]->End compute...", tid);
+        println!("[{:?}]->End computing...", tid);
         return;
       }
     }
@@ -187,18 +182,17 @@ fn compute(compute_read_sem: &mut Arc<AtomicBool>,
       }
     };
 
-    compute_write_sem.store(true, Ordering::Relaxed);
+    compute_write_sem.store(true, Ordering::Release);
 
     // Compute det values
     for i in 0..(NUM_BULKS) {
       for j in 0..(MATRIX_LEN * MATRIX_LEN) {
         compute_buffer[j] = matrix[i][j] as f64;
       }
-      let det = determinant(&mut compute_buffer);
-      dets[i] = det;
+      dets[i] = determinant(&mut compute_buffer);
     }
 
-    while writer_write_sem.compare_and_swap(true, false, Ordering::Relaxed) == false {
+    while writer_write_sem.compare_and_swap(true, false, Ordering::Acquire) == false {
       let is_terminate = unsafe {
         TERMINATE.load(Ordering::Relaxed)
       };
@@ -208,21 +202,25 @@ fn compute(compute_read_sem: &mut Arc<AtomicBool>,
       }
     }
 
-    for i in 0..NUM_BULKS {
-      WRITE_VALUES[index][i] = dets[i];
+    unsafe {
+      for i in 0..NUM_BULKS {
+        WRITE_VALUES[index][i] = dets[i];
+      }
     }
 
     writer_read_sem.store(true, Ordering::Release);
+
+    order = order + 1;
   }
-  println!("[{:?}]->End compute...", tid);
+  println!("[{:?}]->End computing...", tid);
 }
 
 
-fn writer(f: &mut File, tid: &thread::ThreadId) {
+fn writer(writer_read_sems: &mut Vec<Arc<AtomicBool> >, writer_write_sems: &mut Vec<Arc<AtomicBool> >, f: &mut File, tid: &thread::ThreadId) {
   println!("[{:?}]->Start writing...", tid);
 
-  let mut dets[i64; NUM_BULKS] = [0; NUM_BULKS];
-  let order = 0;
+  let mut dets: [i64; NUM_BULKS] = [0; NUM_BULKS];
+  let mut order = 0;
   loop {
     let is_terminate = unsafe {
       TERMINATE.load(Ordering::Relaxed)
@@ -230,7 +228,7 @@ fn writer(f: &mut File, tid: &thread::ThreadId) {
     if is_terminate == true {
       break;
     }
-    while read_sems[order % N_WORKERS].compare_and_swap(true, false, Ordering::Acquire) == false {
+    while writer_read_sems[order % N_WORKERS].compare_and_swap(true, false, Ordering::Acquire) == false {
       let is_terminate = unsafe {
         TERMINATE.load(Ordering::Relaxed)
       };
@@ -239,19 +237,24 @@ fn writer(f: &mut File, tid: &thread::ThreadId) {
         return;
       }
     }
-    for i in 0..NUM_BULKS {
-      dets[i] = WRITE_VALUES[order % N_WORKERS][i];
+    // Read results
+    unsafe {
+      for i in 0..NUM_BULKS {
+        dets[i] = WRITE_VALUES[order % N_WORKERS][i];
+      }
     }
-    writer_sems[order % N_WORKERS].store(true, Ordering::Relaxed);
+    writer_write_sems[order % N_WORKERS].store(true, Ordering::Release);
 
+    // Write results
     for i in 0..NUM_BULKS {
       let var = dets[i];
-      let answer = unsafe {
+      let mut answer = unsafe {
         mem::transmute::<i64, [u8; 8]>(var)
       };
       f.write(&answer).expect("Unable to write");
     }
 
+    // Switch to next compute thread's results
     order = order + 1;
   }
   
@@ -267,9 +270,9 @@ fn main() {
   let mut writer_write_sems: Vec<Arc<AtomicBool> > = Vec::new();
   let compute_threads = Arc::new(Mutex::new(Some(Vec::new())));
 
-  for i in 0..N_WORKERS {
-    compute_read_sems.push(Arc::new(AtomicBool::new(true)));
-    compute_write_sems.push(Arc::new(AtomicBool::new(false)));
+  for _ in 0..N_WORKERS {
+    compute_read_sems.push(Arc::new(AtomicBool::new(false)));
+    compute_write_sems.push(Arc::new(AtomicBool::new(true)));
     writer_write_sems.push(Arc::new(AtomicBool::new(true)));
     writer_read_sems.push(Arc::new(AtomicBool::new(false)));
   }
@@ -277,20 +280,15 @@ fn main() {
   // Reset device
   let no_of_reads = String::from("/sys/module/dummy/parameters/no_of_reads");
   let mut f = OpenOptions::new()
-    .write(true)
-    .open(no_of_reads).expect("Unable to open no_of_reads");
+                          .write(true)
+                          .open(no_of_reads).expect("Unable to open no_of_reads");
   write!(f, "{}", '0').expect("Unable to reset");
 
   // Open dummy
   let dummy = String::from("/dev/dummychar");
   let mut f = OpenOptions::new()
-    .read(true)
-    .open(&dummy).expect("Unable to open dummychar for read");
-
-  // Init measurement thread
-  let measurement_thread = thread::spawn(|| {
-      measurement(&thread::current().id());
-      });
+                          .read(true)
+                          .open(&dummy).expect("Unable to open dummychar for read");
 
   // Init compute thread pool
   for i in 0..N_WORKERS {
@@ -306,24 +304,29 @@ fn main() {
 
   // Init reader thread
   let reader_thread = thread::spawn(move || {
-      reader(&mut f, &mut compute_read_sems, &mut compute_write_sems, &thread::current().id());
+      reader(&mut compute_read_sems, &mut compute_write_sems, &mut f, &thread::current().id());
       });
 
   // Init writer thread
   let mut f = OpenOptions::new()
-    .create(true)
-    .write(true)
-    .append(true)
-    .open(&dummy).expect("Unable to open dummychar for write");
+                          .write(true)
+                          .append(true)
+                          .open(&dummy).expect("Unable to open dummychar for write");
 
   let writer_thread = thread::spawn(move || {
-      writer(&mut f, &thread::current().id());
+      writer(&mut writer_read_sems, &mut writer_write_sems, &mut f, &thread::current().id());
+      });
+
+  // Init measurement thread
+  let measurement_thread = thread::spawn(|| {
+      measurement(&thread::current().id());
       });
 
   // Join threads
-  measurement_thread.join();
-  reader_thread.join();
+  measurement_thread.join().expect("Unable to join measurement thread");
+  reader_thread.join().expect("Unable to reader measurement thread");
+  writer_thread.join().expect("Unable to writer measurement thread");
   for t in compute_threads.lock().unwrap().take().unwrap().into_iter() {
-    t.join();
+    t.join().expect("Unable to join compute thread");
   }
 }
