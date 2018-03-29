@@ -110,6 +110,7 @@ void BusSnooper() {
   unsigned  busreq_type;
   unsigned address;
   unsigned requester;
+  unsigned mem_address;
   int BLKMASK = (-1 << BLKSIZE);
   int procId;
   struct genericQueueEntry writeback;
@@ -117,116 +118,186 @@ void BusSnooper() {
   procId = ActivityArgSize(ME); // Id of this Snooper
   if (TRACE)
     printf("BusSnooper[%d]: Activated at time %5.2f\n", procId, GetSimTime());
- 
-  printf("Im a skeleton Snooper that needs fattening!\nI will simply terminate after the number of simulation cycles set expire.\n");
+
 
   while (1) {
+    SemaphoreWait(sem_bussnoop[procId]); // Wait for  a bus command
 
-      SemaphoreWait(sem_bussnoop[procId]); // Wait for  a bus command
-  
+    if (TRACE) {
+      printf("BusSnooper[%d] --  Woken with Bus COMMAND %s at time %.2f\n", procId, g(BROADCAST_CMD.reqtype), GetSimTime());
+    }
+
     /* Parse  Bus Command 
        Actions depend on whether this command is from my own front end or from another processor
-    */
-   
+       */
+    busreq_type = BROADCAST_CMD.reqtype;
+    address = BROADCAST_CMD.address;
+    blkNum = (address >> BLKSIZE) % CACHESIZE;
+    broadcast_tag = (address >> BLKSIZE) / CACHESIZE;
+    mem_address = (CACHE[procId][blkNum].TAG * CACHESIZE + blkNum) << BLKSIZE;
 
-/*  ************************************************************************************ 
+    /*  ************************************************************************************ 
 
-Handle Bus Commands from my Front End. 
-  
-1.  Before handling the cache miss, I may need to write back the cache block being evicted if it is in M state. 
-Use the provided function "writebackMemory()" to write the values to memory.
-Then simulate the memory access time by calling "ProcessDelay(MEM_CYCLE_TIME)". 
-My statistics counter "cache_writebacks[ ]" counter should be incremented. 
+        Handle Bus Commands from my Front End. 
 
-2. Simulate the memory access time on a read by calling "ProcessDelay(MEM_CYCLE_TIME)".  
-To read the values of the  block from memory on a cache miss use the function "readFromMemory()"; 
+        1.  Before handling the cache miss, I may need to write back the cache block being evicted if it is in M state. 
+        Use the provided function "writebackMemory()" to write the values to memory.
+        Then simulate the memory access time by calling "ProcessDelay(MEM_CYCLE_TIME)". 
+        My statistics counter "cache_writebacks[ ]" counter should be incremented. 
 
-3. After the missed block is read into cache the tag needs to be updated.
+        2. Simulate the memory access time on a read by calling "ProcessDelay(MEM_CYCLE_TIME)".  
+        To read the values of the  block from memory on a cache miss use the function "readFromMemory()"; 
 
-4. In the  case that the cache block that we are reading is actually being flushed by some other cache (that has the 
-block in the M state) we should make sure that before the "readFromMemory()" of step 2, the memory has been updated 
-by the other cache. The "ProcessDelay(epsilon)" command orders the concurrent memory write and read so we read memory 
-only after the memory write is completed. Note we  delay for only one  for MEM_CYCLE_TIME; the delays by the writer
-process and the reader process overlap.
+        3. After the missed block is read into cache the tag needs to be updated.
 
-4. After handling  the command the snooper should delay by one cycle using "ProcessDelay(CLOCK_CYCLE)" before 
-it signals  "sem_busnoopdone[ ]" and returning. This simulates the time required for the Bus Snoopers  execution.
-  
-************************************************************************************ */
+        4. In the  case that the cache block that we are reading is actually being flushed by some other cache (that has the 
+        block in the M state) we should make sure that before the "readFromMemory()" of step 2, the memory has been updated 
+        by the other cache. The "ProcessDelay(epsilon)" command orders the concurrent memory write and read so we read memory 
+        only after the memory write is completed. Note we  delay for only one  for MEM_CYCLE_TIME; the delays by the writer
+        process and the reader process overlap.
+
+        4. After handling  the command the snooper should delay by one cycle using "ProcessDelay(CLOCK_CYCLE)" before 
+        it signals  "sem_busnoopdone[ ]" and returning. This simulates the time required for the Bus Snoopers  execution.
+
+     ************************************************************************************ */
 
     if (BUS_GRANT[procId] == TRUE)  { // My own Front End  initiated this request
-
-    switch (busreq_type) {  
-   
-    case (INV): {
-
-      break;
+      switch (busreq_type) {  
+        case (INV):
+        { // SM->M
+          // ignore
+          if (TRACE) {
+            printf("Snooper %d handled INVALIDATE from processor %d at time %.2f\n", procId, procId, GetSimTime());
+          }
+          break;
+        }
+        case (BUS_RD):
+        { // I->S || M->evicted
+          if (CACHE[procId][blkNum].STATE == M) {
+            if (TRACE) {
+              printf("CACHE[%d][%d].STATE: M\n", procId, blkNum); 
+            }
+            writebackMemory((mem_address & BLKMASK), CACHE[procId][blkNum].DATA);
+            ProcessDelay(MEM_CYCLE_TIME);
+            cache_writebacks[procId]++;
+          }
+          ProcessDelay(epsilon);
+          readFromMemory((BLKMASK & address), CACHE[procId][blkNum].DATA);
+          ProcessDelay(MEM_CYCLE_TIME);
+          CACHE[procId][blkNum].TAG = broadcast_tag;
+          if (TRACE) {
+            printf("Snooper %d finished  %s at time %.2f\n", procId, g(BROADCAST_CMD.reqtype), GetSimTime());
+          }
+          if (DEBUG)
+            displayCacheBlock(procId, blkNum);
+          break;
+        }
+        case (BUS_RDX):
+        { // I->M
+          if (CACHE[procId][blkNum].STATE == M) {
+            writebackMemory((mem_address & BLKMASK), CACHE[procId][blkNum].DATA);
+            ProcessDelay(MEM_CYCLE_TIME);
+            cache_writebacks[procId]++;
+          }
+          ProcessDelay(epsilon);
+          readFromMemory((address & BLKMASK), CACHE[procId][blkNum].DATA);
+          ProcessDelay(MEM_CYCLE_TIME);
+          CACHE[procId][blkNum].TAG = broadcast_tag;
+          if (DEBUG)
+            displayCacheBlock(procId, blkNum);
+          break;
+        }
+      }
+      ProcessDelay(CLOCK_CYCLE);
+      SemaphoreSignal(sem_bussnoopdone[procId]);  //  Uncomment Signal when coding
+      if (TRACE) {
+        printf("Snooper %d Done with my own %s request. Time: %.2f\n", procId, g(BROADCAST_CMD.reqtype), GetSimTime());
+      }
+      continue;
     }
 
-    case (BUS_RD): {
-      ProcessDelay(epsilon);
+
+    /*  ************************************************************************************ 
 
 
-      break;
-    }
+        Handle  Bus Command  from another processor
 
-    case (BUS_RDX): {
-      ProcessDelay(epsilon);
+        1.  Ignore command if the block is INVALID in my cache.
 
+        2.  To flush a requested cache block use the provided function "writebackMemory()".
+        After copying to memory simulate the memory access time by calling "ProcessDelay(MEM_CYCLE_TIME)".       
 
-      break;
-    }
-    }
-	
-    ProcessDelay(CLOCK_CYCLE);
+        3.  To change the state of a cache block call  the provided function "atomicUpdate()".
 
-    //    SemaphoreSignal(sem_bussnoopdone[procId]);  //  Uncomment Signal when coding
-    continue;
-    }
+        4. After handling the command, delay by one cycle using "ProcessDelay(CLOCK_CYCLE)" before performing the signal 
+        on "sem_bussnoopdone[ ]" and returning. This simulates the time required for this execution.
 
-  
-/*  ************************************************************************************ 
+        5. If you receive an INV or BUS_RDX signal from some other processor when in the transient state SM,
+        you must update the statistics counters: decrement my "cache_upgrades[ ]" by 1 and increment my "cache_write_misses[ ]" by 1.
+        Also increment your "numUtoX[]"counter by 1. 
 
 
-   Handle  Bus Command  from another processor
-  
-1.  Ignore command if the block is INVALID in my cache.
+     ************************************************************************************ */
 
-2.  To flush a requested cache block use the provided function "writebackMemory()".
-After copying to memory simulate the memory access time by calling "ProcessDelay(MEM_CYCLE_TIME)".       
+    // Check for valid block in the cache; else ignore command.
 
-3.  To change the state of a cache block call  the provided function "atomicUpdate()".
-
-4. After handling the command, delay by one cycle using "ProcessDelay(CLOCK_CYCLE)" before performing the signal 
-on "sem_bussnoopdone[ ]" and returning. This simulates the time required for this execution.
-
-5. If you receive an INV or BUS_RDX signal from some other processor when in the transient state SM,
- you must update the statistics counters: decrement my "cache_upgrades[ ]" by 1 and increment my "cache_write_misses[ ]" by 1.
-Also increment your "numUtoX[]"counter by 1. 
-  
-
-************************************************************************************ */
-
-// Check for valid block in the cache; else ignore command.
 
     switch (busreq_type) { // Handling command from other processor for a block in my cache
-    
-    case (INV): {
-
-      break;
-    }
-    case (BUS_RD): {
-
-      break;
-    }  
-    case (BUS_RDX): {
-
-      break;
-    }
+      case (INV):
+      {
+        if ((mem_address & BLKMASK) == (address & BLKMASK)) {
+          if (CACHE[procId][blkNum].STATE == M) {
+            //won't happen
+          } else if (CACHE[procId][blkNum].STATE == SM) {
+            cache_upgrades[procId]--;
+            cache_write_misses[procId]++;
+            numUtoX[procId]++;
+            atomicUpdate(procId, blkNum, INV);
+          }
+          else if (CACHE[procId][blkNum].STATE == S) {
+            atomicUpdate(procId, blkNum, INV);
+          }
+        }
+        break;
+      }
+      case (BUS_RD):
+      {
+        if ((mem_address & BLKMASK) == (address & BLKMASK)) {
+          if (CACHE[procId][blkNum].STATE == M) {
+            atomicUpdate(procId, blkNum, S);
+            writebackMemory(mem_address, CACHE[procId][blkNum].DATA);
+            ProcessDelay(MEM_CYCLE_TIME);
+          } else if (CACHE[procId][blkNum].STATE == SM) {
+            //cache_upgrades[procId]--;
+            //cache_write_misses[procId]++;
+            //numUtoX[procId]++;
+          } else if (CACHE[procId][blkNum].STATE == S) {
+          }
+        }
+        break;
+      }  
+      case (BUS_RDX):
+      {
+        if ((mem_address & BLKMASK) == (address & BLKMASK)) {
+          if (CACHE[procId][blkNum].STATE == M) {
+            atomicUpdate(procId, blkNum, INV);
+            writebackMemory(mem_address, CACHE[procId][blkNum].DATA);
+            ProcessDelay(MEM_CYCLE_TIME);
+          } else if (CACHE[procId][blkNum].STATE == SM) {
+            cache_upgrades[procId]--;
+            cache_write_misses[procId]++;
+            numUtoX[procId]++;
+            atomicUpdate(procId, blkNum, INV);
+          } else if (CACHE[procId][blkNum].STATE == S) {
+            atomicUpdate(procId, blkNum, INV);
+          }
+        }
+        break;
+      }
     }
 
     ProcessDelay(CLOCK_CYCLE);   
-    //  SemaphoreSignal(sem_bussnoopdone[procId]);   // Uncomment Signal while coding
+    SemaphoreSignal(sem_bussnoopdone[procId]);   // Uncomment Signal while coding
   }
 }
 

@@ -7,8 +7,8 @@
 #define TRUE 1
 
 
-#define NUM_PROCESSORS 1
-#define CHUNK  TRUE  // Change to FALSE for interleaved partitioning
+#define NUM_PROCESSORS 2
+#define CHUNK  FALSE  // Change to FALSE for interleaved partitioning
 #define MAX_SIMULATION_TIME  100000.0   // Change to a large value before running your experiments  
 
 
@@ -16,11 +16,11 @@
 #define STRING2 "Interrupted UPGRADE"
 
 // Flags to turn on levels of debugging info
-#define TRACE  FALSE   
-#define DEBUG FALSE
-#define BUSTRACE FALSE
+#define TRACE  TRUE   
+#define DEBUG TRUE
+#define BUSTRACE TRUE
 
-#define TOTALSIZE  8192
+#define TOTALSIZE  32
 #define MINDELAY 0
 #define MAXDELAY 0
 
