@@ -18,6 +18,7 @@
   macro(long long, plain, determinant_ll_plain) \
   macro(float,  simd,  determinant_s_simd)   \
   macro(double, simd,  determinant_d_simd)   \
+  macro(long long, simd, determinant_ll_simd) \
   macro(float,  blas,  determinant_s_blas)   \
   macro(double, blas,  determinant_d_blas)   
 #else
@@ -26,7 +27,8 @@
   macro(double, plain, determinant_d_plain)  \
   macro(long long, plain, determinant_ll_plain) \
   macro(float,  simd,  determinant_s_simd)   \
-  macro(double, simd,  determinant_d_simd)
+  macro(double, simd,  determinant_d_simd)   \
+  macro(long long, simd, determinant_ll_simd)
 #endif
 
 

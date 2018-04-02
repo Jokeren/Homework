@@ -13,7 +13,7 @@ BUILD_DIR := build/
 LIB := $(LIB_DIR)libdeterminant.so
 
 ifdef DEBUG
-OFLAGS += -g
+OFLAGS += -g -DDEBUG
 endif
 
 ifdef PERFORMANCE

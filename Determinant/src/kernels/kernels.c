@@ -6,6 +6,7 @@
 #define DType long long
 #define SYMBOL(name) determinant_ ## ll_ ## name
 #include "plain-inl.h"
+#include "simd-ll-inl.h"
 #undef SYMBOL
 #undef DType
 
