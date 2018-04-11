@@ -225,7 +225,7 @@ void BusSnooper() {
       // Recall that due to cache-to-cache transfers a block in the S state can be DIRTY!!
 
       if (DEBUG)
-        printf("PFlag: %s OFLag: %s\n", PFlag? "TRUE":"FALSE", OFlag ? "TRUE" : "FALSE");
+        printf("PFlag : %s   OFLag: %s\n", PFlag? "TRUE":"FALSE", OFlag ? "TRUE" : "FALSE");
 
       //  Handle the three possible requests initiated by my own front end.
       switch (busreq_type) {  
@@ -250,15 +250,17 @@ void BusSnooper() {
             // cache tag
             CACHE[procId][blkNum].TAG = broadcast_tag;
             // read value
-            if (OFlag && PFlag) {
+            if (OFlag) {
+              // update cache state
+              atomicUpdate(procId, blkNum, S);
               receiveCacheTransfer();
-              ++numCacheToCacheTransfer;
+              ++numCacheToCacheTransfer[procId];
             } else {
-              receiveMemTransfer();
-              ++numMemToCacheTransfer;
+              // update cache state
+              atomicUpdate(procId, blkNum, E);
+              receiveMemTransfer(procId, blkNum, address);
+              ++numMemToCacheTransfer[procId];
             }
-            // update cache state
-            atomicUpdate(procId, blkNum, S);
             break;
           }
 
@@ -279,12 +281,12 @@ void BusSnooper() {
             // cache tag
             CACHE[procId][blkNum].TAG = broadcast_tag;
             // read value
-            if (OFlag && PFlag) {
+            if (OFlag) {
               receiveCacheTransfer();
-              ++numCacheToCacheTransfer;
+              ++numCacheToCacheTransfer[procId];
             } else {
-              receiveMemTransfer();
-              ++numMemToCacheTransfer;
+              receiveMemTransfer(procId, blkNum, address);
+              ++numMemToCacheTransfer[procId];
             }
             break;
           }
@@ -309,9 +311,13 @@ void BusSnooper() {
     unsigned mem_address = (CACHE[procId][blkNum].TAG * CACHESIZE + blkNum) << BLKSIZE;
     if ((mem_address & BLKMASK) == (address & BLKMASK)) {
       PBit[procId] = TRUE;
+    } else {
+      PBit[procId] = FALSE;
     }
-    if (CACHE[procId][blkNum].STATE != I) {
+    if (CACHE[procId][blkNum].STATE != I && CACHE[procId][blkNum].STATE != S && PBit[procId]) {
       OBit[procId] = TRUE;
+    } else {
+      OBit[procId] = FALSE;
     }
 
     switch (busreq_type) { // Handling command from other processor for a block in my cache
@@ -348,15 +354,11 @@ void BusSnooper() {
             case OM:
             case O:
               sendCacheTransfer(procId, requester, blkNum);
-              CACHE[requester][blkNum].DIRTY = CACHE[procId][blkNum].DIRTY;
-              CACHE[procId][blkNum].DIRTY = FALSE;
               break;
             case M:
             case E:
               atomicUpdate(procId, blkNum, O);
               sendCacheTransfer(procId, requester, blkNum);
-              CACHE[requester][blkNum].DIRTY = CACHE[procId][blkNum].DIRTY;
-              CACHE[procId][blkNum].DIRTY = FALSE;
               break;
             default:
               break;
@@ -380,8 +382,6 @@ void BusSnooper() {
             case O:
               atomicUpdate(procId, blkNum, I);
               sendCacheTransfer(procId, requester, blkNum);
-              CACHE[requester][blkNum].DIRTY = CACHE[procId][blkNum].DIRTY;
-              CACHE[procId][blkNum].DIRTY = FALSE;
               break;
 
             case SM:

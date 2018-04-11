@@ -4,7 +4,7 @@ FILE *fp;
 
 
 struct tracerecord tracerec;
- int a[TOTALSIZE];
+int a[TOTALSIZE];
 int numRecords = 0;
 
 void init(int *p, int size) {
@@ -34,7 +34,7 @@ maketrace(FILE *fp, int id) {
   mode = 1;                  // mode = 1  implies WRITE; mode = 0 implies READ
  
    // Uncomment the floowing  line for demo3  and for the final part of Experiment II
-  //  if (id == 2)  mode = 0;
+  if (id == 1)  mode = 0;
 
   for (i=0,  p = a; i < datasize; i++)    {
     temp = *p + 1000;

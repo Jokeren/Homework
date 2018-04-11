@@ -133,7 +133,7 @@ void UserMain(int argc, char *argv[])
   buscntrl = NewProcess("buscntrl",BusArbiter,0);
   ActivitySetArg(buscntrl,NULL,1);
   ActivitySchedTime(buscntrl, 0.00000, INDEPENDENT);
-  printf("Done Creating Bus Arbiter Process\n");
+  printf("Done Creating Bus Arbiter  Process\n");
 
   // Create a process to model activities of  each processor 
   for (i=0; i < NUM_PROCESSORS; i++){
@@ -174,7 +174,7 @@ void Processor()
 
     if (TRACE) {
       printf("\nProcessor %d makes %s request:", proc_num, h(memreq->type));
-      printf("Address: %x Time:%5.2f\n", memreq->address, GetSimTime());
+      printf(" Address: %x Time:%5.2f\n", memreq->address, GetSimTime());
     }
 
     SemaphoreSignal(sem_memreq[proc_num]);  // Notify memory controller of request

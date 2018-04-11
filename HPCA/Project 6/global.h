@@ -5,7 +5,8 @@
 
 // Global variables
 #define  CHUNK TRUE
-#define NUM_PROCESSORS 1
+//#define NUM_PROCESSORS 1
+#define NUM_PROCESSORS 2
 
 #define FALSE 0
 #define TRUE 1
@@ -16,11 +17,12 @@
 
 
 
-#define TRACE  FALSE
-#define DEBUG FALSE
+#define TRACE TRUE
+#define DEBUG TRUE
 #define BUSTRACE FALSE
 
-#define TOTALSIZE 8192
+//#define TOTALSIZE 8192
+#define TOTALSIZE 32
 #define MINDELAY 0
 #define MAXDELAY 10
 
