@@ -194,7 +194,7 @@ void compute(int fd, size_t tid) {
     return;
   }
   printf("[tid:%zu]->Start computing...\n", tid);
-  double *compute_buffer = (double *)malloc(sizeof(double) * NUM_BULKS * D_ARRAY_SIZE * D_ARRAY_SIZE);
+  double compute_buffer[NUM_BULKS * D_ARRAY_SIZE * D_ARRAY_SIZE];
   long long results[NUM_BULKS];
   size_t order = 0;
   /*Do not have to wait for terminate in the first interval*/
