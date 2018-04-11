@@ -1,0 +1,6 @@
+[package]
+name = "determinant"
+version = "0.1.0"
+authors = ["Jokeren <robinho364@gmail.com>"]
+
+[dependencies]

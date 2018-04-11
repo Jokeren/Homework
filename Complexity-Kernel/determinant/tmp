@@ -1,0 +1,34 @@
+   Compiling determinant v0.1.0 (file:///home/kz21/Codes/Homework/Complexity-Kernel/determinant)
+warning: constant item is never used: `MATRIX_LEN`
+ --> src/main.rs:6:1
+  |
+6 | const MATRIX_LEN: usize = 32;
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: #[warn(dead_code)] on by default
+
+warning: method is never used: `abs`
+  --> src/main.rs:39:5
+   |
+39 |     fn abs(&self) -> Fraction {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: method is never used: `to_i128`
+  --> src/main.rs:45:5
+   |
+45 |     fn to_i128(&self) -> i128 {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: method is never used: `is_zero`
+  --> src/main.rs:57:5
+   |
+57 |     fn is_zero(&self) -> bool {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function is never used: `determinant`
+   --> src/main.rs:126:1
+    |
+126 | fn determinant(matrix: &mut [Fraction; MATRIX_LEN * MATRIX_LEN])->i64 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+    Finished dev [unoptimized + debuginfo] target(s) in 0.98 secs
