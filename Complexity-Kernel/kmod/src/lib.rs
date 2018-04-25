@@ -15,9 +15,9 @@ use determinant::MATRIX_LEN;
 use determinant::Fraction;
 use determinant::determinant_fn; 
 
-const N_WORKERS: usize = 8;
-const BULK_SIZE: usize = 4;
-const LIFE: i64 = 1;
+const N_WORKERS: usize = 6;
+const BULK_SIZE: usize = 16;
+const LIFE: usize = 180;
 
 static mut BUF1: [[[i32; MATRIX_LEN * MATRIX_LEN]; BULK_SIZE]; N_WORKERS] = [[[0; MATRIX_LEN * MATRIX_LEN]; BULK_SIZE]; N_WORKERS];
 static mut BUF2: [[[i32; MATRIX_LEN * MATRIX_LEN]; BULK_SIZE]; N_WORKERS] = [[[0; MATRIX_LEN * MATRIX_LEN]; BULK_SIZE]; N_WORKERS];
@@ -25,6 +25,7 @@ static mut FRACTIONS : [[[Fraction; MATRIX_LEN * MATRIX_LEN]; BULK_SIZE]; N_WORK
 static mut RESULTS: [[i64; BULK_SIZE]; N_WORKERS] = [[0; BULK_SIZE]; N_WORKERS];
 static mut WRITE_DETS : [i64; BULK_SIZE] = [0; BULK_SIZE];
 static mut COMPUTE_DETS : [[i64; BULK_SIZE]; N_WORKERS] = [[0; BULK_SIZE]; N_WORKERS];
+static mut RETS : [i32; LIFE * 2] = [0; LIFE * 2];
 
 
 #[no_mangle]
@@ -32,6 +33,7 @@ pub fn rust_reader() {
   println!("Reader thread start");
   let mut count = 0;
   while kdev::measure_get_terminate() == false {
+    //kdev::schedule(0);
     unsafe {
       if count == 0 {
         for t in 0..N_WORKERS {
@@ -54,6 +56,7 @@ pub fn rust_reader() {
           kdev::reader_set_terminate();
           return;
         }
+        kdev::schedule(0);
       }
       kdev::compute_read_unlock(t as i32);
     }
@@ -72,13 +75,13 @@ pub fn rust_writer() {
   println!("Writer thread start");
   let mut order = 0;
   while kdev::measure_get_terminate() == false {
-    kdev::schedule(10);
+    //kdev::schedule(0);
     while kdev::writer_read_trylock(order) == false {
-      kdev::schedule(1);
       if kdev::measure_get_terminate() == true {
         kdev::writer_set_terminate();
         return;
       }
+      kdev::schedule(0);
     }
 
     for b in 0..BULK_SIZE {
@@ -86,6 +89,7 @@ pub fn rust_writer() {
         *WRITE_DETS.get_unchecked_mut(b) = RESULTS.get_unchecked(order as usize).get_unchecked(b).clone();
       };
     }
+
     kdev::writer_write_unlock(order);
 
     for b in 0..BULK_SIZE {
@@ -108,15 +112,15 @@ pub fn rust_compute(thread_id: i32) {
   println!("Compute thread start %d", thread_id);
   let mut count = 0;
   while kdev::measure_get_terminate() == false {
-    kdev::schedule(10);
     while kdev::compute_read_trylock(thread_id) == false {
       if kdev::measure_get_terminate() == true {
         kdev::compute_set_terminate(thread_id);
         println!("Compute thread terminate %d", thread_id);
         return;
       }
-      kdev::schedule(1);
+      kdev::schedule(0);
     }
+
     unsafe {
       if count == 0 {
         for b in 0..BULK_SIZE {
@@ -138,6 +142,7 @@ pub fn rust_compute(thread_id: i32) {
         }
       }
     }
+
     kdev::compute_write_unlock(thread_id);
 
     for b in 0..BULK_SIZE {
@@ -147,6 +152,7 @@ pub fn rust_compute(thread_id: i32) {
       unsafe {
         *COMPUTE_DETS.get_unchecked_mut(thread_id as usize).get_unchecked_mut(b) = det;
       }
+      kdev::schedule(1);
     }
 
     while kdev::writer_write_trylock(thread_id) == false {
@@ -155,7 +161,7 @@ pub fn rust_compute(thread_id: i32) {
         println!("Compute thread terminate %d", thread_id);
         return;
       }
-      kdev::schedule(1);
+      kdev::schedule(0);
     }
     for b in 0..BULK_SIZE {
       unsafe {
@@ -178,16 +184,20 @@ pub fn rust_measure() {
   let prev_time: i64 = kdev::get_time();
   let mut time: i64 = kdev::get_time();
   let mut prev_num = 0;
-  while time - prev_time < LIFE {
+  let mut count = 0;
+  while time - prev_time < LIFE as i64 {
     kdev::sleep(1000);
     let ret : i32 = unsafe {
       kdev::get_no_det_cals() 
     };
-    kdev::write_file(ret);
     let curr_num = ret - prev_num;
     prev_num = ret;
     println!("Lib->Number correction determinants %d", curr_num);
     time = kdev::get_time();
+    unsafe {
+      *RETS.get_unchecked_mut(count) = curr_num;
+    }
+    count = count + 1;
   }
   kdev::measure_set_terminate();
   println!("Lib->Wait for reader terminate");
@@ -210,12 +220,18 @@ pub fn rust_measure() {
     kdev::writer_write_trylock(i as i32);
     kdev::writer_write_unlock(i as i32);
   }
+  for i in 0..count {
+    let ret = unsafe {
+      RETS.get_unchecked(i).clone()
+    };
+    kdev::write_file(ret);
+  }
 }
 
 
 /// Entry point for the kernel module
 #[no_mangle]
-pub fn init_module() -> i32 {
+pub fn rust_init() -> i32 {
   println!("Lib->Module initialize...");
   unsafe {
     kdev::kdev_open();
@@ -227,7 +243,7 @@ pub fn init_module() -> i32 {
 
 /// Exit point for the kernel module
 #[no_mangle]
-pub fn cleanup_module() {
+pub fn rust_cleanup() {
   unsafe {
     kdev::kdev_release();
   }

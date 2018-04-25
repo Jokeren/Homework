@@ -2,9 +2,10 @@ obj-m := ${MODULE_NAME}.o
 RUSTLIB := lib${MODULE_NAME}.a
 ${MODULE_NAME}-objs := $(patsubst %.c,%.o,${CFILES}) ${RUSTLIB}
 
-EXTRA_LDFLAGS += --gc-sections --entry=init_module --undefined=cleanup_module
-EXTRA_LDFLAGS += $(if ${RELEASE},--strip-all)
-#EXTRA_CFLAGS += -fno-asynchronous-unwind-tables -fno-exceptions
+#EXTRA_LDFLAGS += --gc-sections --entry=init_module --undefined=cleanup_module
+#EXTRA_LDFLAGS += $(if ${RELEASE},--strip-all)
+KBUILD_EXTRA_SYMBOLS += /usr/src/linux-headers-4.10.0-42-generic/Module.symvers
+KBUILD_EXTRA_SYMBOLS += /home/ompl/Codes/Homework/Complexity-Kernel/dummy/Module.symvers
 
 src := ${PWD}
 

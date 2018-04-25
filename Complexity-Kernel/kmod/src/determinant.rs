@@ -1,5 +1,7 @@
 // Determinant calculation module
 
+use kdev;
+
 pub const MATRIX_LEN: usize = 32;
 
 
@@ -184,7 +186,7 @@ pub fn determinant_fn(matrix: &mut [Fraction; MATRIX_LEN * MATRIX_LEN])->i64 {
           *matrix.get_unchecked_mut(j * MATRIX_LEN + k) = matrix.get_unchecked(j * MATRIX_LEN + k).sub(&tmp);
         }
       }
-      det = det.mul(matrix.get_unchecked_mut(i * MATRIX_LEN + i));
+      det = det.mul(matrix.get_unchecked(i * MATRIX_LEN + i));
     }
   }
 

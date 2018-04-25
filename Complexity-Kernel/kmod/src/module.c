@@ -12,12 +12,15 @@
 #include <linux/sched.h>  // for task_struct
 #include <linux/time.h>
 #include <linux/atomic.h>
-#include <asm/uaccess.h> 
+#include <linux/mutex.h>
 
+
+MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Keren Zhou <kz21@rice.edu>");
 MODULE_DESCRIPTION("A simple kernel module for determinant calculation");
-MODULE_LICENSE("MIT");
 MODULE_VERSION("0.1.0");
+
+#include <asm/uaccess.h> 
 
 #define MODULE_DEBUG 1
 #ifdef MODULE_DEBUG
@@ -26,11 +29,11 @@ MODULE_VERSION("0.1.0");
 #define PRINT(...)
 #endif
 
-#define NUM_COMP_THREADS 8
+#define NUM_COMP_THREADS 6
 
 // entry functions
-extern int init_module(void);
-extern void cleanup_module(void);
+extern void rust_init(void);
+extern void rust_cleanup(void);
 extern void rust_reader(void);
 extern void rust_writer(void);
 extern void rust_measure(void);
@@ -48,14 +51,23 @@ atomic_t reader_terminate_flag;
 atomic_t writer_terminate_flag;
 atomic_t measure_terminate_flag;
 atomic_t compute_terminate_flag[NUM_COMP_THREADS];
-spinlock_t writer_read_lock[NUM_COMP_THREADS];
-spinlock_t writer_write_lock[NUM_COMP_THREADS];
-spinlock_t compute_read_lock[NUM_COMP_THREADS];
-spinlock_t compute_write_lock[NUM_COMP_THREADS];
+struct mutex writer_read_lock[NUM_COMP_THREADS];
+struct mutex writer_write_lock[NUM_COMP_THREADS];
+struct mutex compute_read_lock[NUM_COMP_THREADS];
+struct mutex compute_write_lock[NUM_COMP_THREADS];
+
+static int m_init_module(void) {
+  rust_init();
+}
+
+
+static void m_cleanup_module(void) {
+  rust_cleanup();
+}
 
 
 extern void kschedule_timeout(int time) {
-  schedule_timeout(time);
+  schedule_timeout_interruptible(time);
 }
 
 extern long long kget_time(void) {
@@ -86,67 +98,67 @@ extern void kwrite_file(int num) {
 
 
 extern void ksleep(int time) {
-  msleep(time);
+  msleep_interruptible(time);
 }
 
 
 extern bool kcompute_write_trylock(int thread_id) {
-  return spin_trylock_irq(&compute_write_lock[thread_id]);
+  return mutex_trylock(&compute_write_lock[thread_id]);
 }
 
 
 extern void kcompute_write_lock(int thread_id) {
-  spin_lock_irq(&compute_write_lock[thread_id]);
+  mutex_lock(&compute_write_lock[thread_id]);
 }
 
 
 extern void kcompute_write_unlock(int thread_id) {
-  spin_unlock_irq(&compute_write_lock[thread_id]);
+  mutex_unlock(&compute_write_lock[thread_id]);
 }
 
 
 extern bool kcompute_read_trylock(int thread_id) {
-  return spin_trylock_irq(&compute_read_lock[thread_id]);
+  return mutex_trylock(&compute_read_lock[thread_id]);
 }
 
 
 extern void kcompute_read_lock(int thread_id) {
-  spin_lock_irq(&compute_read_lock[thread_id]);
+  mutex_lock(&compute_read_lock[thread_id]);
 }
 
 
 extern void kcompute_read_unlock(int thread_id) {
-  spin_unlock_irq(&compute_read_lock[thread_id]);
+  mutex_unlock(&compute_read_lock[thread_id]);
 }
 
 
 extern bool kwriter_write_trylock(int thread_id) {
-  return spin_trylock_irq(&writer_write_lock[thread_id]);
+  return mutex_trylock(&writer_write_lock[thread_id]);
 }
 
 
 extern void kwriter_write_lock(int thread_id) {
-  spin_lock_irq(&writer_write_lock[thread_id]);
+  mutex_lock(&writer_write_lock[thread_id]);
 }
 
 
 extern void kwriter_write_unlock(int thread_id) {
-  spin_unlock_irq(&writer_write_lock[thread_id]);
+  mutex_unlock(&writer_write_lock[thread_id]);
 }
 
 
 extern bool kwriter_read_trylock(int thread_id) {
-  return spin_trylock_irq(&writer_read_lock[thread_id]);
+  return mutex_trylock(&writer_read_lock[thread_id]);
 }
 
 
 extern void kwriter_read_lock(int thread_id) {
-  spin_lock_irq(&writer_read_lock[thread_id]);
+  mutex_lock(&writer_read_lock[thread_id]);
 }
 
 
 extern void kwriter_read_unlock(int thread_id) {
-  spin_unlock_irq(&writer_read_lock[thread_id]);
+  mutex_unlock(&writer_read_lock[thread_id]);
 }
 
 
@@ -225,12 +237,12 @@ extern void kinit_thread(void) {
 
   size_t i;
   for (i = 0; i < NUM_COMP_THREADS; ++i) {
-    spin_lock_init(&compute_read_lock[i]);
-    spin_lock_init(&compute_write_lock[i]);
-    spin_lock_init(&writer_read_lock[i]);
-    spin_lock_init(&writer_write_lock[i]);
-    spin_lock(&compute_read_lock[i]);
-    spin_lock(&writer_read_lock[i]);
+    mutex_init(&compute_read_lock[i]);
+    mutex_init(&compute_write_lock[i]);
+    mutex_init(&writer_read_lock[i]);
+    mutex_init(&writer_write_lock[i]);
+    mutex_lock(&compute_read_lock[i]);
+    mutex_lock(&writer_read_lock[i]);
   }
 
   for (i = 0; i < NUM_COMP_THREADS; ++i) {
@@ -240,11 +252,31 @@ extern void kinit_thread(void) {
   atomic_set(&writer_terminate_flag, 0);
   atomic_set(&measure_terminate_flag, 0);
 
-  reader_task = kthread_run(&reader_function, (void *)&reader_id, "reader_task");
+  struct sched_param param = { .sched_priority = MAX_USER_RT_PRIO - 1 };
+
+  //reader_task = kthread_run(&reader_function, (void *)&reader_id, "reader_task");
+  reader_task = kthread_create(&reader_function, (void *)&reader_id, "reader_task");
+  sched_setscheduler(reader_task, SCHED_RR, &param);
+  wake_up_process(reader_task);
+
   for (i = 0; i < NUM_COMP_THREADS; ++i) {
     compute_id[i] = i;
-    compute_task[i] = kthread_run(&compute_function, (void *)&compute_id[i], "compute_task");
+    //compute_task[i] = kthread_run(&compute_function, (void *)&compute_id[i], "compute_task");
+    compute_task[i] = kthread_create(&compute_function, (void *)&compute_id[i], "compute_task");
+    sched_setscheduler(compute_task[i], SCHED_RR, &param);
+    wake_up_process(compute_task[i]);
   }
-  writer_task = kthread_run(&writer_function, (void *)&writer_id, "writer_task");
-  measure_task = kthread_run(&measure_function, (void *)&measure_id, "measure_task");
+
+  //writer_task = kthread_run(&writer_function, (void *)&writer_id, "writer_task");
+  writer_task = kthread_create(&writer_function, (void *)&writer_id, "writer_task");
+  sched_setscheduler(writer_task, SCHED_RR, &param);
+  wake_up_process(writer_task);
+
+  //measure_task = kthread_run(&measure_function, (void *)&measure_id, "measure_task");
+  measure_task = kthread_create(&measure_function, (void *)&measure_id, "measure_task");
+  sched_setscheduler(measure_task, SCHED_RR, &param);
+  wake_up_process(measure_task);
 }
+
+module_init(m_init_module);
+module_exit(m_cleanup_module);
