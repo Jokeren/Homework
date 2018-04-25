@@ -16,11 +16,16 @@ use determinant::Fraction;
 use determinant::determinant_fn; 
 
 const N_WORKERS: usize = 2;
+const BULK_SIZE: usize = 2;
+const LIFE: i64 = 1;
 
-static mut BUF1: [[i32; MATRIX_LEN * MATRIX_LEN]; N_WORKERS] = [[0; MATRIX_LEN * MATRIX_LEN]; N_WORKERS];
-static mut BUF2: [[i32; MATRIX_LEN * MATRIX_LEN]; N_WORKERS] = [[0; MATRIX_LEN * MATRIX_LEN]; N_WORKERS];
-static mut FRACTIONS : [[Fraction; MATRIX_LEN * MATRIX_LEN]; N_WORKERS] = [[Fraction { numerator: 0, denominator: 0}; MATRIX_LEN * MATRIX_LEN]; N_WORKERS];
-static mut RESULTS: [i64; N_WORKERS] = [0; N_WORKERS];
+static mut BUF1: [[[i32; MATRIX_LEN * MATRIX_LEN]; BULK_SIZE]; N_WORKERS] = [[[0; MATRIX_LEN * MATRIX_LEN]; BULK_SIZE]; N_WORKERS];
+static mut BUF2: [[[i32; MATRIX_LEN * MATRIX_LEN]; BULK_SIZE]; N_WORKERS] = [[[0; MATRIX_LEN * MATRIX_LEN]; BULK_SIZE]; N_WORKERS];
+static mut FRACTIONS : [[[Fraction; MATRIX_LEN * MATRIX_LEN]; BULK_SIZE]; N_WORKERS] = [[[Fraction { numerator: 0, denominator: 0}; MATRIX_LEN * MATRIX_LEN]; BULK_SIZE]; N_WORKERS];
+static mut RESULTS: [[i64; BULK_SIZE]; N_WORKERS] = [[0; BULK_SIZE]; N_WORKERS];
+static mut WRITE_DETS : [i64; BULK_SIZE] = [0; BULK_SIZE];
+static mut COMPUTE_DETS : [[i64; BULK_SIZE]; N_WORKERS] = [[0; BULK_SIZE]; N_WORKERS];
+
 
 #[no_mangle]
 pub fn rust_reader() {
@@ -28,11 +33,17 @@ pub fn rust_reader() {
   let mut count = 0;
   while kdev::measure_get_terminate() == false {
     unsafe {
-      for t in 0..N_WORKERS {
-        if count == 0 {
-          kdev::kdev_read(&mut BUF1[t][0] as *mut i32);
-        } else {
-          kdev::kdev_read(&mut BUF2[t][0] as *mut i32);
+      if count == 0 {
+        for t in 0..N_WORKERS {
+          for b in 0..BULK_SIZE {
+            kdev::kdev_read(BUF1.get_unchecked_mut(t).get_unchecked_mut(b).get_unchecked_mut(0) as *mut i32);
+          }
+        }
+      } else {
+        for t in 0..N_WORKERS {
+          for b in 0..BULK_SIZE {
+            kdev::kdev_read(BUF2.get_unchecked_mut(t).get_unchecked_mut(b).get_unchecked_mut(0) as *mut i32);
+          }
         }
       }
     }
@@ -61,6 +72,7 @@ pub fn rust_writer() {
   println!("Writer thread start");
   let mut order = 0;
   while kdev::measure_get_terminate() == false {
+    kdev::schedule(10);
     while kdev::writer_read_trylock(order) == false {
       if kdev::measure_get_terminate() == true {
         kdev::writer_set_terminate();
@@ -68,12 +80,18 @@ pub fn rust_writer() {
       }
     }
 
-    let mut det: i64 = unsafe {
-      RESULTS.get_unchecked(order as usize).clone()
-    };
+    for b in 0..BULK_SIZE {
+      unsafe {
+        WRITE_DETS[b] = RESULTS.get_unchecked(order as usize).get_unchecked(b).clone();
+      };
+    }
     kdev::writer_write_unlock(order);
-    unsafe {
-      kdev::kdev_write(&mut det as *mut i64, 8);
+
+    for b in 0..BULK_SIZE {
+      unsafe {
+        let mut det = WRITE_DETS[b];
+        kdev::kdev_write(&mut det as *mut i64, 8);
+      }
     }
 
     order = order + 1;
@@ -89,44 +107,59 @@ pub fn rust_compute(thread_id: i32) {
   println!("Compute thread start %d", thread_id);
   let mut count = 0;
   while kdev::measure_get_terminate() == false {
+    kdev::schedule(10);
     while kdev::compute_read_trylock(thread_id) == false {
       if kdev::measure_get_terminate() == true {
         kdev::compute_set_terminate(thread_id);
-        println!("terminate %d", thread_id);
+        println!("Compute thread terminate %d", thread_id);
         return;
       }
+      kdev::schedule(1);
     }
     unsafe {
-      let mut i = 0;
       if count == 0 {
-        while i < MATRIX_LEN * MATRIX_LEN {
-          let numerator = BUF1.get_unchecked(thread_id as usize).get_unchecked(i).clone() as i128;
-          *FRACTIONS.get_unchecked_mut(thread_id as usize).get_unchecked_mut(i) = Fraction { numerator: numerator, denominator: 1};
-          i = i + 1;
+        for b in 0..BULK_SIZE {
+          let mut i = 0;
+          while i < MATRIX_LEN * MATRIX_LEN {
+            let numerator = BUF1.get_unchecked(thread_id as usize).get_unchecked(b).get_unchecked(i).clone() as i128;
+            *FRACTIONS.get_unchecked_mut(thread_id as usize).get_unchecked_mut(b).get_unchecked_mut(i) = Fraction { numerator: numerator, denominator: 1};
+            i = i + 1;
+          }
         }
       } else {
-        while i < MATRIX_LEN * MATRIX_LEN {
-          let numerator = BUF2.get_unchecked(thread_id as usize).get_unchecked(i).clone() as i128;
-          *FRACTIONS.get_unchecked_mut(thread_id as usize).get_unchecked_mut(i) = Fraction { numerator: numerator, denominator: 1};
-          i = i + 1;
+        for b in 0..BULK_SIZE {
+          let mut i = 0;
+          while i < MATRIX_LEN * MATRIX_LEN {
+            let numerator = BUF2.get_unchecked(thread_id as usize).get_unchecked(b).get_unchecked(i).clone() as i128;
+            *FRACTIONS.get_unchecked_mut(thread_id as usize).get_unchecked_mut(b).get_unchecked_mut(i) = Fraction { numerator: numerator, denominator: 1};
+            i = i + 1;
+          }
         }
       }
     }
     kdev::compute_write_unlock(thread_id);
 
-    let mut det: i64 = unsafe {
-      determinant_fn(&mut FRACTIONS.get_unchecked_mut(thread_id as usize)) 
-    };
+    for b in 0..BULK_SIZE {
+      let mut det: i64 = unsafe {
+        determinant_fn(&mut FRACTIONS.get_unchecked_mut(thread_id as usize).get_unchecked_mut(b)) 
+      };
+      unsafe {
+        *COMPUTE_DETS.get_unchecked_mut(thread_id as usize).get_unchecked_mut(b) = det;
+      }
+    }
 
     while kdev::writer_write_trylock(thread_id) == false {
       if kdev::measure_get_terminate() == true {
         kdev::compute_set_terminate(thread_id);
-        println!("terminate %d", thread_id);
+        println!("Compute thread terminate %d", thread_id);
         return;
       }
+      kdev::schedule(1);
     }
-    unsafe {
-      *RESULTS.get_unchecked_mut(thread_id as usize) = det;
+    for b in 0..BULK_SIZE {
+      unsafe {
+        *RESULTS.get_unchecked_mut(thread_id as usize).get_unchecked_mut(b) = COMPUTE_DETS.get_unchecked(thread_id as usize).get_unchecked(b).clone();
+      }
     }
     kdev::writer_read_unlock(thread_id);
 
@@ -134,9 +167,6 @@ pub fn rust_compute(thread_id: i32) {
     if count == 2 {
       count = 0;
     }
-    kdev::schedule(1000);
-    let flag = kdev::measure_get_terminate();
-    println!("Compute thread %d terminate_flag %d", thread_id, flag as i32);
   }
   kdev::compute_set_terminate(thread_id);
 }
@@ -147,8 +177,7 @@ pub fn rust_measure() {
   let prev_time: i64 = kdev::get_time();
   let mut time: i64 = kdev::get_time();
   let mut prev_num = 0;
-  let total = 1;
-  while time - prev_time < total {
+  while time - prev_time < LIFE {
     kdev::sleep(1000);
     let ret : i32 = unsafe {
       kdev::get_no_det_cals() 

@@ -91,62 +91,62 @@ extern void ksleep(int time) {
 
 
 extern bool kcompute_write_trylock(int thread_id) {
-  return spin_trylock(&compute_write_lock[thread_id]);
+  return spin_trylock_irq(&compute_write_lock[thread_id]);
 }
 
 
 extern void kcompute_write_lock(int thread_id) {
-  spin_lock(&compute_write_lock[thread_id]);
+  spin_lock_irq(&compute_write_lock[thread_id]);
 }
 
 
 extern void kcompute_write_unlock(int thread_id) {
-  spin_unlock(&compute_write_lock[thread_id]);
+  spin_unlock_irq(&compute_write_lock[thread_id]);
 }
 
 
 extern bool kcompute_read_trylock(int thread_id) {
-  return spin_trylock(&compute_read_lock[thread_id]);
+  return spin_trylock_irq(&compute_read_lock[thread_id]);
 }
 
 
 extern void kcompute_read_lock(int thread_id) {
-  spin_lock(&compute_read_lock[thread_id]);
+  spin_lock_irq(&compute_read_lock[thread_id]);
 }
 
 
 extern void kcompute_read_unlock(int thread_id) {
-  spin_unlock(&compute_read_lock[thread_id]);
+  spin_unlock_irq(&compute_read_lock[thread_id]);
 }
 
 
 extern bool kwriter_write_trylock(int thread_id) {
-  return spin_trylock(&writer_write_lock[thread_id]);
+  return spin_trylock_irq(&writer_write_lock[thread_id]);
 }
 
 
 extern void kwriter_write_lock(int thread_id) {
-  spin_lock(&writer_write_lock[thread_id]);
+  spin_lock_irq(&writer_write_lock[thread_id]);
 }
 
 
 extern void kwriter_write_unlock(int thread_id) {
-  spin_unlock(&writer_write_lock[thread_id]);
+  spin_unlock_irq(&writer_write_lock[thread_id]);
 }
 
 
 extern bool kwriter_read_trylock(int thread_id) {
-  return spin_trylock(&writer_read_lock[thread_id]);
+  return spin_trylock_irq(&writer_read_lock[thread_id]);
 }
 
 
 extern void kwriter_read_lock(int thread_id) {
-  spin_lock(&writer_read_lock[thread_id]);
+  spin_lock_irq(&writer_read_lock[thread_id]);
 }
 
 
 extern void kwriter_read_unlock(int thread_id) {
-  spin_unlock(&writer_read_lock[thread_id]);
+  spin_unlock_irq(&writer_read_lock[thread_id]);
 }
 
 

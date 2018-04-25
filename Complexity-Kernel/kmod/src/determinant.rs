@@ -29,64 +29,65 @@ fn i128abs(num: i128) -> i128 {
 
 
 fn i128div(mut l: i128, mut r: i128) -> i128 {
-  let mut signed : bool = false;
-  if (l < 0 && r > 0) || (l > 0 && r < 0) {
-    signed = true;
-  }
-  l = i128abs(l);
-  r = i128abs(r);
+  return l / r;
+  //let mut signed : bool = false;
+  //if (l < 0 && r > 0) || (l > 0 && r < 0) {
+  //  signed = true;
+  //}
+  //l = i128abs(l);
+  //r = i128abs(r);
 
-  if r > l {
-    if signed {
-      return -1;
-    } else {
-      return 0;
-    }
-  }
+  //if r > l {
+  //  if signed {
+  //    return -1;
+  //  } else {
+  //    return 0;
+  //  }
+  //}
 
-  if r == l {
-    if signed {
-      return -1;
-    } else {
-      return 1;
-    }
-  }
+  //if r == l {
+  //  if signed {
+  //    return -1;
+  //  } else {
+  //    return 1;
+  //  }
+  //}
 
-  let mut current : i128 = 1;
-  let mut dividend : i128 = l;
-  let mut divisor : i128 = r;
-  let mut result : i128 = 0;
+  //let mut current : i128 = 1;
+  //let mut dividend : i128 = l;
+  //let mut divisor : i128 = r;
+  //let mut result : i128 = 0;
 
-  while dividend >= divisor {
-    current = current << 1;
-    divisor = divisor << 1;   
-  }
+  //while dividend >= divisor {
+  //  current = current << 1;
+  //  divisor = divisor << 1;   
+  //}
 
-  current = current >> 1;
-  divisor = divisor >> 1;
+  //current = current >> 1;
+  //divisor = divisor >> 1;
 
-  while current != 0 {
-    if dividend >= divisor {
-      dividend = dividend - divisor;
-      result = current | result;
-    }
-    current = current >> 1;
-    divisor = divisor >> 1;
-  }
+  //while current != 0 {
+  //  if dividend >= divisor {
+  //    dividend = dividend - divisor;
+  //    result = current | result;
+  //  }
+  //  current = current >> 1;
+  //  divisor = divisor >> 1;
+  //}
 
-  if dividend == 0 {
-    if signed {
-      return -result;
-    } else {
-      return result;
-    }
-  } else {
-    if signed {
-      return -(result + 1);
-    } else {
-      return result;
-    }
-  }
+  //if dividend == 0 {
+  //  if signed {
+  //    return -result;
+  //  } else {
+  //    return result;
+  //  }
+  //} else {
+  //  if signed {
+  //    return -(result + 1);
+  //  } else {
+  //    return result;
+  //  }
+  //}
 }
 
 
