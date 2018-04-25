@@ -26,7 +26,7 @@ MODULE_VERSION("0.1.0");
 #define PRINT(...)
 #endif
 
-#define NUM_COMP_THREADS 2
+#define NUM_COMP_THREADS 8
 
 // entry functions
 extern int init_module(void);

@@ -15,8 +15,8 @@ use determinant::MATRIX_LEN;
 use determinant::Fraction;
 use determinant::determinant_fn; 
 
-const N_WORKERS: usize = 2;
-const BULK_SIZE: usize = 2;
+const N_WORKERS: usize = 8;
+const BULK_SIZE: usize = 4;
 const LIFE: i64 = 1;
 
 static mut BUF1: [[[i32; MATRIX_LEN * MATRIX_LEN]; BULK_SIZE]; N_WORKERS] = [[[0; MATRIX_LEN * MATRIX_LEN]; BULK_SIZE]; N_WORKERS];
@@ -74,6 +74,7 @@ pub fn rust_writer() {
   while kdev::measure_get_terminate() == false {
     kdev::schedule(10);
     while kdev::writer_read_trylock(order) == false {
+      kdev::schedule(1);
       if kdev::measure_get_terminate() == true {
         kdev::writer_set_terminate();
         return;
@@ -82,14 +83,14 @@ pub fn rust_writer() {
 
     for b in 0..BULK_SIZE {
       unsafe {
-        WRITE_DETS[b] = RESULTS.get_unchecked(order as usize).get_unchecked(b).clone();
+        *WRITE_DETS.get_unchecked_mut(b) = RESULTS.get_unchecked(order as usize).get_unchecked(b).clone();
       };
     }
     kdev::writer_write_unlock(order);
 
     for b in 0..BULK_SIZE {
       unsafe {
-        let mut det = WRITE_DETS[b];
+        let mut det = WRITE_DETS.get_unchecked(b).clone();
         kdev::kdev_write(&mut det as *mut i64, 8);
       }
     }
