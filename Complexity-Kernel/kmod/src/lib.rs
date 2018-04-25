@@ -15,9 +15,10 @@ use determinant::MATRIX_LEN;
 use determinant::Fraction;
 use determinant::determinant_fn; 
 
-const N_WORKERS: usize = 6;
-const BULK_SIZE: usize = 16;
+const N_WORKERS: usize = 30;
+const BULK_SIZE: usize = 1;
 const LIFE: usize = 180;
+const TOTAL: usize = 250000;
 
 static mut BUF1: [[[i32; MATRIX_LEN * MATRIX_LEN]; BULK_SIZE]; N_WORKERS] = [[[0; MATRIX_LEN * MATRIX_LEN]; BULK_SIZE]; N_WORKERS];
 static mut BUF2: [[[i32; MATRIX_LEN * MATRIX_LEN]; BULK_SIZE]; N_WORKERS] = [[[0; MATRIX_LEN * MATRIX_LEN]; BULK_SIZE]; N_WORKERS];
@@ -152,7 +153,7 @@ pub fn rust_compute(thread_id: i32) {
       unsafe {
         *COMPUTE_DETS.get_unchecked_mut(thread_id as usize).get_unchecked_mut(b) = det;
       }
-      kdev::schedule(1);
+      //kdev::schedule(0);
     }
 
     while kdev::writer_write_trylock(thread_id) == false {
@@ -181,24 +182,32 @@ pub fn rust_compute(thread_id: i32) {
 #[no_mangle]
 pub fn rust_measure() {
   println!("Measure thread start");
+  let init_time: i64 = kdev::get_time();
   let prev_time: i64 = kdev::get_time();
   let mut time: i64 = kdev::get_time();
   let mut prev_num = 0;
   let mut count = 0;
+  let mut sum = 0;
   while time - prev_time < LIFE as i64 {
-    kdev::sleep(1000);
+    kdev::sleep(100);
     let ret : i32 = unsafe {
       kdev::get_no_det_cals() 
     };
     let curr_num = ret - prev_num;
+    sum = sum + curr_num;
     prev_num = ret;
-    println!("Lib->Number correction determinants %d", curr_num);
+    //println!("Lib->Number correction determinants %d", curr_num);
     time = kdev::get_time();
     unsafe {
       *RETS.get_unchecked_mut(count) = curr_num;
     }
     count = count + 1;
+    if sum >= TOTAL as i32 {
+      break;
+    }
   }
+  let final_time: i64 = kdev::get_time();
+  println!("Lib->Calculation Time %lld s\n", final_time - init_time);
   kdev::measure_set_terminate();
   println!("Lib->Wait for reader terminate");
   while kdev::reader_get_terminate() == false {}

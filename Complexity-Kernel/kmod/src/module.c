@@ -29,7 +29,7 @@ MODULE_VERSION("0.1.0");
 #define PRINT(...)
 #endif
 
-#define NUM_COMP_THREADS 6
+#define NUM_COMP_THREADS 30
 
 // entry functions
 extern void rust_init(void);
@@ -233,7 +233,6 @@ extern void kinit_thread(void) {
   reader_id = NUM_COMP_THREADS;
   writer_id = NUM_COMP_THREADS + 1;
   measure_id = NUM_COMP_THREADS + 2;
-
 
   size_t i;
   for (i = 0; i < NUM_COMP_THREADS; ++i) {
